@@ -1,11 +1,11 @@
 # dot-line
 
-NxN game field with dots and lines.
-Each player draw line between dots.
-When we have no lines - first line could be drown anywhere between 2 dots.
-Each new line should starts from existed one.
-If player fill square - it becomes owner of square.
-Winner - who fills more squares in Game field.
+NxN game field with dots and lines.\
+Each player draw line between dots.\
+When we have no lines - first line could be drown anywhere between 2 dots.\
+Each new line should starts from existed one.\
+If player fill square - it becomes owner of square.\
+Winner - who fills more squares in Game field.\
 
 ## Recommended IDE Setup
 
