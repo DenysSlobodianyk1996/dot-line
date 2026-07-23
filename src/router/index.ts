@@ -6,7 +6,7 @@ const router = createRouter({
   routes: [
     {
       path: '/game',
-      component: DotLineGamePage
+      component: DotLineGamePage,
     },
     {
       path: '/:pathMatch(.*)*',
