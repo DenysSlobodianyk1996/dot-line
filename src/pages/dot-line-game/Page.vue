@@ -1,18 +1,37 @@
 <template>
   <component
-    :is="dotLineGame.isGameStarted ? Game : GameSetup"
-    :dot-line-game="dotLineGame"
-    @game-setup="gameSetup"
-  ></component>
+    :is="componentConfig.component"
+    v-bind="componentConfig.props"
+    v-on="componentConfig.listeners">
+  </component>
 </template>
 
 <script setup lang="ts">
 import { DotLineGame, type GameSetupForm } from '@/models'
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import GameSetup from './game-setup/GameSetup.vue'
 import Game from './Game.vue'
 
 const dotLineGame = reactive<DotLineGame>(new DotLineGame())
+
+const componentConfig = computed(() => {
+  if (dotLineGame.isGameStarted) {
+    return {
+      component: Game,
+      props: {
+        dotLineGame,
+      },
+      listeners: {}
+    }
+  }
+  return {
+    component: GameSetup,
+    props: {},
+    listeners: {
+      gameSetup
+    }
+  }
+})
 
 function gameSetup({ player1, player2, size }: GameSetupForm) {
   dotLineGame.setPlayer1(player1).setPlayer2(player2).setSize(size)
