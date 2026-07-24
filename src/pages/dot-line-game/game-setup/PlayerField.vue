@@ -35,8 +35,13 @@ import BaseInput from '@/shared/components/BaseInput.vue'
 import BaseFieldError from '@/shared/components/BaseFieldError.vue'
 
 defineRule('required', required)
-defineRule('differentFromAll', (fieldValue: string, otherValues: string) => {
-  return !otherValues.includes(fieldValue) || 'Values must be different'
+defineRule('differentFromAll', (fieldValue: string, otherValues: string[]) => {
+  return (
+    !otherValues
+      ?.filter(Boolean)
+      ?.map((s) => s.toLocaleLowerCase())
+      ?.includes(fieldValue?.toLowerCase()) || 'Values must be different'
+  )
 })
 
 const props = defineProps<{

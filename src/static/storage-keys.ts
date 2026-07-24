@@ -1,0 +1,1 @@
+export const CURRENT_GAME = 'CURRENT_GAME'
