@@ -31,6 +31,10 @@ export class DotLineGame {
     return this
   }
 
+  getPlayerByName(name: string): Player | null {
+    return [this.player1, this.player2].find((p) => p?.name === name) || null
+  }
+
   get isGameStarted(): boolean {
     return !!this.player1 && !!this.player2 && !!this.size && this.size > 0
   }

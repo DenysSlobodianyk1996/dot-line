@@ -21,7 +21,7 @@ import { CURRENT_GAME } from '@/static/storage-keys.ts'
 
 const dotLineGame = reactive<DotLineGame>(new DotLineGame())
 
-const savedGame: DotLineGame = StorageService.getItem(CURRENT_GAME)
+const savedGame: DotLineGame = StorageService.getItem(CURRENT_GAME, { applyParse: true })
 dotLineGame.reset(savedGame)
 
 const componentConfig = computed(() => {

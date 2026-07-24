@@ -3,7 +3,7 @@ export const StorageService = {
     const saveValue = typeof value === 'object' ? JSON.stringify(value) : value
     localStorage.setItem(key, saveValue)
   },
-  getItem(key: string, applyParse?: boolean) {
+  getItem(key: string, { applyParse }: { applyParse?: boolean } = {}) {
     const value = localStorage.getItem(key)
     try {
       return applyParse && value ? JSON.parse(value) : value
