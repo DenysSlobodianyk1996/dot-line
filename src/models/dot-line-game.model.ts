@@ -40,7 +40,7 @@ export class DotLineGame {
   }
 
   reset(game?: DotLineGame) {
-    Object.assign(this, new DotLineGame(game))
+    Object.assign(this, new DotLineGame(game || {}))
     return
   }
 }
