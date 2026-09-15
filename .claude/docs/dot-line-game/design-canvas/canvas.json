@@ -17,7 +17,7 @@
       "x": 0,
       "y": 0,
       "w": 390,
-      "h": 960
+      "h": 1120
     },
     {
       "file": "MobileGame.dc.html",
@@ -35,7 +35,7 @@
       "x": 940,
       "y": 0,
       "w": 390,
-      "h": 960
+      "h": 1120
     },
     {
       "file": "MobileGameN10.dc.html",
@@ -44,7 +44,7 @@
       "x": 1410,
       "y": 0,
       "w": 390,
-      "h": 844
+      "h": 900
     },
     {
       "file": "MobileStopConfirm.dc.html",
@@ -53,7 +53,7 @@
       "x": 1880,
       "y": 0,
       "w": 320,
-      "h": 568
+      "h": 640
     },
     {
       "file": "MobileResult.dc.html",
@@ -65,12 +65,21 @@
       "h": 844
     },
     {
+      "file": "MobileSetupEnglish.dc.html",
+      "title": "14 · Mobile setup, English",
+      "page": "page-2",
+      "x": 2750,
+      "y": 0,
+      "w": 390,
+      "h": 1040
+    },
+    {
       "file": "Setup.dc.html",
       "title": "1 · Game setup, rules shown",
       "x": 0,
       "y": 0,
       "w": 560,
-      "h": 600
+      "h": 760
     },
     {
       "file": "FirstMove.dc.html",
@@ -78,7 +87,7 @@
       "x": 640,
       "y": 0,
       "w": 480,
-      "h": 400
+      "h": 460
     },
     {
       "file": "Main.dc.html",
@@ -86,7 +95,7 @@
       "x": 1200,
       "y": 0,
       "w": 480,
-      "h": 400
+      "h": 460
     },
     {
       "file": "GameRules.dc.html",
@@ -94,31 +103,39 @@
       "x": 1760,
       "y": 0,
       "w": 480,
-      "h": 640
+      "h": 800
     },
     {
       "file": "StopConfirm.dc.html",
       "title": "4 · Stop confirmation",
       "x": 0,
-      "y": 780,
+      "y": 940,
       "w": 480,
-      "h": 400
+      "h": 460
     },
     {
       "file": "ResultWinner.dc.html",
       "title": "5 · Result, winner",
       "x": 560,
-      "y": 780,
+      "y": 940,
       "w": 480,
-      "h": 400
+      "h": 460
     },
     {
       "file": "ResultDraw.dc.html",
       "title": "6 · Result, draw",
       "x": 1120,
-      "y": 780,
+      "y": 940,
       "w": 480,
-      "h": 400
+      "h": 460
+    },
+    {
+      "file": "SetupEnglish.dc.html",
+      "title": "15 · Game setup, English",
+      "x": 1680,
+      "y": 940,
+      "w": 560,
+      "h": 720
     }
   ],
   "annotations": [
@@ -126,16 +143,16 @@
       "id": "dot-states",
       "x": 2320,
       "y": 0,
-      "w": 280,
-      "text": "Dot states\n• Small gray dot: not clickable\n• Blue ring: valid start (MV-2, MV-4)\n• Solid dot in the current player's color: selected Dot1\n• Dashed ring in the current player's color: valid Dot2 neighbor (MV-3, MV-5)\n\nBoard shown at N=4, 48 px squares. Sample players: Ann and Bob.\nSpec: .claude/docs/dot-line-game/requirements.md"
+      "w": 300,
+      "text": "Dot states\n• Small gray dot: not clickable\n• Blue ring: valid start (MV-2, MV-4)\n• Solid dot in the current player's color: selected Dot1\n• Dashed ring in the current player's color: valid Dot2 neighbor (MV-3, MV-5)\n\nBoard shown at N=4, 48 px squares. Sample players: Оля and Богдан on Ukrainian screens, Ann and Bob on English ones.\n\nLanguages: the UA / EN toggle is at the top right of every screen. Ukrainian is the default (I18N-2, I18N-3); screen 15 shows English.\nAll text comes from src/i18n/locales.\nSpec: .claude/docs/dot-line-game/requirements.md"
     },
     {
       "id": "mobile-notes",
       "page": "page-2",
-      "x": 2750,
+      "x": 3220,
       "y": 0,
       "w": 300,
-      "text": "Mobile layout (below 640 px wide)\n• Board on top, centered; panel below at full width (MB-2)\n• Squares stay 48 px while the board fits, then shrink to fit the screen, 24 px minimum (MB-3)\n• Each dot is tappable across a whole square, up to 44 px (MB-4)\n• Buttons are at least 44 px tall (MB-8)\n• Rules: toggle at the bottom; shown by default on setup, hidden during a game (RL-2, RL-3)\n\nFrom 640 px up, the desktop layout on the Desktop page applies.\nOpen for confirmation: 640 px breakpoint, board-first order, shrink instead of scroll."
+      "text": "Mobile layout (below 640 px wide)\n• Board on top, centered; panel below at full width (MB-2)\n• Squares stay 48 px while the board fits, then shrink to fit the screen, 24 px minimum (MB-3)\n• Each dot is tappable across a whole square, up to 44 px (MB-4)\n• Buttons are at least 44 px tall (MB-8)\n• Rules: toggle at the bottom; shown by default on setup, hidden during a game (RL-2, RL-3)\n• Languages: UA / EN toggle at the top right, 44 × 44 px buttons, Ukrainian by default; screen 14 shows English (I18N-2, I18N-3, I18N-5)\n\nFrom 640 px up, the desktop layout on the Desktop page applies.\nOpen for confirmation: 640 px breakpoint, board-first order, shrink instead of scroll."
     }
   ],
   "launch": {

@@ -6,13 +6,13 @@ Implements [requirements.md](requirements.md). Requirement IDs are shown in brac
 
 Claude Design canvas (approved 2026-09-15, static mockups): https://claude.ai/artifact/H54pzHj9XtpJ6A4CVc3pnA
 
-The artboards match the app's current Tailwind styles (`Base*` components, gray/blue palette). The board is shown at N=4 with 48 px squares, and the sample players are Ann and Bob.
+The artboards match the app's current Tailwind styles (`Base*` components, gray/blue palette). The board is shown at N=4 with 48 px squares. The sample players are Оля and Богдан on the Ukrainian screens (1–13) and Ann and Bob on the English screens (14, 15).
 
 1. Game setup (current form) [GS-1, GS-2]
 2. First move: empty board, every dot a valid start [MV-1, MV-4, GB-4]
-3. Mid-game: Bob to move, Dot1 (1,2) selected, valid Dot2 at (2,2) and (1,3), other valid starts (2,0), (2,1), (0,3), owned squares with fill and initial [MV-2, MV-3, MV-5, GB-2, GB-3]
+3. Mid-game: Богдан to move, Dot1 (1,2) selected, valid Dot2 at (2,2) and (1,3), other valid starts (2,0), (2,1), (0,3), owned squares with fill and initial [MV-2, MV-3, MV-5, GB-2, GB-3]
 4. Stop confirmation [END-2]
-5. Result, winner (Bob 9, Ann 7): result panel beside the final board, with New game and Rematch [END-3..6]
+5. Result, winner (Богдан 9, Оля 7): result panel beside the final board, with New game and Rematch [END-3..6]
 6. Result, draw (8 each) [END-3, END-4]
 
 "Mobile" page (390 px wide phone frames):
@@ -25,6 +25,8 @@ The artboards match the app's current Tailwind styles (`Base*` components, gray/
 12. Game at N=4 with the rules open [RL-2..4]
 
 Rules additions: setup screens 1 and 7 end with "Hide rules" and the rules card. Every game screen ends with "Show rules" (full width on phones). Desktop artboard 13, "Game, rules open", shows the rules card beside-the-board layout [RL-1..4].
+
+Languages: every screen has the UA / EN toggle at the top right. Screens 1–13 show the default Ukrainian UI, with sample players Оля and Богдан and "UA" pressed. Screens 14, "Mobile setup, English", and 15, "Game setup, English", show the English UI with "EN" pressed [I18N-1..5]. The generator reads all text from `src/i18n/locales`, so the canvas uses exactly the app's strings.
 
 Source files for the artboards are in [design-canvas/](design-canvas/) (`*.dc.html` plus `canvas.json`). They were generated from the board data, so board state and highlights are consistent with the rules below.
 
@@ -181,7 +183,7 @@ The phone layout is the default, and `sm:` classes (640 px and up) restore the d
 
 ## Rules [RL-1..5, APP-1]
 
-- **GameRules.vue** [RL-1, RL-5]: a `section` card (`rounded-lg border border-gray-300 bg-white p-4`, gap 12 px) labelled by its "How to play" heading (`text-sm font-semibold text-gray-900`). Below it, an ordered list of five rules (`text-sm text-gray-700`, gap 8 px), each with a 20 px round `bg-gray-200` number. The rules text lives in the component:
+- **GameRules.vue** [RL-1, RL-5]: a `section` card (`rounded-lg border border-gray-300 bg-white p-4`, gap 12 px) labelled by its "How to play" heading (`text-sm font-semibold text-gray-900`). Below it, an ordered list of five rules (`text-sm text-gray-700`, gap 8 px), each with a 20 px round `bg-gray-200` number. The rules text comes from `rules.step1`–`step5` in `src/i18n/locales` (see Languages). The English wording is:
   1. Take turns drawing a line between two neighboring dots: left, right, up or down.
   2. The first line can go anywhere. After that, start from a dot that already has a line.
   3. Draw the fourth side of a square to claim it. One line can claim two squares.
@@ -193,4 +195,32 @@ The phone layout is the default, and `sm:` classes (640 px and up) restore the d
   - The `defaultOpen` prop sets the initial state, and the state isn't saved.
 - **GameSetup.vue**: `<RulesToggle default-open class="mt-4" />` after the form, inside the existing `max-w-130` column.
 - **Game.vue**: the board and panel row sits in a `flex flex-col gap-4` wrapper, followed by `<RulesToggle class="w-full sm:max-w-130" />` (closed by default).
-- **index.html** [APP-1]: `<title>Dot Line Game</title>`. The deploy workflow's `404.html` copy inherits it.
+- **index.html** [APP-1]: `<html lang="uk">` with `<title>Точки й лінії</title>`, the default before the app starts. At runtime the title and `lang` follow the language (see Languages). The deploy workflow's `404.html` copy inherits the same defaults.
+
+## Languages [I18N-1..6, APP-1]
+
+Library: `vue-i18n` with the Composition API (`legacy: false`). The design canvas shows the Ukrainian UI by default, plus English setup screens (see Visual draft).
+
+```
+src/i18n/
+  index.ts          # createI18n, SUPPORTED_LOCALES, setLocale(), vee-validate message config
+  locales/
+    en.ts           # source of keys (app, language, setup, validation, game, status, result, rules)
+    uk.ts           # typed as `typeof en`, so a missing or extra key fails type-check
+src/shared/components/LanguageToggle.vue
+```
+
+- **index.ts**:
+  - `SUPPORTED_LOCALES = ['uk', 'en']` and `DEFAULT_LOCALE = 'uk'` [I18N-2].
+  - The initial locale is the saved `LOCALE` value from localStorage (through `StorageService`), if it's supported, otherwise `uk` [I18N-4]. `fallbackLocale` is `en`.
+  - `setLocale(locale)` sets `i18n.global.locale.value`, saves `LOCALE`, then sets `document.documentElement.lang` and `document.title = t('app.title')` [I18N-3, APP-1]. The same document update runs once at startup.
+  - `configure({ generateMessage })` from vee-validate: the `differentFromAll` rule gets `validation.differentNames`, and every other rule gets `validation.invalid` with `{ field }`. `field` is the `<Field>`'s translated `label` [GS-1, I18N-1]. The custom rule returns `false`, not a hard-coded string. Messages are generated when validation runs, so a message already on screen updates on the next validation [I18N-6].
+- **Message keys**: `rules.step1`–`step5` for the rules, `game.hintFirstLine` / `hintSelected` / `hintStart` for hints, `game.dotLabel` with `{row}`/`{col}`, `result.wins` with `{name}`, `setup.player` / `setup.playerName` with `{number}`. Player names are passed in as parameters and never translated.
+- **Components** call `const { t } = useI18n()`. `PlayerField` takes `number` (1 or 2) instead of a `label` string.
+- **LanguageToggle.vue** [I18N-3, I18N-5]:
+  - A `role="group"` element labelled `t('language.label')`: `inline-flex rounded-md border border-gray-300 bg-white p-0.5 shadow-sm`.
+  - One button per locale, showing "UA" / "EN" with `aria-label` set to the language's own name ("Українська" / "English"), `lang` set to the locale, and `aria-pressed`.
+  - Pressed style `bg-blue-600 text-white`; otherwise `text-gray-700 hover:bg-gray-100`. Size `min-h-11 min-w-11 px-3 text-sm font-medium`, with `sm:min-h-8 sm:min-w-0` from 640 px up.
+- **App.vue**: `<header class="mb-2 flex justify-end">` with `LanguageToggle`, above `RouterView`, so it's on every screen.
+- **vite.config.ts**: `define` sets the vue-i18n esm-bundler flags: `__VUE_I18N_FULL_INSTALL__: true`, `__VUE_I18N_LEGACY_API__: false`, `__INTLIFY_PROD_DEVTOOLS__: false`.
+- **StorageService.setItem** accepts a `string` as well as an `object`, and strings are stored as they are.
