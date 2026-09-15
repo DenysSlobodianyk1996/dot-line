@@ -70,4 +70,4 @@ src/
 
 ## Specs and design
 
-Features are built spec-first. The requirements (with IDs and acceptance criteria), the design and the task list are in [`.claude/docs/`](.claude/docs/README.md). The desktop and mobile screen designs are in a private Claude Design canvas linked from [design.md](.claude/docs/dot-line-game/design.md).
+Features are built spec-first. The requirements (with IDs and acceptance criteria), the design and the task list are in [`.claude/docs/`](.claude/docs/README.md). The desktop and mobile screen designs (setup, gameplay, rules, stop confirmation and results) are in the [Claude Design canvas](https://claude.ai/artifact/H54pzHj9XtpJ6A4CVc3pnA). It opens on claude.ai, and the "Mobile" and "Desktop" pages are in its toolbar.
