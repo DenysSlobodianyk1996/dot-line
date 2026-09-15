@@ -14,9 +14,8 @@
   </style>
 </helmet>
 
-<div style="position: relative; width: 480px; min-height: 400px; padding: 8px; background: #ffffff;">
-  <div style="display: flex; flex-direction: column; gap: 16px;">
-    <div style="display: flex; gap: 24px; align-items: flex-start;">
+<div style="position: relative; width: 390px; min-height: 960px; padding: 8px; background: #ffffff;">
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
   <div style="position: relative; width: 226px; height: 226px; flex-shrink: 0; border-radius: 8px; border: 1px solid #d1d5dc; background: #ffffff;">
     <div style="position: absolute; left: 16px; top: 16px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: rgba(50, 160, 110, 0.3); font-size: 16px; line-height: 24px; font-weight: 700; color: #32a06e;">B</div>
     <div style="position: absolute; left: 64px; top: 16px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: rgba(205, 63, 90, 0.3); font-size: 16px; line-height: 24px; font-weight: 700; color: #cd3f5a;">A</div>
@@ -58,34 +57,35 @@
     <div style="position: absolute; left: 156px; top: 204px; width: 8px; height: 8px; display: flex; align-items: center; justify-content: center; border-radius: 9999px;  background: transparent;"><div style="width: 8px; height: 8px; border-radius: 9999px; background: #99a1af; "></div></div>
     <div style="position: absolute; left: 204px; top: 204px; width: 8px; height: 8px; display: flex; align-items: center; justify-content: center; border-radius: 9999px;  background: transparent;"><div style="width: 8px; height: 8px; border-radius: 9999px; background: #99a1af; "></div></div>
   </div>
-  <div style="width: 200px; display: flex; flex-direction: column; gap: 16px;">
-    <div style="display: flex; flex-direction: column; gap: 4px;">
-      <div style="display: block; font-size: 14px; line-height: 20px; font-weight: 500; color: #364153;">Turn</div>
-      <div style="display: flex; align-items: center; gap: 8px; font-size: 16px; line-height: 24px; font-weight: 600; color: #101828;"><div style="width: 12px; height: 12px; flex-shrink: 0; border-radius: 9999px; background: #32a06e;"></div><span>Bob</span></div>
-    </div>
-    <div style="display: flex; flex-direction: column; gap: 4px;">
-      <div style="display: block; font-size: 14px; line-height: 20px; font-weight: 500; color: #364153;">Score</div>
-      <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; line-height: 24px; color: #101828;"><div style="width: 12px; height: 12px; flex-shrink: 0; border-radius: 9999px; background: #cd3f5a;"></div><span style="flex-grow: 1;">Ann</span><span style="font-weight: 600; font-variant-numeric: tabular-nums;">1</span></div>
-      <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; line-height: 24px; color: #101828;"><div style="width: 12px; height: 12px; flex-shrink: 0; border-radius: 9999px; background: #32a06e;"></div><span style="flex-grow: 1;">Bob</span><span style="font-weight: 600; font-variant-numeric: tabular-nums;">2</span></div>
-    </div>
-    <p style="margin: 0; font-size: 14px; line-height: 20px; color: #6a7282;">Pick a highlighted dot to start a line.</p>
-    <div style="display: flex;"><div style="display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; background: #e5e7eb; padding: 8px 16px; font-size: 16px; line-height: 24px; color: #101828; cursor: pointer;">Stop</div></div>
-  </div>
-    </div>
-    <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px;">
-      <div style="display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; background: #e5e7eb; padding: 8px 16px; font-size: 16px; line-height: 24px; color: #101828; cursor: pointer;">Show rules</div>
-    </div>
-  </div>
-  <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(16, 24, 40, 0.4);">
-    <div style="width: 300px; display: flex; flex-direction: column; gap: 16px; border-radius: 8px; border: 1px solid #d1d5dc; background: #ffffff; padding: 24px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);">
-      <h3 style="margin: 0; font-size: 20px; line-height: 28px; font-weight: 700; color: #101828;">Stop the game?</h3>
-      <p style="margin: 0; font-size: 14px; line-height: 20px; color: #364153;">Whoever owns more squares now wins.</p>
-      <div style="display: flex; flex-direction: column;">
+  <div style="display: flex; flex-direction: column; gap: 16px; width: 100%;">
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <div style="display: block; font-size: 14px; line-height: 20px; font-weight: 500; color: #364153;">Turn</div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 16px; line-height: 24px; font-weight: 600; color: #101828;"><div style="width: 12px; height: 12px; flex-shrink: 0; border-radius: 9999px; background: #32a06e;"></div><span>Bob</span></div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <div style="display: block; font-size: 14px; line-height: 20px; font-weight: 500; color: #364153;">Score</div>
       <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; line-height: 24px; color: #101828;"><div style="width: 12px; height: 12px; flex-shrink: 0; border-radius: 9999px; background: #cd3f5a;"></div><span style="flex-grow: 1;">Ann</span><span style="font-weight: 600; font-variant-numeric: tabular-nums;">1</span></div>
       <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; line-height: 24px; color: #101828;"><div style="width: 12px; height: 12px; flex-shrink: 0; border-radius: 9999px; background: #32a06e;"></div><span style="flex-grow: 1;">Bob</span><span style="font-weight: 600; font-variant-numeric: tabular-nums;">2</span></div>
       </div>
-      <div style="display: flex; gap: 8px; justify-content: flex-end;"><div style="display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; background: #e5e7eb; padding: 8px 16px; font-size: 16px; line-height: 24px; color: #101828; cursor: pointer;">Cancel</div><div style="display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; background: #155dfc; padding: 8px 16px; font-size: 14px; line-height: 20px; font-weight: 500; color: #ffffff; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); cursor: pointer;">Stop game</div></div>
     </div>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: #6a7282;">Pick a highlighted dot to start a line.</p>
+    <div style="display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; background: #e5e7eb; padding: 8px 16px; font-size: 16px; line-height: 24px; color: #101828; cursor: pointer; min-height: 44px; width: 100%;">Stop</div>
+  </div>
+    <div style="align-self: stretch;">
+    <div style="display: flex; flex-direction: column; align-items: stretch; gap: 8px;">
+      <div style="display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; background: #e5e7eb; padding: 8px 16px; font-size: 16px; line-height: 24px; color: #101828; cursor: pointer; min-height: 44px; width: 100%;">Hide rules</div>
+      <div style="align-self: stretch; display: flex; flex-direction: column; gap: 12px; border-radius: 8px; border: 1px solid #d1d5dc; padding: 16px; background: #ffffff;">
+        <h4 style="margin: 0; font-size: 14px; line-height: 20px; font-weight: 600; color: #101828;">How to play</h4>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: flex-start; gap: 8px;"><span style="flex-shrink: 0; width: 20px; height: 20px; border-radius: 9999px; background: #e5e7eb; font-size: 12px; line-height: 20px; font-weight: 600; text-align: center; color: #364153;">1</span><span style="font-size: 14px; line-height: 20px; color: #364153;">Take turns drawing a line between two neighboring dots: left, right, up or down.</span></div>
+          <div style="display: flex; align-items: flex-start; gap: 8px;"><span style="flex-shrink: 0; width: 20px; height: 20px; border-radius: 9999px; background: #e5e7eb; font-size: 12px; line-height: 20px; font-weight: 600; text-align: center; color: #364153;">2</span><span style="font-size: 14px; line-height: 20px; color: #364153;">The first line can go anywhere. After that, start from a dot that already has a line.</span></div>
+          <div style="display: flex; align-items: flex-start; gap: 8px;"><span style="flex-shrink: 0; width: 20px; height: 20px; border-radius: 9999px; background: #e5e7eb; font-size: 12px; line-height: 20px; font-weight: 600; text-align: center; color: #364153;">3</span><span style="font-size: 14px; line-height: 20px; color: #364153;">Draw the fourth side of a square to claim it. One line can claim two squares.</span></div>
+          <div style="display: flex; align-items: flex-start; gap: 8px;"><span style="flex-shrink: 0; width: 20px; height: 20px; border-radius: 9999px; background: #e5e7eb; font-size: 12px; line-height: 20px; font-weight: 600; text-align: center; color: #364153;">4</span><span style="font-size: 14px; line-height: 20px; color: #364153;">After every line, the turn passes to the other player.</span></div>
+          <div style="display: flex; align-items: flex-start; gap: 8px;"><span style="flex-shrink: 0; width: 20px; height: 20px; border-radius: 9999px; background: #e5e7eb; font-size: 12px; line-height: 20px; font-weight: 600; text-align: center; color: #364153;">5</span><span style="font-size: 14px; line-height: 20px; color: #364153;">The game ends when all squares are claimed or someone presses Stop. Most squares wins; equal scores are a draw.</span></div>
+        </div>
+      </div>
+    </div></div>
   </div>
 </div>
 </x-dc>

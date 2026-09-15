@@ -12,12 +12,12 @@
   "artboards": [
     {
       "file": "MobileSetup.dc.html",
-      "title": "7 · Mobile setup",
+      "title": "7 · Mobile setup, rules shown",
       "page": "page-2",
       "x": 0,
       "y": 0,
       "w": 390,
-      "h": 844
+      "h": 960
     },
     {
       "file": "MobileGame.dc.html",
@@ -29,10 +29,19 @@
       "h": 844
     },
     {
+      "file": "MobileGameRules.dc.html",
+      "title": "12 · Mobile game, rules open",
+      "page": "page-2",
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 960
+    },
+    {
       "file": "MobileGameN10.dc.html",
       "title": "9 · Mobile game, N=10 (34 px squares)",
       "page": "page-2",
-      "x": 940,
+      "x": 1410,
       "y": 0,
       "w": 390,
       "h": 844
@@ -41,7 +50,7 @@
       "file": "MobileStopConfirm.dc.html",
       "title": "10 · Stop confirmation at 320 px",
       "page": "page-2",
-      "x": 1410,
+      "x": 1880,
       "y": 0,
       "w": 320,
       "h": 568
@@ -50,18 +59,18 @@
       "file": "MobileResult.dc.html",
       "title": "11 · Mobile result",
       "page": "page-2",
-      "x": 1810,
+      "x": 2280,
       "y": 0,
       "w": 390,
       "h": 844
     },
     {
       "file": "Setup.dc.html",
-      "title": "1 · Game setup",
+      "title": "1 · Game setup, rules shown",
       "x": 0,
       "y": 0,
       "w": 560,
-      "h": 330
+      "h": 600
     },
     {
       "file": "FirstMove.dc.html",
@@ -69,7 +78,7 @@
       "x": 640,
       "y": 0,
       "w": 480,
-      "h": 340
+      "h": 400
     },
     {
       "file": "Main.dc.html",
@@ -77,37 +86,45 @@
       "x": 1200,
       "y": 0,
       "w": 480,
-      "h": 340
+      "h": 400
+    },
+    {
+      "file": "GameRules.dc.html",
+      "title": "13 · Game, rules open",
+      "x": 1760,
+      "y": 0,
+      "w": 480,
+      "h": 640
     },
     {
       "file": "StopConfirm.dc.html",
       "title": "4 · Stop confirmation",
       "x": 0,
-      "y": 480,
+      "y": 780,
       "w": 480,
-      "h": 340
+      "h": 400
     },
     {
       "file": "ResultWinner.dc.html",
       "title": "5 · Result, winner",
       "x": 560,
-      "y": 480,
+      "y": 780,
       "w": 480,
-      "h": 340
+      "h": 400
     },
     {
       "file": "ResultDraw.dc.html",
       "title": "6 · Result, draw",
       "x": 1120,
-      "y": 480,
+      "y": 780,
       "w": 480,
-      "h": 340
+      "h": 400
     }
   ],
   "annotations": [
     {
       "id": "dot-states",
-      "x": 1760,
+      "x": 2320,
       "y": 0,
       "w": 280,
       "text": "Dot states\n• Small gray dot: not clickable\n• Blue ring: valid start (MV-2, MV-4)\n• Solid dot in the current player's color: selected Dot1\n• Dashed ring in the current player's color: valid Dot2 neighbor (MV-3, MV-5)\n\nBoard shown at N=4, 48 px squares. Sample players: Ann and Bob.\nSpec: .claude/docs/dot-line-game/requirements.md"
@@ -115,10 +132,10 @@
     {
       "id": "mobile-notes",
       "page": "page-2",
-      "x": 2280,
+      "x": 2750,
       "y": 0,
       "w": 300,
-      "text": "Mobile layout (below 640 px wide)\n• Board on top, centered; panel below at full width (MB-2)\n• Squares stay 48 px while the board fits, then shrink to fit the screen, 24 px minimum (MB-3)\n• Each dot is tappable across a whole square, up to 44 px (MB-4)\n• Buttons are at least 44 px tall (MB-8)\n\nFrom 640 px up, the desktop layout on the Desktop page applies.\nOpen for confirmation: 640 px breakpoint, board-first order, shrink instead of scroll."
+      "text": "Mobile layout (below 640 px wide)\n• Board on top, centered; panel below at full width (MB-2)\n• Squares stay 48 px while the board fits, then shrink to fit the screen, 24 px minimum (MB-3)\n• Each dot is tappable across a whole square, up to 44 px (MB-4)\n• Buttons are at least 44 px tall (MB-8)\n• Rules: toggle at the bottom; shown by default on setup, hidden during a game (RL-2, RL-3)\n\nFrom 640 px up, the desktop layout on the Desktop page applies.\nOpen for confirmation: 640 px breakpoint, board-first order, shrink instead of scroll."
     }
   ],
   "launch": {
