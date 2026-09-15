@@ -82,7 +82,7 @@ Acceptance:
 
 Acceptance:
 - Given N=2 and the last line closes the last square, then the result panel appears immediately.
-- Given Ann 3, Bob 3 and I press Stop and confirm, then the panel shows "Draw 3 : 3".
+- Given Ann 3, Bob 3 and I press Stop and confirm, then the result panel shows "Draw" with Ann 3 and Bob 3.
 - Given I press Stop and cancel, then the game continues unchanged.
 
 ## PS: Persistence

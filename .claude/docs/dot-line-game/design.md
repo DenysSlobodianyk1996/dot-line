@@ -12,8 +12,8 @@ The artboards match the app's current Tailwind styles (`Base*` components, gray/
 2. First move: empty board, every dot a valid start [MV-1, MV-4, GB-4]
 3. Mid-game: Bob to move, Dot1 (1,2) selected, valid Dot2 at (2,2) and (1,3), other valid starts (2,0), (2,1), (0,3), owned squares with fill and initial [MV-2, MV-3, MV-5, GB-2, GB-3]
 4. Stop confirmation [END-2]
-5. Result, winner (Bob 9 : Ann 7) with New game and Rematch [END-3..6]
-6. Result, draw (8 : 8) [END-3, END-4]
+5. Result, winner (Bob 9, Ann 7): result panel beside the final board, with New game and Rematch [END-3..6]
+6. Result, draw (8 each) [END-3, END-4]
 
 Source files for the artboards are in [design-canvas/](design-canvas/) (`*.dc.html` plus `canvas.json`). They were generated from the board data, so board state and highlights are consistent with the rules below.
 
@@ -103,7 +103,7 @@ src/pages/dot-line-game/
   game/
     GameStatus.vue    # current player (name + swatch), scores, Stop button (confirm)
     GameBoard.vue     # SVG board; owns local selectedDot ref
-    GameResult.vue    # overlay panel: winner/Draw + scores, New game, Rematch
+    GameResult.vue    # replaces GameStatus beside the final board: winner/Draw + scores, New game, Rematch
 ```
 
 - **GameBoard.vue** [GB-1..3, MV-4..8]
@@ -119,7 +119,7 @@ src/pages/dot-line-game/
     - Anything else is ignored.
   - The selection is cleared when `status` becomes `finished`.
 - **GameStatus.vue** [GB-4, END-2]: uses `BaseButton color="secondary"` for Stop, and `window.confirm` (or a small confirm dialog) before `game.stop()`.
-- **GameResult.vue** [END-4..6]: shown when `status === 'finished'`, over the board.
+- **GameResult.vue** [END-4..6]: shown instead of `GameStatus` when `status === 'finished'`. It sits in the side column next to the board, so the whole final board stays visible.
   - New game: `StorageService.removeItem(CURRENT_GAME)` then `game.reset()`, which is the current `goBack()` behavior.
   - Rematch: `game.start()`.
 - **Game.vue**: the "Back" button is removed (replaced by Stop, then New game).
