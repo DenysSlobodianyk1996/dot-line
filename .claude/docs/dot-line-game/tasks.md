@@ -32,3 +32,11 @@ Ordered implementation checklist for [requirements.md](requirements.md) and [des
   - The hint reads "Pick the selected dot again to cancel.".
 
   _(MB-1, MB-3, MB-4, MB-7)_
+
+## Rules
+
+- [ ] **16. Rules design**: add the rules toggle and card to the setup screens (open) and game screens (closed) on both canvas pages, plus "Game, rules open" artboards for phone and desktop. _(RL-1..4)_
+- [ ] **17. Rules component**: `rules/GameRules.vue` with the five rules, and `rules/RulesToggle.vue` with the accessible Show/Hide button and `defaultOpen`. _(RL-1, RL-4, RL-5)_
+- [ ] **18. Wire rules into screens**: `GameSetup.vue` (open by default) and `Game.vue` (closed by default), with the toggle at the bottom. _(RL-2, RL-3)_
+- [ ] **19. Tab title**: `index.html` title "Dot Line Game". _(APP-1)_
+- [ ] **20. Rules QA**: render setup and game in a browser at phone and desktop widths, and check the toggle and the title.

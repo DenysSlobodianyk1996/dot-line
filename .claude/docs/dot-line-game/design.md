@@ -22,6 +22,9 @@ The artboards match the app's current Tailwind styles (`Base*` components, gray/
 9. Mid-game at N=10: squares shrink to 34 px to fit [MB-3]
 10. Stop confirmation [MB-5]
 11. Result, winner, with equal-width buttons [MB-6]
+12. Game at N=4 with the rules open [RL-2..4]
+
+Rules additions: setup screens 1 and 7 end with "Hide rules" and the rules card. Every game screen ends with "Show rules" (full width on phones). Desktop artboard 13, "Game, rules open", shows the rules card beside-the-board layout [RL-1..4].
 
 Source files for the artboards are in [design-canvas/](design-canvas/) (`*.dc.html` plus `canvas.json`). They were generated from the board data, so board state and highlights are consistent with the rules below.
 
@@ -122,6 +125,9 @@ src/pages/dot-line-game/
     GameStatus.vue    # turn, score, hint, Stop button and the Stop confirmation dialog
     GameResult.vue    # replaces GameStatus when finished: winner/Draw, score, New game, Rematch
     PlayerScore.vue   # one score row: color swatch, name, score
+  rules/
+    GameRules.vue     # "How to play" card with the five numbered rules
+    RulesToggle.vue   # Show/Hide rules button plus GameRules; used at the bottom of setup and game
 ```
 
 All sizes and colors come from the approved canvas.
@@ -172,3 +178,19 @@ The phone layout is the default, and `sm:` classes (640 px and up) restore the d
 - **Stop dialog** card: `w-full max-w-75`, inside the `p-4` backdrop.
 - **GameResult** on phones: New game and Rematch in `grid grid-cols-2 gap-2`, each `min-h-11`. From `sm` up they return to the wrapping row.
 - **GameSetup**: the player fieldsets row becomes `flex flex-col gap-2 sm:flex-row`.
+
+## Rules [RL-1..5, APP-1]
+
+- **GameRules.vue** [RL-1, RL-5]: a `section` card (`rounded-lg border border-gray-300 bg-white p-4`, gap 12 px) labelled by its "How to play" heading (`text-sm font-semibold text-gray-900`). Below it, an ordered list of five rules (`text-sm text-gray-700`, gap 8 px), each with a 20 px round `bg-gray-200` number. The rules text lives in the component:
+  1. Take turns drawing a line between two neighboring dots: left, right, up or down.
+  2. The first line can go anywhere. After that, start from a dot that already has a line.
+  3. Draw the fourth side of a square to claim it. One line can claim two squares.
+  4. After every line, the turn passes to the other player.
+  5. The game ends when all squares are claimed or someone presses Stop. Most squares wins; equal scores are a draw.
+- **RulesToggle.vue** [RL-2..4]: a `flex flex-col gap-2 sm:items-start` wrapper with a `BaseButton` secondary ("Hide rules" / "Show rules") and `GameRules` kept in the DOM with `v-show`.
+  - The button has `aria-expanded` and `aria-controls` pointing at the rules card's `useId()` id.
+  - On phones the button is `w-full min-h-11`; from `sm` up it is `sm:w-auto sm:min-h-0` and the card stretches (`sm:self-stretch`).
+  - The `defaultOpen` prop sets the initial state, and the state isn't saved.
+- **GameSetup.vue**: `<RulesToggle default-open class="mt-4" />` after the form, inside the existing `max-w-130` column.
+- **Game.vue**: the board and panel row sits in a `flex flex-col gap-4` wrapper, followed by `<RulesToggle class="w-full sm:max-w-130" />` (closed by default).
+- **index.html** [APP-1]: `<title>Dot Line Game</title>`. The deploy workflow's `404.html` copy inherits it.

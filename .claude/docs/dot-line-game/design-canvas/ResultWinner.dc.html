@@ -14,8 +14,9 @@
   </style>
 </helmet>
 
-<div style="position: relative; width: 480px; height: 340px; padding: 8px; background: #ffffff;">
-  <div style="display: flex; gap: 24px; align-items: flex-start;">
+<div style="position: relative; width: 480px; min-height: 400px; padding: 8px; background: #ffffff;">
+  <div style="display: flex; flex-direction: column; gap: 16px;">
+    <div style="display: flex; gap: 24px; align-items: flex-start;">
   <div style="position: relative; width: 226px; height: 226px; flex-shrink: 0; border-radius: 8px; border: 1px solid #d1d5dc; background: #ffffff;">
     <div style="position: absolute; left: 16px; top: 16px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: rgba(50, 160, 110, 0.3); font-size: 16px; line-height: 24px; font-weight: 700; color: #32a06e;">B</div>
     <div style="position: absolute; left: 64px; top: 16px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: rgba(205, 63, 90, 0.3); font-size: 16px; line-height: 24px; font-weight: 700; color: #cd3f5a;">A</div>
@@ -112,6 +113,10 @@
     </div>
     <div style="display: flex; flex-wrap: wrap; gap: 8px;"><div style="display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; background: #e5e7eb; padding: 8px 16px; font-size: 16px; line-height: 24px; color: #101828; cursor: pointer;">New game</div><div style="display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; background: #155dfc; padding: 8px 16px; font-size: 14px; line-height: 20px; font-weight: 500; color: #ffffff; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); cursor: pointer;">Rematch</div></div>
   </div>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px;">
+      <div style="display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; background: #e5e7eb; padding: 8px 16px; font-size: 16px; line-height: 24px; color: #101828; cursor: pointer;">Show rules</div>
+    </div>
   </div>
 </div>
 </x-dc>

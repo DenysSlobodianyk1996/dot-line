@@ -112,6 +112,25 @@ Acceptance:
 - Given a 320 px wide phone, when I press Stop, then the dialog has at least 16 px of space on both sides.
 - Given a 1024 px wide screen, then the layout is the desktop one (board with the panel beside it).
 
+## RL: Rules
+
+- **RL-1**: A short "How to play" rules section explains the game in five points: how lines are drawn, where a line can start, how squares are claimed, that turns alternate, and how the game ends and who wins.
+- **RL-2**: The setup screen and the game screen both end with a rules toggle button, with the rules shown below it when open. Both screens use the same rules component.
+- **RL-3**: The rules are shown by default on the setup screen ("Hide rules") and hidden by default on the game screen ("Show rules"). Pressing the button switches them, and the open/closed state isn't saved.
+- **RL-4**: The toggle button tells assistive technology whether the rules are shown (`aria-expanded`). Below 640 px wide it is full width and at least 44 px tall.
+- **RL-5**: The rules text matches the game rules (MV-1..3, SQ-1..2, TR-1, END-1..3). When a rule changes, its text changes with it.
+
+## APP: App
+
+- **APP-1**: The browser tab title is "Dot Line Game".
+
+Acceptance:
+- Given I open the setup screen, then "How to play" is shown below the form, and the button above it reads "Hide rules".
+- Given the rules are shown on setup, when I press "Hide rules", then they disappear and the button reads "Show rules".
+- Given a game in progress, then the rules are hidden and the button at the bottom reads "Show rules". When I press it, the same five rules appear.
+- Given a 390 px wide phone, then the rules button spans the screen width and is at least 44 px tall.
+- Given the app is open, then the browser tab reads "Dot Line Game".
+
 ## Confirmed in design review (2026-09-15)
 
 These started as assumptions and were accepted with the design canvas:
@@ -148,6 +167,10 @@ Every statement from the product owner's brief and follow-up answers, and where 
 | Answer: one game-level list of lines in the model | design data model |
 | Existing app: the game is kept in localStorage | PS-1, PS-2, PS-3 |
 | Follow-up request: take the mobile version into account | MB-1..MB-8 |
+| Follow-up request: change the "Vite App" title to "Dot Line Game" | APP-1 |
+| Follow-up request: short, user-friendly rules based on the README, as a component | RL-1, RL-5 |
+| Follow-up request: rules on the setup screen, behind the same toggle button at the bottom, shown by default | RL-2, RL-3 |
+| Follow-up request: a toggle button at the bottom of the game screen that shows the same rules component | RL-2, RL-3 |
 
 ## Open / assumed (mobile)
 
@@ -155,3 +178,10 @@ The mobile request didn't specify these details. They are shown on the "Mobile" 
 - The phone layout applies below 640 px wide (Tailwind `sm`) (MB-2, MB-6, MB-7, MB-8).
 - On phones the board comes first and the panel follows below it (MB-2).
 - Squares shrink to fit narrow screens instead of the board scrolling, with a 24 px minimum (MB-3).
+
+## Open / assumed (rules)
+
+The rules request didn't specify these details. They are shown on the design canvas for confirmation:
+- On the game screen the rules are hidden by default (RL-3).
+- The toggle button sits above the rules card, and its label switches between "Show rules" and "Hide rules" (RL-2, RL-3).
+- The rules use the five points in RL-1, headed "How to play" (RL-1).

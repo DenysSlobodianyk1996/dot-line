@@ -35,6 +35,8 @@
 
       <BaseButton color="primary" type="submit">Save</BaseButton>
     </Form>
+
+    <RulesToggle default-open class="mt-4" />
   </div>
 </template>
 
@@ -42,6 +44,7 @@
 import { Form, Field, defineRule } from 'vee-validate'
 import { required, min_value, max_value } from '@vee-validate/rules'
 import PlayerField from './PlayerField.vue'
+import RulesToggle from '../rules/RulesToggle.vue'
 import type { GameSetupForm } from '@/models'
 
 import BaseLabel from '@/shared/components/BaseLabel.vue'

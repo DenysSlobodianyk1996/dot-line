@@ -1,13 +1,17 @@
 <template>
-  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
-    <GameBoard v-model:selected-dot="selectedDot" :dot-line-game="dotLineGame" />
-    <GameResult
-      v-if="dotLineGame.isFinished"
-      :dot-line-game="dotLineGame"
-      @new-game="newGame"
-      @rematch="rematch"
-    />
-    <GameStatus v-else :dot-line-game="dotLineGame" :hint="hint" @stop="stop" />
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+      <GameBoard v-model:selected-dot="selectedDot" :dot-line-game="dotLineGame" />
+      <GameResult
+        v-if="dotLineGame.isFinished"
+        :dot-line-game="dotLineGame"
+        @new-game="newGame"
+        @rematch="rematch"
+      />
+      <GameStatus v-else :dot-line-game="dotLineGame" :hint="hint" @stop="stop" />
+    </div>
+
+    <RulesToggle class="w-full sm:max-w-130" />
   </div>
 </template>
 
@@ -19,6 +23,7 @@ import { computed, ref, watchEffect } from 'vue'
 import GameBoard from './game/GameBoard.vue'
 import GameResult from './game/GameResult.vue'
 import GameStatus from './game/GameStatus.vue'
+import RulesToggle from './rules/RulesToggle.vue'
 
 const props = defineProps<{
   dotLineGame: DotLineGame

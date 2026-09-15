@@ -10,7 +10,7 @@ A two-player dots-and-lines game in the browser. Players take turns connecting n
 4. **Squares**: drawing the fourth side of a square makes it yours. One line can close two squares. Turns alternate after every line.
 5. **End**: the game ends when every square has an owner, or when a player presses **Stop** and confirms. More squares wins, and equal scores are a draw. **Rematch** keeps the players and size; **New game** returns to setup.
 
-The game is saved in the browser's localStorage, so reloading the page continues where you left off. It works on desktop and on phones: on narrow screens the board sits above the panel and its squares shrink to fit.
+The game is saved in the browser's localStorage, so reloading the page continues where you left off. It works on desktop and on phones: on narrow screens the board sits above the panel and its squares shrink to fit. A short "How to play" guide is shown under the setup form, and during a game the **Show rules** button at the bottom brings it back.
 
 ## Getting started
 
@@ -62,7 +62,7 @@ Vue 3 (`<script setup>` with TypeScript), Vite, Tailwind CSS v4, vee-validate fo
 ```
 src/
   models/                game state and rules (DotLineGame, Dot, Line, Square)
-  pages/dot-line-game/   setup screen, game screen and the board components
+  pages/dot-line-game/   setup screen, game screen, board and rules components
   services/              localStorage wrapper
   shared/components/     base UI components (button, input, label)
 .claude/docs/            feature specs: requirements, design, tasks

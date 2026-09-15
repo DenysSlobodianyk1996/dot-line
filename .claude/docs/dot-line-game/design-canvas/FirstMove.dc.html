@@ -14,8 +14,9 @@
   </style>
 </helmet>
 
-<div style="position: relative; width: 480px; height: 340px; padding: 8px; background: #ffffff;">
-  <div style="display: flex; gap: 24px; align-items: flex-start;">
+<div style="position: relative; width: 480px; min-height: 400px; padding: 8px; background: #ffffff;">
+  <div style="display: flex; flex-direction: column; gap: 16px;">
+    <div style="display: flex; gap: 24px; align-items: flex-start;">
   <div style="position: relative; width: 226px; height: 226px; flex-shrink: 0; border-radius: 8px; border: 1px solid #d1d5dc; background: #ffffff;">
     <div style="position: absolute; left: 6px; top: 6px; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 9999px; border: 2px solid #2b7fff; background: rgba(43, 127, 255, 0.12);"><div style="width: 8px; height: 8px; border-radius: 9999px; background: #101828; "></div></div>
     <div style="position: absolute; left: 54px; top: 6px; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 9999px; border: 2px solid #2b7fff; background: rgba(43, 127, 255, 0.12);"><div style="width: 8px; height: 8px; border-radius: 9999px; background: #101828; "></div></div>
@@ -56,6 +57,10 @@
     <p style="margin: 0; font-size: 14px; line-height: 20px; color: #6a7282;">Pick any dot to start the first line.</p>
     <div style="display: flex;"><div style="display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; background: #e5e7eb; padding: 8px 16px; font-size: 16px; line-height: 24px; color: #101828; cursor: pointer;">Stop</div></div>
   </div>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px;">
+      <div style="display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; background: #e5e7eb; padding: 8px 16px; font-size: 16px; line-height: 24px; color: #101828; cursor: pointer;">Show rules</div>
+    </div>
   </div>
 </div>
 </x-dc>
