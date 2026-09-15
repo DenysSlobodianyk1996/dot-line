@@ -6,7 +6,7 @@
       :rules="`required|differentFromAll:${otherPlayerNames}`"
       v-slot="{ field, errorMessage }"
     >
-      <div class="flex flex-col gap-2">
+      <div class="flex min-w-0 flex-1 flex-col gap-2">
         <BaseLabel :for="field.name">Name</BaseLabel>
         <BaseInput v-bind="field" :id="field.name" :title="field.value" type="text" />
         <BaseFieldError :errorMessage />

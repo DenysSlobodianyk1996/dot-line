@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-full flex-col gap-4 sm:w-50">
+  <div class="flex w-full flex-col gap-4 sm:w-50 sm:shrink-0">
     <!-- phones: Turn and Score side by side (MB-2) -->
     <div class="grid grid-cols-2 gap-4 sm:flex sm:flex-col">
       <div class="flex min-w-0 flex-col gap-1">

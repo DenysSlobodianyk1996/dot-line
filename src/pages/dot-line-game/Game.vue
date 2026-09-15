@@ -28,7 +28,7 @@ const selectedDot = ref<Dot | null>(null)
 
 const hint = computed(() => {
   if (selectedDot.value) {
-    return 'Pick a highlighted neighbor to draw the line. Click the selected dot again to cancel.'
+    return 'Pick a highlighted neighbor to draw the line. Pick the selected dot again to cancel.'
   }
   if (props.dotLineGame.lines.length === 0) {
     return 'Pick any dot to start the first line.'

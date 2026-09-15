@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-full flex-col gap-4 sm:w-53">
+  <div class="flex w-full flex-col gap-4 sm:w-53 sm:shrink-0">
     <div class="flex flex-col gap-1">
       <div class="text-sm font-medium text-gray-700">Result</div>
       <div v-if="winner" class="flex items-center gap-2">

@@ -24,3 +24,11 @@ Ordered implementation checklist for [requirements.md](requirements.md) and [des
 - [ ] **14. Mobile QA**
   - Done: the square-size formula gives 48 px at N=4 on 320 and 390 px, 34 px at N=10 on 390 px, 27 px at N=10 on 320 px, and 48 px at 1024 px, and every board fits. Type-check, build and lint (only the existing `master` errors) pass, the responsive classes are in the built CSS, and the dev server compiles every changed component.
   - Remaining: check the MB acceptance criteria in a browser at 320, 390 and 1024 px wide.
+- [x] **15. Review fixes**
+  - From 640 px up, the square size accounts for the side panel, so large boards no longer scroll beside it (for example N=10 at 640–754 px). Both panels no longer shrink.
+  - The window is measured with `clientWidth`.
+  - Dot tap areas are square, and the focus outline isn't clipped at the board edge.
+  - The setup name field fills its fieldset.
+  - The hint reads "Pick the selected dot again to cancel.".
+
+  _(MB-1, MB-3, MB-4, MB-7)_

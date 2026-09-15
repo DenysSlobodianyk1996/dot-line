@@ -128,7 +128,7 @@ All sizes and colors come from the approved canvas.
 
 - **Game.vue**: a `flex items-start gap-6` row with GameBoard, then GameResult when finished, otherwise GameStatus. It holds `selectedDot` so GameStatus can show the hint:
   - no lines yet: "Pick any dot to start the first line."
-  - Dot1 selected: "Pick a highlighted neighbor to draw the line. Click the selected dot again to cancel."
+  - Dot1 selected: "Pick a highlighted neighbor to draw the line. Pick the selected dot again to cancel."
   - otherwise: "Pick a highlighted dot to start a line."
 
   Stop and Rematch clear the selection. The old "Back" button is gone; Stop, then New game, leads back to setup.
@@ -136,7 +136,7 @@ All sizes and colors come from the approved canvas.
   - Absolutely positioned elements inside a `rounded-lg border-gray-300` box of `N·cell + 32` px plus the border. `cell` is the square size: 48 px, or smaller on narrow screens (see Mobile). A dot's center is at `(16 + col·cell, 16 + row·cell)`.
   - Owned squares: `cell` px, owner color mixed at 30% over transparent, bold uppercase initial in the owner color.
   - Lines: `(cell + 4)`×4 px (horizontal) or 4×`(cell + 4)` px (vertical), centered on the dots, in the owner color.
-  - Dots are `<button>` tap areas of `min(cell, 44)` px with an `aria-label` [MB-4]. States:
+  - Dots are square `<button>` tap areas of `min(cell, 44)` px, with no border radius so the corners stay tappable. Each has an `aria-label`, and its focus outline is drawn 2 px inside the tap area so the board edge doesn't clip it [MB-4]. States:
     - idle: 8 px `gray-400` dot, disabled
     - start: 20 px ring with a 2 px `blue-500` border and `blue-500/12` fill, 8 px `gray-900` dot
     - selected: 26 px ring in the current player's color (12% fill), 12 px dot in that color with a white border
@@ -161,8 +161,13 @@ All sizes and colors come from the approved canvas.
 
 The phone layout is the default, and `sm:` classes (640 px and up) restore the desktop layout described above.
 
-- **Game.vue**: `flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6`. The board wrapper is centered on phones (`self-center sm:self-start`), and the panel is full width (`w-full`, with `sm:w-50` for GameStatus and `sm:w-53` for GameResult).
-- **Board size** (GameBoard): `cell = clamp(floor((viewportWidth − 16 − 34) / N), 24, 48)`. The 16 px is the app's `p-2` gutters, and the 34 px is the board's padding plus border. It updates on window `resize`. The board sits in an `overflow-x-auto max-w-full` wrapper for screens where 24 px squares still don't fit.
+- **Game.vue**: `flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6`. The board wrapper is centered on phones (`self-center sm:self-start`), and the panel is full width (`w-full`, with `sm:w-50 sm:shrink-0` for GameStatus and `sm:w-53 sm:shrink-0` for GameResult).
+- **Board size** (GameBoard): `cell = clamp(floor((viewportWidth − 16 − sidePanel − 34) / N), 24, 48)`.
+  - `viewportWidth` is `document.documentElement.clientWidth`, which excludes a desktop scrollbar.
+  - The 16 px is the app's `p-2` gutters, and the 34 px is the board's padding plus border.
+  - `sidePanel` is 0 in the stacked phone layout. When the panel sits beside the board, it is 236 px: the widest panel (GameResult, 212 px) plus the 24 px gap. "Beside" is decided by the `(min-width: 40rem)` media query, the same one Tailwind's `sm` uses. For example, a 700 px wide window gives a 10×10 board 41 px squares next to the panel.
+  - Both values update on window `resize`.
+  - The board sits in an `overflow-x-auto max-w-full` wrapper for screens where 24 px squares still don't fit.
 - **GameStatus** on phones: Turn and Score in a two-column grid (`grid grid-cols-2 gap-4 sm:flex sm:flex-col`), then the hint, then Stop at full width with `min-h-11` (`w-full sm:w-auto sm:min-h-0`).
 - **Stop dialog** card: `w-full max-w-75`, inside the `p-4` backdrop.
 - **GameResult** on phones: New game and Rematch in `grid grid-cols-2 gap-2`, each `min-h-11`. From `sm` up they return to the wrapping row.

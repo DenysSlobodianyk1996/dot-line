@@ -24,7 +24,7 @@
         v-for="{ dot, state } in dots"
         :key="dot.key"
         type="button"
-        class="absolute flex items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-blue-500 enabled:cursor-pointer"
+        class="absolute flex items-center justify-center focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue-500 enabled:cursor-pointer"
         :style="dotStyle(dot)"
         :disabled="state === 'idle'"
         :aria-label="`Dot row ${dot.row + 1}, column ${dot.col + 1}`"
@@ -57,6 +57,9 @@ const LINE_WIDTH = 4
 const MAX_TAP_AREA = 44
 // horizontal space taken by the app's p-2 gutters
 const APP_GUTTERS = 16
+// from Tailwind's sm breakpoint the widest side panel (GameResult, w-53) and gap-6 sit beside the board
+const SIDE_PANEL_WITH_GAP = 212 + 24
+const SIDE_BY_SIDE_QUERY = '(min-width: 40rem)'
 const FALLBACK_COLOR = '#101828'
 
 const RING_CLASS: Record<DotState, string> = {
@@ -79,19 +82,25 @@ const props = defineProps<{
 
 const selectedDot = defineModel<Dot | null>('selectedDot', { default: null })
 
-const viewportWidth = ref(window.innerWidth)
+const sideBySideMedia = window.matchMedia(SIDE_BY_SIDE_QUERY)
+// clientWidth excludes a desktop scrollbar, unlike window.innerWidth
+const viewportWidth = ref(document.documentElement.clientWidth)
+const isSideBySide = ref(sideBySideMedia.matches)
 
-function updateViewportWidth() {
-  viewportWidth.value = window.innerWidth
+function updateViewport() {
+  viewportWidth.value = document.documentElement.clientWidth
+  isSideBySide.value = sideBySideMedia.matches
 }
 
-onMounted(() => window.addEventListener('resize', updateViewportWidth))
-onBeforeUnmount(() => window.removeEventListener('resize', updateViewportWidth))
+onMounted(() => window.addEventListener('resize', updateViewport))
+onBeforeUnmount(() => window.removeEventListener('resize', updateViewport))
 
 // squares keep 48 px while the board fits and shrink on narrow screens (MB-3)
 const cell = computed(() => {
   const size = props.dotLineGame.size || 1
-  const available = viewportWidth.value - APP_GUTTERS - PADDING * 2 - BORDER * 2
+  const sidePanel = isSideBySide.value ? SIDE_PANEL_WITH_GAP : 0
+  const available =
+    viewportWidth.value - APP_GUTTERS - sidePanel - PADDING * 2 - BORDER * 2
   return Math.min(MAX_CELL, Math.max(MIN_CELL, Math.floor(available / size)))
 })
 
