@@ -9,6 +9,12 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   // GitHub Pages serves the app under /<repo>/; the deploy workflow sets BASE_PATH
   base: process.env.BASE_PATH ?? '/',
+  // vue-i18n esm-bundler feature flags: Composition API only, no devtools in production
+  define: {
+    __VUE_I18N_FULL_INSTALL__: true,
+    __VUE_I18N_LEGACY_API__: false,
+    __INTLIFY_PROD_DEVTOOLS__: false,
+  },
   plugins: [
     vue(),
     vueDevTools(),

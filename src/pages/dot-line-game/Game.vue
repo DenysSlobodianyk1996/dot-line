@@ -20,6 +20,7 @@ import type { Dot, DotLineGame } from '@/models'
 import { StorageService } from '@/services'
 import { CURRENT_GAME } from '@/static'
 import { computed, ref, watchEffect } from 'vue'
+import { useI18n } from 'vue-i18n'
 import GameBoard from './game/GameBoard.vue'
 import GameResult from './game/GameResult.vue'
 import GameStatus from './game/GameStatus.vue'
@@ -31,14 +32,16 @@ const props = defineProps<{
 
 const selectedDot = ref<Dot | null>(null)
 
+const { t } = useI18n()
+
 const hint = computed(() => {
   if (selectedDot.value) {
-    return 'Pick a highlighted neighbor to draw the line. Pick the selected dot again to cancel.'
+    return t('game.hintSelected')
   }
   if (props.dotLineGame.lines.length === 0) {
-    return 'Pick any dot to start the first line.'
+    return t('game.hintFirstLine')
   }
-  return 'Pick a highlighted dot to start a line.'
+  return t('game.hintStart')
 })
 
 watchEffect(() => {

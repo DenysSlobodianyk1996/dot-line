@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-130">
-    <h3 class="w-full text-center font-bold text-xl mb-4">Game Setup</h3>
+    <h3 class="w-full text-center font-bold text-xl mb-4">{{ t('setup.title') }}</h3>
     <Form
       :initial-values="formInitialValues"
       class="flex flex-col gap-2"
@@ -9,12 +9,12 @@
     >
       <div class="flex flex-col gap-2 sm:flex-row">
         <PlayerField
-          label="Player 1"
+          :number="1"
           parent-form="player1"
           :other-player-names="[values.player2?.name]"
         />
         <PlayerField
-          label="Player 2"
+          :number="2"
           parent-form="player2"
           :other-player-names="[values.player1?.name]"
         />
@@ -22,18 +22,18 @@
 
       <Field
         name="size"
-        label="Size"
+        :label="t('setup.size')"
         :rules="`required|min_value:2|max_value:10`"
         v-slot="{ field, errorMessage }"
       >
         <div class="flex flex-col gap-2">
-          <BaseLabel :for="field.name">Size</BaseLabel>
+          <BaseLabel :for="field.name">{{ t('setup.size') }}</BaseLabel>
           <BaseInput v-bind="field" :id="field.name" :title="field.value" type="number" />
           <BaseFieldError :errorMessage />
         </div>
       </Field>
 
-      <BaseButton color="primary" type="submit">Save</BaseButton>
+      <BaseButton color="primary" type="submit">{{ t('setup.save') }}</BaseButton>
     </Form>
 
     <RulesToggle default-open class="mt-4" />
@@ -43,6 +43,7 @@
 <script setup lang="ts">
 import { Form, Field, defineRule } from 'vee-validate'
 import { required, min_value, max_value } from '@vee-validate/rules'
+import { useI18n } from 'vue-i18n'
 import PlayerField from './PlayerField.vue'
 import RulesToggle from '../rules/RulesToggle.vue'
 import type { GameSetupForm } from '@/models'
@@ -57,6 +58,8 @@ import { randomHexColor } from '@/utils'
 defineRule('required', required)
 defineRule('min_value', min_value)
 defineRule('max_value', max_value)
+
+const { t } = useI18n()
 
 const formInitialValues: GameSetupForm = {
   player1: {

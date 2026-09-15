@@ -40,3 +40,11 @@ Ordered implementation checklist for [requirements.md](requirements.md) and [des
 - [ ] **18. Wire rules into screens**: `GameSetup.vue` (open by default) and `Game.vue` (closed by default), with the toggle at the bottom. _(RL-2, RL-3)_
 - [ ] **19. Tab title**: `index.html` title "Dot Line Game". _(APP-1)_
 - [ ] **20. Rules QA**: render setup and game in a browser at phone and desktop widths, and check the toggle and the title.
+
+## Languages
+
+- [ ] **21. i18n setup**: install `vue-i18n`, add `src/i18n/` with `en.ts`/`uk.ts`, `setLocale()` with localStorage and document `lang`/title, the vee-validate `generateMessage`, and the Vite feature flags. _(I18N-1..4, I18N-6, APP-1)_
+- [ ] **22. Translate the UI**: move every visible string in setup, game, status, result, board `aria-label`s, rules and the rules toggle to `t()`. _(I18N-1, GS-1)_
+- [ ] **23. Language toggle**: `LanguageToggle.vue` in an `App.vue` header at the top right. _(I18N-3, I18N-5)_
+- [ ] **24. Docs**: update the README and CLAUDE.md for languages. _(I18N-1..4)_
+- [ ] **25. Languages QA**: render setup and game in both languages in a browser, check that the toggle, saved choice, tab title, `lang` and validation messages switch, and check the 390 px layout.

@@ -7,7 +7,7 @@
       :aria-controls="rulesId"
       @click="isOpen = !isOpen"
     >
-      {{ isOpen ? 'Hide rules' : 'Show rules' }}
+      {{ isOpen ? t('rules.hide') : t('rules.show') }}
     </BaseButton>
     <GameRules v-show="isOpen" :id="rulesId" class="sm:self-stretch" />
   </div>
@@ -15,12 +15,15 @@
 
 <script setup lang="ts">
 import { ref, useId } from 'vue'
+import { useI18n } from 'vue-i18n'
 import BaseButton from '@/shared/components/BaseButton.vue'
 import GameRules from './GameRules.vue'
 
 const props = defineProps<{
   defaultOpen?: boolean
 }>()
+
+const { t } = useI18n()
 
 // not saved: setup opens the rules by default, the game screen doesn't (RL-3)
 const isOpen = ref(props.defaultOpen)

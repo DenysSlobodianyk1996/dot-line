@@ -1,5 +1,6 @@
 export const StorageService = {
-  setItem(key: string, value: object) {
+  // objects are stored as JSON, strings as they are
+  setItem(key: string, value: object | string) {
     const saveValue = typeof value === 'object' ? JSON.stringify(value) : value
     localStorage.setItem(key, saveValue)
   },

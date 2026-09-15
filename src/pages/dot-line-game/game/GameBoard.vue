@@ -27,7 +27,7 @@
         class="absolute flex items-center justify-center focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue-500 enabled:cursor-pointer"
         :style="dotStyle(dot)"
         :disabled="state === 'idle'"
-        :aria-label="`Dot row ${dot.row + 1}, column ${dot.col + 1}`"
+        :aria-label="t('game.dotLabel', { row: dot.row + 1, col: dot.col + 1 })"
         :aria-pressed="state === 'selected'"
         @click="onDotClick(dot)"
       >
@@ -46,6 +46,7 @@
 <script setup lang="ts">
 import { Dot, type DotLineGame, type Line, type Square } from '@/models'
 import { computed, onBeforeUnmount, onMounted, ref, type CSSProperties } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 type DotState = 'idle' | 'start' | 'selected' | 'target'
 
@@ -81,6 +82,8 @@ const props = defineProps<{
 }>()
 
 const selectedDot = defineModel<Dot | null>('selectedDot', { default: null })
+
+const { t } = useI18n()
 
 const sideBySideMedia = window.matchMedia(SIDE_BY_SIDE_QUERY)
 // clientWidth excludes a desktop scrollbar, unlike window.innerWidth

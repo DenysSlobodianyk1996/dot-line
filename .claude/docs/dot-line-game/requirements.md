@@ -16,13 +16,14 @@ Two players take turns drawing lines between neighboring dots on a square grid. 
 
 ## GS: Game setup (existing screen)
 
-- **GS-1**: Each player enters a name and a color. Names are required and must differ case-insensitively. The color is used for that player's lines and owned squares. Validation messages use readable field names ("Player 1 name", "Player 2 name", "Size"), never internal names like `player1.name`.
+- **GS-1**: Each player enters a name and a color. Names are required and must differ case-insensitively. The color is used for that player's lines and owned squares. Validation messages use readable, translated field names ("Ім’я гравця 1" / "Player 1 name", "Розмір поля" / "Size"), never internal names like `player1.name` (I18N-1).
 - **GS-2**: Size N is required, integer, 2 ≤ N ≤ 10.
 - **GS-3**: Submitting a valid form starts the game. The first player is chosen at random (see TR-2).
 
 Acceptance:
-- Given both names are "Ann" and "ann", when I submit, then I see "Values must be different" and the game doesn't start.
-- Given Player 1's name is empty, when I submit, then I see "Player 1 name is not valid." and the game doesn't start.
+- Given the language is English and both names are "Ann" and "ann", when I submit, then I see "Values must be different" and the game doesn't start.
+- Given the language is English and Player 1's name is empty, when I submit, then I see "Player 1 name is not valid." and the game doesn't start.
+- Given the language is Ukrainian and Player 1's name is empty, when I submit, then I see "Поле «Ім’я гравця 1» заповнено некоректно." and the game doesn't start.
 - Given a valid form, when I submit, then the game screen opens with an empty board of size N.
 
 ## GB: Game board
@@ -122,14 +123,32 @@ Acceptance:
 
 ## APP: App
 
-- **APP-1**: The browser tab title is "Dot Line Game".
+- **APP-1**: The browser tab title follows the language: "Точки й лінії" in Ukrainian and "Dot Line Game" in English (I18N-3).
 
 Acceptance:
 - Given I open the setup screen, then "How to play" is shown below the form, and the button above it reads "Hide rules".
 - Given the rules are shown on setup, when I press "Hide rules", then they disappear and the button reads "Show rules".
 - Given a game in progress, then the rules are hidden and the button at the bottom reads "Show rules". When I press it, the same five rules appear.
 - Given a 390 px wide phone, then the rules button spans the screen width and is at least 44 px tall.
-- Given the app is open, then the browser tab reads "Dot Line Game".
+- Given the app is open in English, then the browser tab reads "Dot Line Game".
+
+## I18N: Languages
+
+- **I18N-1**: Every text the UI shows is available in Ukrainian and English: labels, buttons, hints, the Stop dialog, the result panel, the rules, validation messages, dot `aria-label`s and the browser tab title. Player names are shown exactly as typed.
+- **I18N-2**: Ukrainian is the default language on the first visit.
+- **I18N-3**: A language toggle ("UA" / "EN") sits at the top right of every screen. Switching changes all text at once, along with the page's `lang` attribute and the tab title.
+- **I18N-4**: The chosen language is saved in localStorage and restored on reload.
+- **I18N-5**: The toggle is a labelled button group. Each button has `aria-pressed` and the full language name for assistive technology, and below 640 px wide each button is at least 44×44 px.
+- **I18N-6**: A validation message that's already on screen switches language the next time its field is validated.
+
+Acceptance criteria elsewhere in this document quote the English text; the Ukrainian UI shows the matching translations from `src/i18n/locales/uk.ts`.
+
+Acceptance:
+- Given a first visit, then the setup screen shows "Налаштування гри" and "Як грати", and "UA" is pressed in the toggle.
+- Given I press "EN", then the setup screen shows "Game Setup", the tab reads "Dot Line Game", and the page has `lang="en"`.
+- Given I chose English, when I reload, then the app is still in English.
+- Given a game in progress in Ukrainian, then the panel shows "Хід", "Рахунок" and "Зупинити", and player names are unchanged.
+- Given a 390 px wide phone, then each toggle button is at least 44×44 px.
 
 ## Confirmed in design review (2026-09-15)
 
@@ -171,6 +190,7 @@ Every statement from the product owner's brief and follow-up answers, and where 
 | Follow-up request: short, user-friendly rules based on the README, as a component | RL-1, RL-5 |
 | Follow-up request: rules on the setup screen, behind the same toggle button at the bottom, shown by default | RL-2, RL-3 |
 | Follow-up request: a toggle button at the bottom of the game screen that shows the same rules component | RL-2, RL-3 |
+| Follow-up request: i18n in the UI, Ukrainian by default, English supported, all visible text translated, with a language toggle | I18N-1..I18N-6, APP-1 |
 
 ## Open / assumed (mobile)
 
@@ -185,3 +205,12 @@ The rules request didn't specify these details. They are shown on the design can
 - On the game screen the rules are hidden by default (RL-3).
 - The toggle button sits above the rules card, and its label switches between "Show rules" and "Hide rules" (RL-2, RL-3).
 - The rules use the five points in RL-1, headed "How to play" (RL-1).
+
+## Open / assumed (languages)
+
+The i18n request didn't specify these details:
+- The toggle is a "UA / EN" button pair in a header at the top right of every screen (I18N-3, I18N-5).
+- The chosen language is saved and restored; Ukrainian is used only when nothing is saved (I18N-2, I18N-4).
+- The Ukrainian tab title is "Точки й лінії", and the Ukrainian wording lives in `src/i18n/locales/uk.ts` (APP-1, I18N-1).
+- Validation keeps one generic message per field, translated, rather than a different message per rule (GS-1).
+- A validation message already on screen changes language on the next validation, not instantly (I18N-6).
