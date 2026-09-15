@@ -1,0 +1,64 @@
+{
+  "artboards": [
+    {
+      "file": "Setup.dc.html",
+      "title": "1 · Game setup",
+      "x": 0,
+      "y": 0,
+      "w": 560,
+      "h": 330
+    },
+    {
+      "file": "FirstMove.dc.html",
+      "title": "2 · First move",
+      "x": 640,
+      "y": 0,
+      "w": 480,
+      "h": 340
+    },
+    {
+      "file": "Main.dc.html",
+      "title": "3 · Mid-game, Dot1 selected",
+      "x": 1200,
+      "y": 0,
+      "w": 480,
+      "h": 340
+    },
+    {
+      "file": "StopConfirm.dc.html",
+      "title": "4 · Stop confirmation",
+      "x": 0,
+      "y": 480,
+      "w": 480,
+      "h": 340
+    },
+    {
+      "file": "ResultWinner.dc.html",
+      "title": "5 · Result, winner",
+      "x": 560,
+      "y": 480,
+      "w": 480,
+      "h": 340
+    },
+    {
+      "file": "ResultDraw.dc.html",
+      "title": "6 · Result, draw",
+      "x": 1120,
+      "y": 480,
+      "w": 480,
+      "h": 340
+    }
+  ],
+  "annotations": [
+    {
+      "id": "dot-states",
+      "x": 1760,
+      "y": 0,
+      "w": 280,
+      "text": "Dot states\n• Small gray dot: not clickable\n• Blue ring: valid start (MV-2, MV-4)\n• Solid dot in the current player's color: selected Dot1\n• Dashed ring in the current player's color: valid Dot2 neighbor (MV-3, MV-5)\n\nBoard shown at N=4, 48 px squares. Sample players: Ann and Bob.\nSpec: .claude/docs/dot-line-game/requirements.md"
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

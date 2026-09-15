@@ -8,6 +8,10 @@ Two-player "dots and lines" game on an NxN field. Players take turns drawing a l
 
 Stack: Vue 3 (`<script setup lang="ts">`), Vite, TypeScript, Tailwind CSS v4 (via `@tailwindcss/vite`, imported in `src/assets/styles.css`), vee-validate + `@vee-validate/rules`, vue-router, Pinia (installed, but `src/stores/counter.ts` is unused scaffold). SCSS is available for `<style lang="scss">`.
 
+## Specs
+
+Feature specs live in `.claude/docs/` (index and workflow in `.claude/docs/README.md`). Each feature has `requirements.md` → `design.md` → `tasks.md`. Read the spec before implementing a feature, update the spec first when behavior changes, and reference requirement IDs (for example `MV-2`) in commits. The gameplay spec is `.claude/docs/dot-line-game/`. Its design replaces the current `Square.lines` model described below.
+
 ## Commands
 
 - `npm run dev`: Vite dev server on **port 4200**
