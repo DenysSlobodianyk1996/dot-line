@@ -43,8 +43,14 @@ Ordered implementation checklist for [requirements.md](requirements.md) and [des
 
 ## Languages
 
-- [ ] **21. i18n setup**: install `vue-i18n`, add `src/i18n/` with `en.ts`/`uk.ts`, `setLocale()` with localStorage and document `lang`/title, the vee-validate `generateMessage`, and the Vite feature flags. _(I18N-1..4, I18N-6, APP-1)_
-- [ ] **22. Translate the UI**: move every visible string in setup, game, status, result, board `aria-label`s, rules and the rules toggle to `t()`. _(I18N-1, GS-1)_
-- [ ] **23. Language toggle**: `LanguageToggle.vue` in an `App.vue` header at the top right. _(I18N-3, I18N-5)_
-- [ ] **24. Docs**: update the README and CLAUDE.md for languages. _(I18N-1..4)_
-- [ ] **25. Languages QA**: render setup and game in both languages in a browser, check that the toggle, saved choice, tab title, `lang` and validation messages switch, and check the 390 px layout.
+- [x] **21. i18n setup**: install `vue-i18n`, add `src/i18n/` with `en.ts`/`uk.ts`, `setLocale()` with localStorage and document `lang`/title, the vee-validate `generateMessage`, and the Vite feature flags. _(I18N-1..4, I18N-6, APP-1)_
+- [x] **22. Translate the UI**: move every visible string in setup, game, status, result, board `aria-label`s, rules and the rules toggle to `t()`. _(I18N-1, GS-1)_
+- [x] **23. Language toggle**: `LanguageToggle.vue` in an `App.vue` header at the top right. _(I18N-3, I18N-5)_
+- [x] **24. Docs**: update the README and CLAUDE.md for languages. _(I18N-1..4)_
+- [ ] **25. Languages QA**
+  - Done: headless Chrome rendered a GitHub Pages build of setup and a game in progress, in both languages.
+    - First visit is Ukrainian with UA pressed; a saved `LOCALE` of `en` gives English.
+    - `<html lang>`, the tab title, setup, status, hints, rules and dot `aria-label`s are in the expected language, and player names are unchanged.
+    - Screenshots at 390 px (phone) and 1024 px (desktop) match the design canvas.
+    - `npm run type-check` passes; lint reports only the existing `Game.vue`/`Page.vue` naming errors.
+  - Remaining: press the UA/EN toggle in a real browser, and check that validation messages switch language on the next validation (I18N-3, I18N-6).
