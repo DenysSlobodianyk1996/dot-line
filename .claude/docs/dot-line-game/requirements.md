@@ -89,15 +89,43 @@ Acceptance:
 
 - **PS-1**: The game state (players, size, lines, owned squares, current player, status) is saved to localStorage on every change.
 - **PS-2**: On reload, a saved game is restored as it was: an in-progress game continues with the same current player, and a finished game shows the result panel. The current Dot1 selection isn't saved.
+- **PS-3**: A game saved before gameplay existed (players and size set, but no current player) starts on load with a random first player.
 
 Acceptance:
 - Given a game in progress with 5 lines, when I reload, then the same 5 lines, owners and current player are shown.
 
-## Open / assumed
+## Confirmed in design review (2026-09-15)
 
-Not yet confirmed by the product owner:
+These started as assumptions and were accepted with the design canvas:
 - Stop asks for confirmation (END-2).
 - The existing "Back" button on the game screen is replaced by Stop. Setup is reached only through New game (END-5).
 - Rematch re-randomizes the first player (TR-2, END-6).
 - Finished games are restored with the result panel on reload (PS-2).
 - A dot with no undrawn adjacent edges isn't a valid Dot1 (MV-2).
+
+## Source requirements coverage
+
+Every statement from the product owner's brief and follow-up answers, and where it's specified.
+
+| Source statement | Covered by |
+| --- | --- |
+| Game setup sets the size (NxN) and each player's name and color | GS-1, GS-2 |
+| The player's color is used for their lines | GS-1, GB-2 |
+| When everything is entered, Game.vue opens and the game starts | GS-3 |
+| NxN squares shown as (N+1)×(N+1) dots; each square is 48×48 px | GB-1 |
+| First move: click any dot, then only its left/right/top/bottom neighbor | MV-1, MV-3 |
+| The line is drawn in the player's color | GB-2 |
+| Later lines can start only where existing lines are, not at any dot | MV-2 |
+| A player who closes a square with lines owns it, and `dirtySquares` is filled | SQ-1, SQ-2, SQ-3, design data model |
+| Winner is whoever owns more squares | END-3 |
+| The game ends when all squares are filled | END-1 |
+| The game can be stopped; the player with more squares wins | END-2, END-3 |
+| Answer: a line can start from the start or end of any line on the board | MV-2 |
+| Answer: turns always alternate | TR-1 |
+| Answer: equal scores show a draw | END-3 |
+| Answer: highlight valid starts and neighbors, re-click cancels, another start switches | MV-4, MV-5, MV-6, MV-7 |
+| Answer: result panel with New game and Rematch | END-4, END-5, END-6 |
+| Answer: random first player | TR-2 |
+| Answer: owned square has a translucent owner fill and the owner's initial | GB-3 |
+| Answer: one game-level list of lines in the model | design data model |
+| Existing app: the game is kept in localStorage | PS-1, PS-2, PS-3 |
