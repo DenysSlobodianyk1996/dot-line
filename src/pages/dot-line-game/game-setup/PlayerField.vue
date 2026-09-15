@@ -3,6 +3,7 @@
     <legend class="px-2 text-sm font-semibold text-gray-700">{{ label }}</legend>
     <Field
       :name="`${props.parentForm}.name`"
+      :label="`${label} name`"
       :rules="`required|differentFromAll:${otherPlayerNames}`"
       v-slot="{ field, errorMessage }"
     >

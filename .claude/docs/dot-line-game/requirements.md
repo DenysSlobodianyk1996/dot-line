@@ -16,12 +16,13 @@ Two players take turns drawing lines between neighboring dots on a square grid. 
 
 ## GS: Game setup (existing screen)
 
-- **GS-1**: Each player enters a name and a color. Names are required and must differ case-insensitively. The color is used for that player's lines and owned squares.
+- **GS-1**: Each player enters a name and a color. Names are required and must differ case-insensitively. The color is used for that player's lines and owned squares. Validation messages use readable field names ("Player 1 name", "Player 2 name", "Size"), never internal names like `player1.name`.
 - **GS-2**: Size N is required, integer, 2 ≤ N ≤ 10.
 - **GS-3**: Submitting a valid form starts the game. The first player is chosen at random (see TR-2).
 
 Acceptance:
 - Given both names are "Ann" and "ann", when I submit, then I see "Values must be different" and the game doesn't start.
+- Given Player 1's name is empty, when I submit, then I see "Player 1 name is not valid." and the game doesn't start.
 - Given a valid form, when I submit, then the game screen opens with an empty board of size N.
 
 ## GB: Game board
