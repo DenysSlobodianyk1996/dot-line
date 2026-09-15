@@ -1,56 +1,62 @@
 <template>
-  <div
-    class="relative shrink-0 rounded-lg border border-gray-300 bg-white"
-    :style="{ width: `${boardSize + 2}px`, height: `${boardSize + 2}px` }"
-  >
+  <div class="max-w-full self-center overflow-x-auto sm:self-start">
     <div
-      v-for="square in dotLineGame.dirtySquares"
-      :key="`square-${square.row}-${square.col}`"
-      class="absolute flex items-center justify-center text-base font-bold"
-      :style="squareStyle(square)"
+      class="relative shrink-0 overflow-hidden rounded-lg border border-gray-300 bg-white"
+      :style="{ width: `${boardSize + BORDER * 2}px`, height: `${boardSize + BORDER * 2}px` }"
     >
-      {{ square.ownerName?.charAt(0).toUpperCase() }}
-    </div>
-
-    <div
-      v-for="line in dotLineGame.lines"
-      :key="line.key"
-      class="absolute rounded-[2px]"
-      :style="lineStyle(line)"
-    ></div>
-
-    <button
-      v-for="{ dot, state } in dots"
-      :key="dot.key"
-      type="button"
-      class="absolute flex items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-blue-500 enabled:cursor-pointer"
-      :style="dotStyle(dot)"
-      :disabled="state === 'idle'"
-      :aria-label="`Dot row ${dot.row + 1}, column ${dot.col + 1}`"
-      :aria-pressed="state === 'selected'"
-      @click="onDotClick(dot)"
-    >
-      <span
-        class="flex items-center justify-center rounded-full"
-        :class="RING_CLASS[state]"
-        :style="ringStyle(state)"
+      <div
+        v-for="square in dotLineGame.dirtySquares"
+        :key="`square-${square.row}-${square.col}`"
+        class="absolute flex items-center justify-center text-base font-bold"
+        :style="squareStyle(square)"
       >
-        <span class="rounded-full" :class="DOT_CLASS[state]" :style="dotFillStyle(state)"></span>
-      </span>
-    </button>
+        {{ square.ownerName?.charAt(0).toUpperCase() }}
+      </div>
+
+      <div
+        v-for="line in dotLineGame.lines"
+        :key="line.key"
+        class="absolute rounded-[2px]"
+        :style="lineStyle(line)"
+      ></div>
+
+      <button
+        v-for="{ dot, state } in dots"
+        :key="dot.key"
+        type="button"
+        class="absolute flex items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-blue-500 enabled:cursor-pointer"
+        :style="dotStyle(dot)"
+        :disabled="state === 'idle'"
+        :aria-label="`Dot row ${dot.row + 1}, column ${dot.col + 1}`"
+        :aria-pressed="state === 'selected'"
+        @click="onDotClick(dot)"
+      >
+        <span
+          class="flex items-center justify-center rounded-full"
+          :class="RING_CLASS[state]"
+          :style="ringStyle(state)"
+        >
+          <span class="rounded-full" :class="DOT_CLASS[state]" :style="dotFillStyle(state)"></span>
+        </span>
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Dot, type DotLineGame, type Line, type Square } from '@/models'
-import { computed, type CSSProperties } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, type CSSProperties } from 'vue'
 
 type DotState = 'idle' | 'start' | 'selected' | 'target'
 
-const CELL = 48
+const MAX_CELL = 48
+const MIN_CELL = 24
 const PADDING = 16
+const BORDER = 1
 const LINE_WIDTH = 4
-const DOT_HIT_AREA = 28
+const MAX_TAP_AREA = 44
+// horizontal space taken by the app's p-2 gutters
+const APP_GUTTERS = 16
 const FALLBACK_COLOR = '#101828'
 
 const RING_CLASS: Record<DotState, string> = {
@@ -73,7 +79,26 @@ const props = defineProps<{
 
 const selectedDot = defineModel<Dot | null>('selectedDot', { default: null })
 
-const boardSize = computed(() => (props.dotLineGame.size ?? 0) * CELL + PADDING * 2)
+const viewportWidth = ref(window.innerWidth)
+
+function updateViewportWidth() {
+  viewportWidth.value = window.innerWidth
+}
+
+onMounted(() => window.addEventListener('resize', updateViewportWidth))
+onBeforeUnmount(() => window.removeEventListener('resize', updateViewportWidth))
+
+// squares keep 48 px while the board fits and shrink on narrow screens (MB-3)
+const cell = computed(() => {
+  const size = props.dotLineGame.size || 1
+  const available = viewportWidth.value - APP_GUTTERS - PADDING * 2 - BORDER * 2
+  return Math.min(MAX_CELL, Math.max(MIN_CELL, Math.floor(available / size)))
+})
+
+// each dot is tappable across a whole square, capped at 44 px (MB-4)
+const tapArea = computed(() => Math.min(cell.value, MAX_TAP_AREA))
+
+const boardSize = computed(() => (props.dotLineGame.size ?? 0) * cell.value + PADDING * 2)
 
 const currentColor = computed(() => props.dotLineGame.currentPlayer?.color ?? FALLBACK_COLOR)
 
@@ -98,7 +123,7 @@ const dots = computed(() => {
 })
 
 function toPoint({ row, col }: { row: number; col: number }) {
-  return { x: PADDING + col * CELL, y: PADDING + row * CELL }
+  return { x: PADDING + col * cell.value, y: PADDING + row * cell.value }
 }
 
 function colorOf(playerName: string | null): string {
@@ -111,8 +136,8 @@ function squareStyle(square: Square): CSSProperties {
   return {
     left: `${x}px`,
     top: `${y}px`,
-    width: `${CELL}px`,
-    height: `${CELL}px`,
+    width: `${cell.value}px`,
+    height: `${cell.value}px`,
     color,
     backgroundColor: `color-mix(in srgb, ${color} 30%, transparent)`,
   }
@@ -120,7 +145,7 @@ function squareStyle(square: Square): CSSProperties {
 
 function lineStyle(line: Line): CSSProperties {
   const { x, y } = toPoint(line.from)
-  const length = CELL + LINE_WIDTH
+  const length = cell.value + LINE_WIDTH
   return {
     left: `${x - LINE_WIDTH / 2}px`,
     top: `${y - LINE_WIDTH / 2}px`,
@@ -133,10 +158,10 @@ function lineStyle(line: Line): CSSProperties {
 function dotStyle(dot: Dot): CSSProperties {
   const { x, y } = toPoint(dot)
   return {
-    left: `${x - DOT_HIT_AREA / 2}px`,
-    top: `${y - DOT_HIT_AREA / 2}px`,
-    width: `${DOT_HIT_AREA}px`,
-    height: `${DOT_HIT_AREA}px`,
+    left: `${x - tapArea.value / 2}px`,
+    top: `${y - tapArea.value / 2}px`,
+    width: `${tapArea.value}px`,
+    height: `${tapArea.value}px`,
   }
 }
 

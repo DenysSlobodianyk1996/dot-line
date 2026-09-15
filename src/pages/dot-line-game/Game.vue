@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-start gap-6">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
     <GameBoard v-model:selected-dot="selectedDot" :dot-line-game="dotLineGame" />
     <GameResult
       v-if="dotLineGame.isFinished"

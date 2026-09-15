@@ -15,6 +15,14 @@ The artboards match the app's current Tailwind styles (`Base*` components, gray/
 5. Result, winner (Bob 9, Ann 7): result panel beside the final board, with New game and Rematch [END-3..6]
 6. Result, draw (8 each) [END-3, END-4]
 
+"Mobile" page (390 px wide phone frames):
+
+7. Setup, players stacked [MB-7]
+8. Mid-game at N=4: 48 px squares, board centered above the panel [MB-2, MB-4, MB-8]
+9. Mid-game at N=10: squares shrink to 34 px to fit [MB-3]
+10. Stop confirmation [MB-5]
+11. Result, winner, with equal-width buttons [MB-6]
+
 Source files for the artboards are in [design-canvas/](design-canvas/) (`*.dc.html` plus `canvas.json`). They were generated from the board data, so board state and highlights are consistent with the rules below.
 
 ## Data model (`src/models/`)
@@ -125,10 +133,10 @@ All sizes and colors come from the approved canvas.
 
   Stop and Rematch clear the selection. The old "Back" button is gone; Stop, then New game, leads back to setup.
 - **GameBoard.vue** [GB-1..3, MV-4..8]
-  - Absolutely positioned elements inside a `rounded-lg border-gray-300` box of `N·48 + 32` px plus the border. A dot's center is at `(16 + col·48, 16 + row·48)`.
-  - Owned squares: 48 px, owner color mixed at 30% over transparent, bold uppercase initial in the owner color.
-  - Lines: 52×4 px (horizontal) or 4×52 px (vertical), centered on the dots, in the owner color.
-  - Dots are 28 px `<button>` hit areas with an `aria-label`. States:
+  - Absolutely positioned elements inside a `rounded-lg border-gray-300` box of `N·cell + 32` px plus the border. `cell` is the square size: 48 px, or smaller on narrow screens (see Mobile). A dot's center is at `(16 + col·cell, 16 + row·cell)`.
+  - Owned squares: `cell` px, owner color mixed at 30% over transparent, bold uppercase initial in the owner color.
+  - Lines: `(cell + 4)`×4 px (horizontal) or 4×`(cell + 4)` px (vertical), centered on the dots, in the owner color.
+  - Dots are `<button>` tap areas of `min(cell, 44)` px with an `aria-label` [MB-4]. States:
     - idle: 8 px `gray-400` dot, disabled
     - start: 20 px ring with a 2 px `blue-500` border and `blue-500/12` fill, 8 px `gray-900` dot
     - selected: 26 px ring in the current player's color (12% fill), 12 px dot in that color with a white border
@@ -148,3 +156,14 @@ All sizes and colors come from the approved canvas.
 ## Persistence [PS-1..3]
 
 `Game.vue`'s `watchEffect` saves the whole reactive game with `StorageService.setItem(CURRENT_GAME, game)`. `Page.vue` restores it with `StorageService.getItem(CURRENT_GAME, { applyParse: true })` and `dotLineGame.reset(savedGame)`, and the constructors rebuild the `Line`, `Dot` and `Square` instances. A started, unfinished save without `currentPlayerName` (saved before gameplay existed) gets `start()` [PS-3]. `status` decides whether Game shows GameStatus or GameResult. The dot selection isn't saved.
+
+## Mobile [MB-1..8]
+
+The phone layout is the default, and `sm:` classes (640 px and up) restore the desktop layout described above.
+
+- **Game.vue**: `flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6`. The board wrapper is centered on phones (`self-center sm:self-start`), and the panel is full width (`w-full`, with `sm:w-50` for GameStatus and `sm:w-53` for GameResult).
+- **Board size** (GameBoard): `cell = clamp(floor((viewportWidth − 16 − 34) / N), 24, 48)`. The 16 px is the app's `p-2` gutters, and the 34 px is the board's padding plus border. It updates on window `resize`. The board sits in an `overflow-x-auto max-w-full` wrapper for screens where 24 px squares still don't fit.
+- **GameStatus** on phones: Turn and Score in a two-column grid (`grid grid-cols-2 gap-4 sm:flex sm:flex-col`), then the hint, then Stop at full width with `min-h-11` (`w-full sm:w-auto sm:min-h-0`).
+- **Stop dialog** card: `w-full max-w-75`, inside the `p-4` backdrop.
+- **GameResult** on phones: New game and Rematch in `grid grid-cols-2 gap-2`, each `min-h-11`. From `sm` up they return to the wrapping row.
+- **GameSetup**: the player fieldsets row becomes `flex flex-col gap-2 sm:flex-row`.

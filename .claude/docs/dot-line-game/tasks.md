@@ -14,3 +14,13 @@ Ordered implementation checklist for [requirements.md](requirements.md) and [des
   - Done: the rules were checked against the real models with a script covering GS-2..3, MV-1..3, TR-1..2, SQ-1..3, END-1..3, END-5..7 and PS-2..3. `npm run type-check` and `npm run build-only` pass, and the dev server serves `/game`.
   - `npm run lint` reports only `vue/multi-word-component-names` for `Page.vue` and `Game.vue`. That error already exists on `master`.
   - Remaining: click through the acceptance criteria in a browser at N=2 and N=4.
+
+## Mobile
+
+- [x] **10. Mobile design**: add a "Mobile" page to the design canvas with setup, N=4 and N=10 games, Stop confirmation (320 px) and result at 390 px. _(MB-1..8)_
+- [x] **11. Responsive board**: `GameBoard.vue` computes the square size from the viewport width (24–48 px), sizes dot tap areas to `min(cell, 44)`, and scrolls inside its own area as a last resort. _(MB-1, MB-3, MB-4)_
+- [x] **12. Stacked game screen**: `Game.vue`, `GameStatus.vue` and `GameResult.vue` stack below 640 px, with 44 px buttons and a Stop dialog that fits 320 px. _(MB-2, MB-5, MB-6, MB-8)_
+- [x] **13. Stacked setup**: `GameSetup.vue` puts Player 2 below Player 1 below 640 px. _(MB-7)_
+- [ ] **14. Mobile QA**
+  - Done: the square-size formula gives 48 px at N=4 on 320 and 390 px, 34 px at N=10 on 390 px, 27 px at N=10 on 320 px, and 48 px at 1024 px, and every board fits. Type-check, build and lint (only the existing `master` errors) pass, the responsive classes are in the built CSS, and the dev server compiles every changed component.
+  - Remaining: check the MB acceptance criteria in a browser at 320, 390 and 1024 px wide.

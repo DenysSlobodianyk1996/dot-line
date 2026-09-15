@@ -17,4 +17,4 @@ Rules:
 
 | Feature | Status | Docs |
 | --- | --- | --- |
-| Dot-line game (gameplay) | Implemented (browser QA pending) | [requirements](dot-line-game/requirements.md) · [design](dot-line-game/design.md) · [tasks](dot-line-game/tasks.md) |
+| Dot-line game (gameplay + mobile) | Implemented (browser QA pending) | [requirements](dot-line-game/requirements.md) · [design](dot-line-game/design.md) · [tasks](dot-line-game/tasks.md) |

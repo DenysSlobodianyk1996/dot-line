@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-53 flex-col gap-4">
+  <div class="flex w-full flex-col gap-4 sm:w-53">
     <div class="flex flex-col gap-1">
       <div class="text-sm font-medium text-gray-700">Result</div>
       <div v-if="winner" class="flex items-center gap-2">
@@ -20,9 +20,14 @@
       />
     </div>
 
-    <div class="flex flex-wrap gap-2">
-      <BaseButton color="secondary" @click="emit('newGame')">New game</BaseButton>
-      <BaseButton color="primary" @click="emit('rematch')">Rematch</BaseButton>
+    <!-- phones: equal-width 44 px buttons (MB-6, MB-8) -->
+    <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+      <BaseButton color="secondary" class="min-h-11 sm:min-h-0" @click="emit('newGame')">
+        New game
+      </BaseButton>
+      <BaseButton color="primary" class="min-h-11 sm:min-h-0" @click="emit('rematch')">
+        Rematch
+      </BaseButton>
     </div>
   </div>
 </template>

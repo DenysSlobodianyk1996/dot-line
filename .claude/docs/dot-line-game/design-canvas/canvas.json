@@ -1,5 +1,60 @@
 {
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "Desktop"
+    },
+    {
+      "id": "page-2",
+      "name": "Mobile"
+    }
+  ],
   "artboards": [
+    {
+      "file": "MobileSetup.dc.html",
+      "title": "7 · Mobile setup",
+      "page": "page-2",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "MobileGame.dc.html",
+      "title": "8 · Mobile game, N=4",
+      "page": "page-2",
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "MobileGameN10.dc.html",
+      "title": "9 · Mobile game, N=10 (34 px squares)",
+      "page": "page-2",
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "MobileStopConfirm.dc.html",
+      "title": "10 · Stop confirmation at 320 px",
+      "page": "page-2",
+      "x": 1410,
+      "y": 0,
+      "w": 320,
+      "h": 568
+    },
+    {
+      "file": "MobileResult.dc.html",
+      "title": "11 · Mobile result",
+      "page": "page-2",
+      "x": 1810,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
     {
       "file": "Setup.dc.html",
       "title": "1 · Game setup",
@@ -56,9 +111,18 @@
       "y": 0,
       "w": 280,
       "text": "Dot states\n• Small gray dot: not clickable\n• Blue ring: valid start (MV-2, MV-4)\n• Solid dot in the current player's color: selected Dot1\n• Dashed ring in the current player's color: valid Dot2 neighbor (MV-3, MV-5)\n\nBoard shown at N=4, 48 px squares. Sample players: Ann and Bob.\nSpec: .claude/docs/dot-line-game/requirements.md"
+    },
+    {
+      "id": "mobile-notes",
+      "page": "page-2",
+      "x": 2280,
+      "y": 0,
+      "w": 300,
+      "text": "Mobile layout (below 640 px wide)\n• Board on top, centered; panel below at full width (MB-2)\n• Squares stay 48 px while the board fits, then shrink to fit the screen, 24 px minimum (MB-3)\n• Each dot is tappable across a whole square, up to 44 px (MB-4)\n• Buttons are at least 44 px tall (MB-8)\n\nFrom 640 px up, the desktop layout on the Desktop page applies.\nOpen for confirmation: 640 px breakpoint, board-first order, shrink instead of scroll."
     }
   ],
   "launch": {
-    "view": "canvas"
+    "view": "canvas",
+    "page": "page-2"
   }
 }

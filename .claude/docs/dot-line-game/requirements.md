@@ -94,6 +94,23 @@ Acceptance:
 Acceptance:
 - Given a game in progress with 5 lines, when I reload, then the same 5 lines, owners and current player are shown.
 
+## MB: Mobile
+
+- **MB-1**: Every screen works from 320 px wide without horizontal page scrolling. The only exception is a board that can't shrink any further (MB-3), which scrolls inside its own area.
+- **MB-2**: Below 640 px wide, the game screen stacks: the board on top, centered, and the panel below it at full width. In the panel, Turn and Score sit side by side, followed by the hint and a full-width Stop button.
+- **MB-3**: Squares are 48 px when the board fits the screen. On narrower screens they shrink so the board fits the available width, down to 24 px.
+- **MB-4**: Each dot's tap area is a square the size of one board square (at most 44 px), centered on the dot, so neighboring dots never share a tap area.
+- **MB-5**: The Stop confirmation dialog fits the screen with at least 16 px on each side.
+- **MB-6**: Below 640 px wide, the result panel sits below the board at full width, with New game and Rematch side by side at equal width.
+- **MB-7**: Below 640 px wide, the setup form shows Player 1 above Player 2.
+- **MB-8**: Below 640 px wide, buttons on the game screen are at least 44 px tall.
+
+Acceptance:
+- Given a 390 px wide phone and N=4, then squares are 48 px and the board is centered above the panel.
+- Given a 390 px wide phone and N=10, then squares are 34 px and the whole board is visible without scrolling.
+- Given a 320 px wide phone, when I press Stop, then the dialog has at least 16 px of space on both sides.
+- Given a 1024 px wide screen, then the layout is the desktop one (board with the panel beside it).
+
 ## Confirmed in design review (2026-09-15)
 
 These started as assumptions and were accepted with the design canvas:
@@ -129,3 +146,11 @@ Every statement from the product owner's brief and follow-up answers, and where 
 | Answer: owned square has a translucent owner fill and the owner's initial | GB-3 |
 | Answer: one game-level list of lines in the model | design data model |
 | Existing app: the game is kept in localStorage | PS-1, PS-2, PS-3 |
+| Follow-up request: take the mobile version into account | MB-1..MB-8 |
+
+## Open / assumed (mobile)
+
+The mobile request didn't specify these details. They are shown on the "Mobile" page of the design canvas for confirmation:
+- The phone layout applies below 640 px wide (Tailwind `sm`) (MB-2, MB-6, MB-7, MB-8).
+- On phones the board comes first and the panel follows below it (MB-2).
+- Squares shrink to fit narrow screens instead of the board scrolling, with a 24 px minimum (MB-3).

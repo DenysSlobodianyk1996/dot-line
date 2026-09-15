@@ -7,7 +7,7 @@
       @submit="emit('gameSetup', $event as GameSetupForm)"
       v-slot="{ values }"
     >
-      <div class="flex gap-2">
+      <div class="flex flex-col gap-2 sm:flex-row">
         <PlayerField
           label="Player 1"
           parent-form="player1"
