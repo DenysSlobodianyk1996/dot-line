@@ -36,6 +36,23 @@ There are no automated tests yet.
 
 Recommended editor: [VS Code](https://code.visualstudio.com/) with the [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) extension.
 
+## Deployment
+
+Every push to `master` builds the app and publishes it to GitHub Pages through [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). You can also run the workflow manually from the Actions tab. The site is served at https://denysslobodianyk1996.github.io/dot-line/.
+
+- The workflow builds with `BASE_PATH=/dot-line/`, which `vite.config.ts` uses as Vite's `base`. Local development keeps `/`.
+- It copies `index.html` to `404.html`, so reloading a route such as `/dot-line/game` still loads the app.
+- One-time setup: in the repository's **Settings → Pages**, set the source to **GitHub Actions**. GitHub Pages requires a public repository unless the account is on a paid plan.
+
+To check a Pages build locally:
+
+```sh
+BASE_PATH=/dot-line/ npm run build
+npm run preview
+```
+
+Then open http://localhost:4173/dot-line/.
+
 ## Tech stack
 
 Vue 3 (`<script setup>` with TypeScript), Vite, Tailwind CSS v4, vee-validate for the setup form, and vue-router.

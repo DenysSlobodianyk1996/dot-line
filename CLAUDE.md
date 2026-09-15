@@ -22,6 +22,8 @@ Feature specs live in `.claude/docs/` (index and workflow in `.claude/docs/READM
 
 There is no test runner configured.
 
+Deployment: `.github/workflows/deploy.yml` publishes to GitHub Pages on every push to `master`. It builds with `BASE_PATH=/dot-line/`, which `vite.config.ts` reads as Vite's `base` and the router picks up through `import.meta.env.BASE_URL`, then copies `dist/index.html` to `404.html` so history-mode reloads work. Keep asset and route URLs base-relative (no hard-coded `/…` paths in code).
+
 ## Architecture
 
 - **Routing** (`src/router/index.ts`): the only route is `/game`, and every other path redirects there. Page folders expose their root component through an `index.ts` barrel (`export { default } from './Page.vue'`).
