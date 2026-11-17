@@ -21,6 +21,9 @@ const en = {
     modeTwoPlayers: 'Two players',
     you: 'You',
     opponent: 'Opponent',
+    difficulty: 'Difficulty',
+    easy: 'Easy',
+    normal: 'Normal',
   },
   players: {
     computer: 'Computer',

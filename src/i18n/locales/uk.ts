@@ -23,6 +23,9 @@ const uk: typeof en = {
     modeTwoPlayers: 'Двоє гравців',
     you: 'Ви',
     opponent: 'Суперник',
+    difficulty: 'Складність',
+    easy: 'Легко',
+    normal: 'Нормально',
   },
   players: {
     computer: 'Комп’ютер',

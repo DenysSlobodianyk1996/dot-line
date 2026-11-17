@@ -137,6 +137,88 @@ describe('the rules read the same in both modes (CM-35, RL-5)', () => {
   })
 })
 
+describe('difficulty', () => {
+  it('offers Easy and Normal only in Versus computer mode, Normal by default (CM-5, CM-6, CM-7)', async () => {
+    const page = await openGamePage()
+    expect(page.selectedDifficulty()).toBe('normal')
+
+    await page.chooseMode('twoPlayers')
+    expect(page.hasDifficultySwitch).toBe(false)
+
+    await page.chooseMode('computer')
+    await page.chooseDifficulty('easy')
+    expect(page.selectedDifficulty()).toBe('easy')
+  })
+
+  it('starts the game at the chosen difficulty (CM-5, CM-30)', async () => {
+    await startComputerGame({ difficulty: 'normal', first: 1 })
+
+    expect(JSON.parse(localStorage.getItem(CURRENT_GAME)!).difficulty).toBe('normal')
+  })
+
+  it('Rematch keeps the game mode, difficulty, players and size (CM-28)', async () => {
+    const page = await startComputerGame({ difficulty: 'easy', size: 3, first: 1 })
+    await page.stopGame()
+
+    await page.rematch(1)
+
+    const saved = JSON.parse(localStorage.getItem(CURRENT_GAME)!)
+    expect(saved).toMatchObject({ gameMode: 'computer', difficulty: 'easy', size: 3 })
+    expect(page.scores()).toEqual({ Anna: 0, [COMPUTER]: 0 })
+    expect(page.dotCount).toBe(16)
+  })
+})
+
+describe('remembered choices', () => {
+  it('a first visit opens in Versus computer on Normal (CM-2, CM-7)', async () => {
+    const page = await openGamePage()
+
+    expect(page.selectedMode()).toBe('computer')
+    expect(page.selectedDifficulty()).toBe('normal')
+  })
+
+  it('New game preselects the last game mode and difficulty (CM-29)', async () => {
+    const page = await startComputerGame({ difficulty: 'easy', first: 1 })
+    await page.stopGame()
+
+    await page.newGame()
+
+    expect(page.selectedMode()).toBe('computer')
+    expect(page.selectedDifficulty()).toBe('easy')
+  })
+
+  it('the next visit opens in the last game mode, keeping the last difficulty (CM-3, CM-7)', async () => {
+    const first = await startComputerGame({ difficulty: 'easy', first: 1 })
+    await first.stopGame()
+    await first.newGame()
+    await first.chooseMode('twoPlayers')
+    await first.submitSetup({
+      mode: 'twoPlayers',
+      player1: ANNA,
+      player2: BOHDAN,
+      size: 2,
+      first: 1,
+    })
+    await first.stopGame()
+    await first.newGame()
+
+    const next = await first.reload()
+    expect(next.selectedMode()).toBe('twoPlayers')
+
+    await next.chooseMode('computer')
+    expect(next.selectedDifficulty()).toBe('easy')
+  })
+
+  it('a mode switched in setup without starting a game is not remembered (CM-3)', async () => {
+    const page = await openGamePage()
+    await page.chooseMode('twoPlayers')
+
+    const next = await page.reload()
+
+    expect(next.selectedMode()).toBe('computer')
+  })
+})
+
 describe('playing against the computer', () => {
   it('waits about a second on its turn with the board locked, then draws one line (CM-15, CM-16, CM-20)', async () => {
     const page = await startComputerGame({ first: 1 })
@@ -249,7 +331,7 @@ describe('stopping and starting again', () => {
 
 describe('saving and reloading', () => {
   it('saves the game mode and difficulty with the game (CM-30)', async () => {
-    await startComputerGame({ first: 1 })
+    await startComputerGame({ difficulty: 'easy', first: 1 })
 
     const saved = JSON.parse(localStorage.getItem(CURRENT_GAME)!)
     expect(saved.gameMode).toBe('computer')
