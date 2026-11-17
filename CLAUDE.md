@@ -18,11 +18,13 @@ Specs live in `docs/` (layout and workflow in `docs/README.md`). Domain terms ar
 - `npm run build`: runs `vue-tsc --build` type-check and `vite build` in parallel
 - `npm run type-check`: type-check only
 - `npm run lint`: oxlint, then ESLint. **Both run with `--fix` and modify files.**
+- `npm run lint-check`: oxlint, then ESLint, without `--fix` (what CI runs)
+- `npm test`: Vitest run once (jsdom + Vue Test Utils); `npm run test:watch` for watch mode
 - `npm run format`: Prettier on `src/` only (no semicolons, single quotes, width 100)
 
-There is no test runner configured.
+Tests: specs sit in `__tests__/` folders next to the code (`*.spec.ts`) and check external behavior only (spec "Testing Decisions"). Shared helpers live in `src/test/`: `mountGamePage({ storage })` mounts the whole app at `/game` with real router, i18n and localStorage, and calling it again simulates a reload. `src/test/setup.ts` clears localStorage and unmounts after each test. Tests and helpers are type-checked through `tsconfig.vitest.json`.
 
-Deployment: `.github/workflows/deploy.yml` publishes to GitHub Pages on every push to `master`. It builds with `BASE_PATH=/dot-line/`, which `vite.config.ts` reads as Vite's `base` and the router picks up through `import.meta.env.BASE_URL`, then copies `dist/index.html` to `404.html` so history-mode reloads work. Keep asset and route URLs base-relative (no hard-coded `/…` paths in code).
+CI: `.github/workflows/ci.yml` runs type-check, `lint-check` and tests on every pull request. Deployment: `.github/workflows/deploy.yml` runs the tests, then publishes to GitHub Pages on every push to `master`. It builds with `BASE_PATH=/dot-line/`, which `vite.config.ts` reads as Vite's `base` and the router picks up through `import.meta.env.BASE_URL`, then copies `dist/index.html` to `404.html` so history-mode reloads work. Keep asset and route URLs base-relative (no hard-coded `/…` paths in code).
 
 ## Architecture
 

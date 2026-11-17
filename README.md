@@ -30,15 +30,18 @@ Then open http://localhost:4200.
 | `npm run preview` | Serve the production build locally |
 | `npm run type-check` | Type-check only (`vue-tsc`) |
 | `npm run lint` | oxlint, then ESLint (both apply auto-fixes) |
+| `npm run lint-check` | oxlint, then ESLint, without fixing (what CI runs) |
+| `npm test` | Run the test suite once (Vitest, Vue Test Utils, jsdom) |
+| `npm run test:watch` | Run the tests in watch mode |
 | `npm run format` | Prettier on `src/` |
 
-There are no automated tests yet.
+Tests live in `__tests__/` folders next to the code they cover, and shared test helpers are in `src/test/`. Every pull request runs type-check, lint and tests through [`.github/workflows/ci.yml`](.github/workflows/ci.yml), and the deploy runs the tests before building.
 
 Recommended editor: [VS Code](https://code.visualstudio.com/) with the [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) extension.
 
 ## Deployment
 
-Every push to `master` builds the app and publishes it to GitHub Pages through [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). You can also run the workflow manually from the Actions tab. The site is served at https://denysslobodianyk1996.github.io/dot-line/.
+Every push to `master` runs the tests, builds the app and publishes it to GitHub Pages through [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). You can also run the workflow manually from the Actions tab. The site is served at https://denysslobodianyk1996.github.io/dot-line/.
 
 - The workflow builds with `BASE_PATH=/dot-line/`, which `vite.config.ts` uses as Vite's `base`. Local development keeps `/`.
 - It copies `index.html` to `404.html`, so reloading a route such as `/dot-line/game` still loads the app.
