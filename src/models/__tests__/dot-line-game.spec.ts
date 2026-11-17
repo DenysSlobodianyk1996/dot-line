@@ -1,0 +1,328 @@
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { Dot, DotLineGame } from '@/models'
+
+const ann = { name: 'Ann', color: '#ff0000' }
+const bob = { name: 'Bob', color: '#0000ff' }
+const dot = (row: number, col: number) => new Dot({ row, col })
+type Edge = [number, number, number, number]
+
+function newGame(size: number, first = 'Ann') {
+  return new DotLineGame({ player1: ann, player2: bob, size, currentPlayerName: first })
+}
+
+/** Draws each edge for whoever's turn it is; fails if a move is rejected. */
+function play(game: DotLineGame, edges: Edge[]) {
+  for (const [r1, c1, r2, c2] of edges) {
+    expect(game.canDraw(dot(r1, c1), dot(r2, c2)), `edge ${[r1, c1, r2, c2]}`).toBe(true)
+    game.drawLine(dot(r1, c1), dot(r2, c2))
+  }
+}
+
+const allDots = (size: number) =>
+  Array.from({ length: (size + 1) ** 2 }, (_, i) => dot(Math.floor(i / (size + 1)), i % (size + 1)))
+
+// every edge of a 2x2 board, each starting from an existing line.
+// Ann draws odd moves, Bob even: Bob closes (0,1) on move 10, Ann (1,1) on 11,
+// Bob (0,0) and (1,0) on 12, so Bob wins 3-1.
+const FULL_2X2: Edge[] = [
+  [0, 0, 0, 1],
+  [0, 1, 0, 2],
+  [0, 2, 1, 2],
+  [1, 2, 2, 2],
+  [2, 2, 2, 1],
+  [2, 1, 2, 0],
+  [2, 0, 1, 0],
+  [1, 0, 0, 0],
+  [0, 1, 1, 1],
+  [1, 1, 1, 2],
+  [1, 1, 2, 1],
+  [1, 0, 1, 1],
+]
+
+afterEach(() => {
+  vi.restoreAllMocks()
+})
+
+describe('moves', () => {
+  it('lets any dot start the first line on an empty board (MV-1)', () => {
+    const game = newGame(2)
+
+    for (const d of allDots(2)) {
+      expect(game.isValidStartDot(d)).toBe(true)
+    }
+  })
+
+  it('only lets the ends of existing lines start a line once one exists (MV-2)', () => {
+    const game = newGame(3)
+    play(game, [[1, 1, 1, 2]])
+
+    const starts = allDots(3).filter((d) => game.isValidStartDot(d))
+    expect(starts.map((d) => d.key)).toEqual(['1,1', '1,2'])
+    expect(game.canDraw(dot(0, 0), dot(0, 1))).toBe(false)
+  })
+
+  it('does not let a dot with no free neighbor start a line (MV-2, ADR-0003)', () => {
+    const game = newGame(2)
+    play(game, [
+      [0, 0, 0, 1],
+      [0, 0, 1, 0],
+    ])
+
+    expect(game.isValidStartDot(dot(0, 0))).toBe(false)
+    expect(game.isValidStartDot(dot(0, 1))).toBe(true)
+  })
+
+  it('only lets a line end at an undrawn neighbor inside the board (MV-3)', () => {
+    const game = newGame(3)
+    play(game, [[1, 1, 1, 2]])
+
+    expect(game.validNeighbors(dot(1, 1)).map((d) => d.key)).toEqual(['0,1', '2,1', '1,0'])
+    expect(game.canDraw(dot(1, 1), dot(1, 2))).toBe(false) // already drawn
+    expect(game.canDraw(dot(1, 1), dot(2, 2))).toBe(false) // diagonal
+    expect(game.canDraw(dot(1, 1), dot(1, 3))).toBe(false) // not adjacent
+    expect(game.canDraw(dot(1, 2), dot(1, 3))).toBe(true)
+  })
+
+  it('ignores a rejected line: nothing is drawn and the turn stays (MV-3)', () => {
+    const game = newGame(2)
+    play(game, [[0, 0, 0, 1]])
+
+    expect(game.drawLine(dot(0, 1), dot(0, 0))).toEqual([])
+    expect(game.lines).toHaveLength(1)
+    expect(game.currentPlayerName).toBe('Bob')
+  })
+
+  it('draws the line for the current player', () => {
+    const game = newGame(2)
+    play(game, [[0, 0, 0, 1]])
+
+    expect(game.hasLine(dot(0, 1), dot(0, 0))).toBe(true)
+    expect(game.lines[0]?.ownerName).toBe('Ann')
+  })
+})
+
+describe('owned squares', () => {
+  it('gives the square to whoever draws its 4th edge (SQ-1)', () => {
+    const game = newGame(2, 'Bob')
+    play(game, [
+      [0, 0, 0, 1], // Bob
+      [0, 1, 0, 2], // Ann
+      [0, 0, 1, 0], // Bob
+      [0, 2, 1, 2], // Ann
+      [1, 0, 1, 1], // Bob
+    ])
+
+    const closed = game.drawLine(dot(0, 1), dot(1, 1)) // Ann
+
+    expect(closed.map((s) => [s.row, s.col, s.ownerName])).toEqual([[0, 0, 'Ann']])
+    expect(game.getSquare(0, 0)?.ownerName).toBe('Ann')
+    expect(game.scoreOf('Ann')).toBe(1)
+    expect(game.scoreOf('Bob')).toBe(0)
+  })
+
+  it('gives both squares to the drawer when one line closes two (SQ-2)', () => {
+    const game = newGame(2)
+    play(game, [
+      [0, 0, 0, 1],
+      [0, 1, 0, 2],
+      [0, 2, 1, 2],
+      [1, 2, 1, 1],
+      [1, 1, 1, 0],
+      [1, 0, 0, 0],
+    ])
+
+    const closed = game.drawLine(dot(0, 1), dot(1, 1)) // Ann, 7th line
+
+    expect(closed).toHaveLength(2)
+    expect(game.getSquare(0, 0)?.ownerName).toBe('Ann')
+    expect(game.getSquare(0, 1)?.ownerName).toBe('Ann')
+    expect(game.scoreOf('Ann')).toBe(2)
+  })
+
+  it('never changes the owner of an owned square (SQ-3)', () => {
+    const game = newGame(2)
+    play(game, FULL_2X2.slice(0, 10)) // Bob owns (0,1)
+
+    play(game, FULL_2X2.slice(10)) // later lines next to (0,1)
+
+    expect(game.getSquare(0, 1)?.ownerName).toBe('Bob')
+    expect(game.dirtySquares).toHaveLength(4)
+  })
+})
+
+describe('turns', () => {
+  it('passes the turn after every line (TR-1)', () => {
+    const game = newGame(2)
+
+    play(game, [[0, 0, 0, 1]])
+    expect(game.currentPlayer).toEqual(bob)
+    play(game, [[0, 1, 0, 2]])
+    expect(game.currentPlayer).toEqual(ann)
+  })
+
+  it('passes the turn even after a line that claims a square (TR-1, ADR-0002)', () => {
+    const game = newGame(2)
+    play(game, FULL_2X2.slice(0, 9))
+    expect(game.currentPlayerName).toBe('Bob')
+
+    expect(game.drawLine(dot(1, 1), dot(1, 2))).toHaveLength(1) // Bob claims (0,1)
+    expect(game.currentPlayerName).toBe('Ann')
+  })
+
+  it('picks a random first player on start (TR-2)', () => {
+    const game = new DotLineGame({ player1: ann, player2: bob, size: 2 })
+
+    vi.spyOn(Math, 'random').mockReturnValue(0)
+    expect(game.start().currentPlayerName).toBe('Ann')
+
+    vi.spyOn(Math, 'random').mockReturnValue(0.99)
+    expect(game.start().currentPlayerName).toBe('Bob')
+  })
+
+  it('starts a rematch on a clear board with the same players and size (TR-2, END-6)', () => {
+    const game = newGame(2)
+    play(game, FULL_2X2)
+
+    game.start()
+
+    expect(game.lines).toEqual([])
+    expect(game.dirtySquares).toEqual([])
+    expect(game.status).toBe('playing')
+    expect(game.finishReason).toBeNull()
+    expect(game.players).toEqual([ann, bob])
+    expect(game.size).toBe(2)
+  })
+})
+
+describe('end of game', () => {
+  it('finishes once every square is owned, and the higher score wins (END-1, END-3)', () => {
+    const game = newGame(2)
+
+    play(game, FULL_2X2.slice(0, 11))
+    expect(game.isFinished).toBe(false)
+
+    play(game, FULL_2X2.slice(11))
+    expect(game.isFinished).toBe(true)
+    expect(game.finishReason).toBe('completed')
+    expect(game.scoreOf('Bob')).toBe(3)
+    expect(game.scoreOf('Ann')).toBe(1)
+    expect(game.winner).toEqual(bob)
+  })
+
+  it('finishes early on Stop (END-2)', () => {
+    const game = newGame(2)
+    play(game, [[0, 0, 0, 1]])
+
+    game.stop()
+
+    expect(game.isFinished).toBe(true)
+    expect(game.finishReason).toBe('stopped')
+  })
+
+  it('keeps a completed game completed when Stop is pressed afterwards', () => {
+    const game = newGame(2)
+    play(game, FULL_2X2)
+
+    game.stop()
+
+    expect(game.finishReason).toBe('completed')
+  })
+
+  it('has no winner on equal scores, including 0-0 (END-3)', () => {
+    const game = newGame(2)
+    game.stop()
+    expect(game.winner).toBeNull()
+
+    const tied = newGame(2, 'Bob')
+    play(tied, [
+      [0, 0, 0, 1], // Bob
+      [0, 1, 0, 2], // Ann
+      [0, 0, 1, 0], // Bob
+      [0, 2, 1, 2], // Ann
+      [1, 0, 1, 1], // Bob
+      [0, 1, 1, 1], // Ann claims (0,0)
+      [1, 1, 1, 2], // Bob claims (0,1)
+    ])
+    tied.stop()
+    expect(tied.scoreOf('Ann')).toBe(1)
+    expect(tied.scoreOf('Bob')).toBe(1)
+    expect(tied.winner).toBeNull()
+  })
+
+  it('allows no moves after the game ends (END-7)', () => {
+    const game = newGame(2)
+    play(game, [[0, 0, 0, 1]])
+    game.stop()
+
+    expect(allDots(2).some((d) => game.isValidStartDot(d))).toBe(false)
+    expect(game.drawLine(dot(0, 1), dot(0, 2))).toEqual([])
+    expect(game.lines).toHaveLength(1)
+  })
+})
+
+describe('rehydration', () => {
+  const roundTrip = (game: DotLineGame) => new DotLineGame(JSON.parse(JSON.stringify(game)))
+
+  it('restores lines, owned squares, current player and status, including row/col 0 (PS-1, PS-2)', () => {
+    const game = newGame(2)
+    play(game, FULL_2X2.slice(0, 10))
+
+    const restored = roundTrip(game)
+
+    expect(restored).toEqual(game)
+    expect(restored.lines.map((l) => [l.key, l.ownerName])).toEqual(
+      game.lines.map((l) => [l.key, l.ownerName]),
+    )
+    expect(restored.hasLine(dot(0, 0), dot(0, 1))).toBe(true)
+    expect(restored.getSquare(0, 1)?.ownerName).toBe('Bob')
+    expect(restored.currentPlayer).toEqual(ann)
+    expect(restored.status).toBe('playing')
+  })
+
+  it('continues a restored game with the same rules (PS-2)', () => {
+    const game = newGame(2)
+    play(game, FULL_2X2.slice(0, 11))
+
+    const restored = roundTrip(game)
+    const closed = restored.drawLine(dot(1, 0), dot(1, 1))
+
+    expect(closed).toHaveLength(2)
+    expect(restored.isFinished).toBe(true)
+    expect(restored.winner).toEqual(bob)
+  })
+
+  it('restores a finished game as finished (PS-2)', () => {
+    const game = newGame(2)
+    play(game, [[0, 0, 0, 1]])
+    game.stop()
+
+    const restored = roundTrip(game)
+
+    expect(restored.isFinished).toBe(true)
+    expect(restored.finishReason).toBe('stopped')
+  })
+
+  it('reset keeps the same object and replaces its state (PS-2)', () => {
+    const saved = JSON.parse(JSON.stringify(newGame(2, 'Bob')))
+    const game = new DotLineGame()
+
+    game.reset(saved)
+
+    expect(game.currentPlayerName).toBe('Bob')
+    expect(game.isGameStarted).toBe(true)
+    game.reset()
+    expect(game.isGameStarted).toBe(false)
+  })
+
+  it('restores a save without a current player so start can pick one (PS-3)', () => {
+    const legacy = new DotLineGame(
+      JSON.parse(JSON.stringify({ player1: ann, player2: bob, size: 3 })),
+    )
+
+    expect(legacy.isGameStarted).toBe(true)
+    expect(legacy.currentPlayerName).toBeNull()
+
+    vi.spyOn(Math, 'random').mockReturnValue(0.99)
+    expect(legacy.start().currentPlayer).toEqual(bob)
+  })
+})
