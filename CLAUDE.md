@@ -45,3 +45,17 @@ Deployment: `.github/workflows/deploy.yml` publishes to GitHub Pages on every pu
 - TS is strict with `noUncheckedIndexedAccess` enabled, so indexed access returns `T | undefined`.
 - Linting: oxlint `correctness` category is set to error, and ESLint uses `vue/flat/essential` plus the vue-ts recommended config. Prettier owns formatting (`eslint-config-prettier`).
 - Node `^22.18.0 || >=24.12.0`.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues for `DenysSlobodianyk1996/dot-line`, managed via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` plus `docs/adr/` at the repo root, created lazily. See `docs/agents/domain.md`.
