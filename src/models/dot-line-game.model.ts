@@ -2,9 +2,12 @@ import type { Player } from './player.model'
 import { Dot } from './dot.model'
 import { Line } from './line.model'
 import { Square } from './square.model'
+import { isComputerPlayer } from './computer-player.model'
 
 export type GameStatus = 'playing' | 'finished'
 export type FinishReason = 'completed' | 'stopped'
+export type GameMode = 'twoPlayers' | 'computer'
+export type Difficulty = 'easy' | 'normal'
 
 const DIRECTIONS: [number, number][] = [
   [-1, 0],
@@ -22,6 +25,8 @@ export class DotLineGame {
   public currentPlayerName: string | null
   public status: GameStatus
   public finishReason: FinishReason | null
+  public gameMode: GameMode
+  public difficulty: Difficulty | null // only in Versus computer mode
 
   constructor({
     player1,
@@ -32,6 +37,8 @@ export class DotLineGame {
     currentPlayerName,
     status,
     finishReason,
+    gameMode,
+    difficulty,
   }: Partial<DotLineGame> = {}) {
     this.player1 = player1 ?? null
     this.player2 = player2 ?? null
@@ -41,6 +48,9 @@ export class DotLineGame {
     this.currentPlayerName = currentPlayerName ?? null
     this.status = status ?? 'playing'
     this.finishReason = finishReason ?? null
+    // saves from before game modes existed load as Two players (CM-33)
+    this.gameMode = gameMode ?? 'twoPlayers'
+    this.difficulty = this.gameMode === 'computer' ? (difficulty ?? 'easy') : null
   }
 
   setPlayer1(player1: Player) {
@@ -49,6 +59,11 @@ export class DotLineGame {
   }
   setPlayer2(player2: Player) {
     this.player2 = player2
+    return this
+  }
+  setGameMode(gameMode: GameMode, difficulty: Difficulty | null = null) {
+    this.gameMode = gameMode
+    this.difficulty = gameMode === 'computer' ? (difficulty ?? 'easy') : null
     return this
   }
   setSize(size: number) {
@@ -71,6 +86,15 @@ export class DotLineGame {
 
   getOpponent(name: string): Player | null {
     return this.players.find((p) => p.name !== name) ?? null
+  }
+
+  get isComputerGame(): boolean {
+    return this.gameMode === 'computer'
+  }
+
+  /** Playing, and the current player is the computer player: the game screen moves for it. */
+  get isComputerTurn(): boolean {
+    return this.isComputerGame && !this.isFinished && isComputerPlayer(this.currentPlayerName)
   }
 
   get isGameStarted(): boolean {
@@ -125,6 +149,26 @@ export class DotLineGame {
 
   canDraw(from: Dot, to: Dot): boolean {
     return this.isValidStartDot(from) && this.validNeighbors(from).some((dot) => dot.equals(to))
+  }
+
+  /**
+   * Every line the current player may draw now, each listed once (owner not set).
+   * Built on the valid-start and free-neighbor checks so the rules live in one place (ADR-0003).
+   */
+  legalMoves(): Line[] {
+    const size = this.size ?? 0
+    const moves = new Map<string, Line>()
+    for (let row = 0; row <= size; row++) {
+      for (let col = 0; col <= size; col++) {
+        const from = new Dot({ row, col })
+        if (!this.isValidStartDot(from)) continue
+        for (const to of this.validNeighbors(from)) {
+          const line = new Line({ from, to })
+          if (!moves.has(line.key)) moves.set(line.key, line)
+        }
+      }
+    }
+    return [...moves.values()]
   }
 
   getSquare(row: number, col: number): Square | null {
@@ -203,7 +247,9 @@ export class DotLineGame {
 }
 
 export interface GameSetupForm {
+  gameMode: GameMode
+  difficulty: Difficulty | null
   player1: Player
-  player2: Player
+  player2: Player // in Versus computer mode, the computer player
   size: number
 }

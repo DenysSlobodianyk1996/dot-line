@@ -1,7 +1,11 @@
 <template>
   <div class="flex flex-col gap-4">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
-      <GameBoard v-model:selected-dot="selectedDot" :dot-line-game="dotLineGame" />
+      <GameBoard
+        v-model:selected-dot="selectedDot"
+        :dot-line-game="dotLineGame"
+        :locked="isBoardLocked"
+      />
       <GameResult
         v-if="dotLineGame.isFinished"
         :dot-line-game="dotLineGame"
@@ -25,6 +29,7 @@ import GameBoard from './game/GameBoard.vue'
 import GameResult from './game/GameResult.vue'
 import GameStatus from './game/GameStatus.vue'
 import RulesToggle from './rules/RulesToggle.vue'
+import { useComputerTurn } from './useComputerTurn'
 
 const props = defineProps<{
   dotLineGame: DotLineGame
@@ -44,21 +49,32 @@ const hint = computed(() => {
   return t('game.hintStart')
 })
 
+// the computer player's turns: ~1 s pause, then its line (CM-11, CM-15, CM-31)
+const computerTurn = useComputerTurn(() => props.dotLineGame)
+
+// on the computer's turn nothing can be picked and clicks are ignored (CM-16)
+const isBoardLocked = computed(
+  () => computerTurn.isThinking.value || props.dotLineGame.isComputerTurn,
+)
+
 watchEffect(() => {
   StorageService.setItem(CURRENT_GAME, props.dotLineGame)
 })
 
 function stop() {
+  computerTurn.cancel()
   selectedDot.value = null
   props.dotLineGame.stop()
 }
 
 function rematch() {
+  computerTurn.cancel()
   selectedDot.value = null
   props.dotLineGame.start()
 }
 
 function newGame() {
+  computerTurn.cancel()
   StorageService.removeItem(CURRENT_GAME)
   props.dotLineGame.reset()
 }

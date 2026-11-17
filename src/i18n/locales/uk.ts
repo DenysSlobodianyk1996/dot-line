@@ -18,6 +18,14 @@ const uk: typeof en = {
     color: 'Колір',
     size: 'Розмір поля',
     save: 'Зберегти',
+    mode: 'Режим гри',
+    modeComputer: 'Проти комп’ютера',
+    modeTwoPlayers: 'Двоє гравців',
+    you: 'Ви',
+    opponent: 'Суперник',
+  },
+  players: {
+    computer: 'Комп’ютер',
   },
   validation: {
     invalid: 'Поле «{field}» заповнено некоректно.',

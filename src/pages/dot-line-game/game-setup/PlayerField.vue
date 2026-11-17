@@ -1,11 +1,11 @@
 <template>
   <fieldset class="rounded-lg border border-gray-300 p-4 flex gap-2">
     <legend class="px-2 text-sm font-semibold text-gray-700">
-      {{ t('setup.player', { number }) }}
+      {{ legend ?? t('setup.player', { number }) }}
     </legend>
     <Field
       :name="`${props.parentForm}.name`"
-      :label="t('setup.playerName', { number })"
+      :label="legend ? t('setup.name') : t('setup.playerName', { number })"
       :rules="`required|max:${MAX_NAME_LENGTH}|differentFromAll:${otherPlayerNames}`"
       v-slot="{ field, errorMessage }"
     >
@@ -61,6 +61,8 @@ const props = defineProps<{
   number: 1 | 2
   parentForm: string
   otherPlayerNames: string[]
+  // replaces "Player N", e.g. "You" in Versus computer mode
+  legend?: string
 }>()
 
 const { t } = useI18n()

@@ -16,6 +16,14 @@ const en = {
     color: 'Color',
     size: 'Size',
     save: 'Save',
+    mode: 'Game mode',
+    modeComputer: 'Versus computer',
+    modeTwoPlayers: 'Two players',
+    you: 'You',
+    opponent: 'Opponent',
+  },
+  players: {
+    computer: 'Computer',
   },
   validation: {
     invalid: '{field} is not valid.',

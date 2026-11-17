@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { Dot, DotLineGame } from '@/models'
+import { COMPUTER_NAME, Dot, DotLineGame } from '@/models'
 
 const ann = { name: 'Ann', color: '#ff0000' }
 const bob = { name: 'Bob', color: '#0000ff' }
@@ -324,5 +324,117 @@ describe('rehydration', () => {
 
     vi.spyOn(Math, 'random').mockReturnValue(0.99)
     expect(legacy.start().currentPlayer).toEqual(bob)
+  })
+})
+
+describe('game mode', () => {
+  const roundTrip = (game: DotLineGame) => new DotLineGame(JSON.parse(JSON.stringify(game)))
+  const computer = { name: COMPUTER_NAME, color: '#32a06e' }
+
+  function computerGame(first: string) {
+    return new DotLineGame({
+      player1: ann,
+      player2: computer,
+      size: 2,
+      currentPlayerName: first,
+    }).setGameMode('computer', 'easy')
+  }
+
+  it('loads a save from before game modes as Two players (CM-33)', () => {
+    const legacy = new DotLineGame(
+      JSON.parse(JSON.stringify({ player1: ann, player2: bob, size: 2, currentPlayerName: 'Ann' })),
+    )
+
+    expect(legacy.gameMode).toBe('twoPlayers')
+    expect(legacy.difficulty).toBeNull()
+    expect(legacy.isComputerTurn).toBe(false)
+  })
+
+  it('saves the game mode and difficulty with the game (CM-30)', () => {
+    const restored = roundTrip(computerGame('Ann'))
+
+    expect(restored.gameMode).toBe('computer')
+    expect(restored.difficulty).toBe('easy')
+  })
+
+  it("knows when it is the computer player's turn (CM-11)", () => {
+    const game = computerGame(COMPUTER_NAME)
+    expect(game.isComputerTurn).toBe(true)
+
+    game.drawLine(dot(0, 0), dot(0, 1))
+    expect(game.isComputerTurn).toBe(false)
+    expect(game.lines[0]?.ownerName).toBe(COMPUTER_NAME)
+  })
+
+  it('is never the computer turn once the game is finished (CM-17)', () => {
+    const game = computerGame(COMPUTER_NAME)
+    game.stop()
+
+    expect(game.isComputerTurn).toBe(false)
+  })
+
+  it('keeps the game mode and difficulty on a rematch (CM-28)', () => {
+    const game = computerGame('Ann')
+    game.stop()
+
+    game.start()
+
+    expect(game.gameMode).toBe('computer')
+    expect(game.difficulty).toBe('easy')
+  })
+
+  it('has no difficulty in Two players mode', () => {
+    const game = newGame(2).setGameMode('twoPlayers', 'easy')
+
+    expect(game.difficulty).toBeNull()
+  })
+})
+
+describe('legal moves', () => {
+  const keys = (game: DotLineGame) =>
+    game
+      .legalMoves()
+      .map((line) => line.key)
+      .sort()
+
+  it('lists every edge of an empty board once (MV-1)', () => {
+    const game = newGame(2)
+
+    // a 2x2 board has 12 edges
+    expect(keys(game)).toHaveLength(12)
+    expect(new Set(keys(game)).size).toBe(12)
+  })
+
+  it('only lists undrawn lines from the ends of existing lines (MV-2, MV-3, ADR-0003)', () => {
+    const game = newGame(2)
+    play(game, [
+      [0, 0, 0, 1],
+      [0, 0, 1, 0],
+    ])
+
+    // 0,0 has no free neighbor; 0,1 and 1,0 are the only valid starts
+    expect(keys(game)).toEqual(['0,1-0,2', '0,1-1,1', '1,0-1,1', '1,0-2,0'])
+  })
+
+  it('agrees with canDraw for every listed line (ADR-0003)', () => {
+    const game = newGame(3)
+    play(game, [
+      [1, 1, 1, 2],
+      [1, 2, 2, 2],
+    ])
+
+    const moves = game.legalMoves()
+    expect(moves.length).toBeGreaterThan(0)
+    for (const line of moves) {
+      expect(game.canDraw(line.from, line.to) || game.canDraw(line.to, line.from)).toBe(true)
+    }
+  })
+
+  it('is empty once the game is finished (END-7)', () => {
+    const game = newGame(2)
+    play(game, [[0, 0, 0, 1]])
+    game.stop()
+
+    expect(game.legalMoves()).toEqual([])
   })
 })

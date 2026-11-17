@@ -10,7 +10,9 @@
             class="mt-1.5 size-3 shrink-0 rounded-full"
             :style="{ backgroundColor: dotLineGame.currentPlayer?.color }"
           ></span>
-          <span class="min-w-0 wrap-break-word">{{ dotLineGame.currentPlayer?.name }}</span>
+          <span class="min-w-0 wrap-break-word">{{
+            displayName(dotLineGame.currentPlayer?.name)
+          }}</span>
         </div>
       </div>
 
@@ -79,6 +81,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseButton from '@/shared/components/BaseButton.vue'
 import PlayerScore from './PlayerScore.vue'
+import { useDisplayName } from '@/shared/composables/useDisplayName'
 
 defineProps<{
   dotLineGame: DotLineGame
@@ -90,6 +93,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const displayName = useDisplayName()
 
 const isConfirmOpen = ref(false)
 

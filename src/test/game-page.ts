@@ -13,12 +13,29 @@ export interface TestPlayer {
   color: string // #rrggbb
 }
 
+export type TestGameMode = 'twoPlayers' | 'computer'
+
 export interface StartGameOptions {
+  // Two players by default, so earlier specs keep testing that mode; 'computer' plays player1
+  // against the computer player (player2 is then ignored)
+  mode?: TestGameMode
   player1?: TestPlayer
   player2?: TestPlayer
   size?: number
-  // which player gets the first turn; the game picks it with Math.random, which is stubbed
+  // which player gets the first turn; the game picks it with Math.random, which is stubbed.
+  // In Versus computer mode the computer player is player 2.
   first?: 1 | 2
+}
+
+// the computer's pause before it draws (CM-15)
+export const COMPUTER_DELAY_MS = 1000
+
+// the computer player's name as the English page shows it (CM-12)
+export const COMPUTER = 'Computer'
+
+const MODE_LABELS: Record<TestGameMode, string> = {
+  twoPlayers: 'Two players',
+  computer: 'Versus computer',
 }
 
 export const ANNA: TestPlayer = { name: 'Anna', color: '#ff0000' }
@@ -32,14 +49,21 @@ export async function openGamePage({ storage = {} }: MountGamePageOptions = {}) 
 
 // Opens the page, fills in the setup form and submits it.
 export async function startGame({
+  mode = 'twoPlayers',
   player1 = ANNA,
   player2 = BOHDAN,
   size = 2,
   first = 1,
 }: StartGameOptions = {}) {
   const page = await openGamePage()
-  await page.submitSetup({ player1, player2, size, first })
+  await page.submitSetup({ mode, player1, player2, size, first })
   return page
+}
+
+// Starts a Versus computer game; the computer's pause runs on fake timers, so the test calls
+// vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] }) first (flushPromises needs a real setImmediate)
+export async function startComputerGame(options: Omit<StartGameOptions, 'mode' | 'player2'> = {}) {
+  return startGame({ ...options, mode: 'computer' })
 }
 
 // Value for Math.random that makes start() pick the given player out of two.
@@ -50,8 +74,10 @@ export function randomFor(first: 1 | 2) {
 export class GamePage {
   constructor(readonly wrapper: VueWrapper) {}
 
-  // reload: remount the app from whatever the game saved in localStorage
+  // reload: close this page (which cancels anything pending) and open the app again
+  // from whatever the game saved in localStorage
   async reload() {
+    this.wrapper.unmount()
     return openGamePage()
   }
 
@@ -65,11 +91,14 @@ export class GamePage {
     return this.wrapper.find('form').exists()
   }
 
-  async submitSetup({ player1, player2, size, first }: Required<StartGameOptions>) {
+  async submitSetup({ mode, player1, player2, size, first }: Required<StartGameOptions>) {
+    await this.chooseMode(mode)
     await this.input('player1.name').setValue(player1.name)
     await this.input('player1.color').setValue(player1.color)
-    await this.input('player2.name').setValue(player2.name)
-    await this.input('player2.color').setValue(player2.color)
+    if (mode === 'twoPlayers') {
+      await this.input('player2.name').setValue(player2.name)
+      await this.input('player2.color').setValue(player2.color)
+    }
     await this.input('size').setValue(String(size))
     await this.withFirstPlayer(first, async () => {
       await this.wrapper.find('form').trigger('submit')
@@ -77,8 +106,46 @@ export class GamePage {
     })
   }
 
-  private input(id: string) {
+  input(id: 'player1.name' | 'player1.color' | 'player2.name' | 'player2.color' | 'size') {
     return this.wrapper.find<HTMLInputElement>(`[id="${id}"]`)
+  }
+
+  private get modeOptions() {
+    return this.wrapper
+      .find('[role="radiogroup"][aria-label="Game mode"]')
+      .findAll('[role="radio"]')
+  }
+
+  async chooseMode(mode: TestGameMode) {
+    const option = this.modeOptions.find((el) => el.text() === MODE_LABELS[mode])
+    if (!option) throw new Error(`No "${MODE_LABELS[mode]}" game mode`)
+    await option.trigger('click')
+    await flushPromises()
+  }
+
+  // the checked game mode
+  selectedMode(): TestGameMode | null {
+    const checked = this.modeOptions.find((el) => el.attributes('aria-checked') === 'true')
+    const entry = Object.entries(MODE_LABELS).find(([, label]) => label === checked?.text())
+    return (entry?.[0] as TestGameMode) ?? null
+  }
+
+  // the fieldsets of the setup form by legend, e.g. ['You', 'Opponent'] or ['Player 1', 'Player 2']
+  setupFieldsets() {
+    return this.wrapper.findAll('fieldset legend').map((legend) => legend.text())
+  }
+
+  // the setup's read-only Opponent field in Versus computer mode
+  setupOpponent() {
+    const fieldset = this.wrapper
+      .findAll('fieldset')
+      .find((el) => el.find('legend').text() === 'Opponent')
+    if (!fieldset) return null
+    const swatch = fieldset.find<HTMLElement>('[data-color]')
+    return {
+      name: fieldset.find('[data-name]').text(),
+      color: swatch.element.style.backgroundColor,
+    }
   }
 
   // ---- board ----
@@ -179,6 +246,27 @@ export class GamePage {
 
   get squareCount() {
     return this.squareElements.length
+  }
+
+  // locked: no dot can be picked, so nothing is highlighted and clicks do nothing (CM-16)
+  get isBoardLocked() {
+    return this.dotsIn('idle').length === this.dotCount
+  }
+
+  // Draws some legal line for the person: the first valid start, then its first free neighbor.
+  async drawAnyLine() {
+    const [start] = this.dotsIn('start')
+    if (!start) throw new Error('No valid start dot')
+    await this.clickDot(start)
+    const [target] = this.dotsIn('target')
+    if (!target) throw new Error('No target dot')
+    await this.clickDot(target)
+  }
+
+  // lets the computer's pause run out (fake timers), so it draws its line
+  async waitForComputer(ms = COMPUTER_DELAY_MS) {
+    await vi.advanceTimersByTimeAsync(ms)
+    await flushPromises()
   }
 
   // ---- status panel ----

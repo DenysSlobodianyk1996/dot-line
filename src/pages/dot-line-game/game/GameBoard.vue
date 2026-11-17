@@ -10,7 +10,7 @@
         class="absolute flex items-center justify-center text-base font-bold"
         :style="squareStyle(square)"
       >
-        {{ square.ownerName?.charAt(0).toUpperCase() }}
+        {{ displayName(square.ownerName).charAt(0).toUpperCase() }}
       </div>
 
       <div
@@ -47,6 +47,7 @@
 import { Dot, type DotLineGame, type Line, type Square } from '@/models'
 import { computed, onBeforeUnmount, onMounted, ref, type CSSProperties } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useDisplayName } from '@/shared/composables/useDisplayName'
 
 type DotState = 'idle' | 'start' | 'selected' | 'target'
 
@@ -79,11 +80,14 @@ const DOT_CLASS: Record<DotState, string> = {
 
 const props = defineProps<{
   dotLineGame: DotLineGame
+  // the computer's turn: every dot idle and clicks ignored (CM-16)
+  locked?: boolean
 }>()
 
 const selectedDot = defineModel<Dot | null>('selectedDot', { default: null })
 
 const { t } = useI18n()
+const displayName = useDisplayName()
 
 const sideBySideMedia = window.matchMedia(SIDE_BY_SIDE_QUERY)
 // clientWidth excludes a desktop scrollbar, unlike window.innerWidth
@@ -102,8 +106,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateViewport))
 const cell = computed(() => {
   const size = props.dotLineGame.size || 1
   const sidePanel = isSideBySide.value ? SIDE_PANEL_WITH_GAP : 0
-  const available =
-    viewportWidth.value - APP_GUTTERS - sidePanel - PADDING * 2 - BORDER * 2
+  const available = viewportWidth.value - APP_GUTTERS - sidePanel - PADDING * 2 - BORDER * 2
   return Math.min(MAX_CELL, Math.max(MIN_CELL, Math.floor(available / size)))
 })
 
@@ -125,7 +128,8 @@ const dots = computed(() => {
     for (let col = 0; col <= size; col++) {
       const dot = new Dot({ row, col })
       let state: DotState = 'idle'
-      if (dot.equals(selected)) state = 'selected'
+      if (props.locked) state = 'idle'
+      else if (dot.equals(selected)) state = 'selected'
       else if (targets.some((target) => target.equals(dot))) state = 'target'
       else if (game.isValidStartDot(dot)) state = 'start'
       result.push({ dot, state })
@@ -192,7 +196,7 @@ function dotFillStyle(state: DotState): CSSProperties {
 function onDotClick(dot: Dot) {
   const game = props.dotLineGame
   const selected = selectedDot.value
-  if (game.isFinished) return
+  if (game.isFinished || props.locked) return
 
   if (dot.equals(selected)) {
     selectedDot.value = null
