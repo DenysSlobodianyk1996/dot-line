@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { CURRENT_GAME } from '@/static'
+import { COMPUTER_NAME } from '@/models/computer-player.model'
 import {
   ANNA,
   BOHDAN,
@@ -7,7 +8,9 @@ import {
   COMPUTER_DELAY_MS,
   openGamePage,
   startComputerGame,
+  startGame,
 } from '@/test/game-page'
+import { flushPromises } from '@vue/test-utils'
 
 // ANNA is #ff0000; the page reports colors as CSS rgb()
 const RED = 'rgb(255, 0, 0)'
@@ -71,6 +74,66 @@ describe('setup in Versus computer mode', () => {
     await page.input('size').setValue('2')
     await page.wrapper.find('form').trigger('submit')
     await vi.waitFor(() => expect(page.isSetupShown).toBe(false))
+  })
+})
+
+describe("my name can't be the computer's (CM-8)", () => {
+  async function submitName(name: string, locale: 'en' | 'uk' = 'en') {
+    const page = await openGamePage({ storage: { LOCALE: locale } })
+    await page.input('player1.name').setValue(name)
+    await page.input('size').setValue('2')
+    await page.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    return page
+  }
+
+  it.each(['Computer', 'computer', 'КОМП’ЮТЕР', "комп'ютер"])(
+    'rejects "%s" with its own message',
+    async (name) => {
+      const page = await submitName(name)
+
+      expect(page.isSetupShown).toBe(true)
+      expect(page.wrapper.text()).toContain('This name belongs to the computer')
+    },
+  )
+
+  it('shows the message in Ukrainian', async () => {
+    const page = await submitName('Computer', 'uk')
+
+    expect(page.isSetupShown).toBe(true)
+    expect(page.wrapper.text()).toContain('Це ім’я належить комп’ютеру')
+  })
+
+  it('allows the name in Two players mode', async () => {
+    const page = await startGame({ player1: { name: 'Computer', color: '#ff0000' } })
+
+    expect(page.isSetupShown).toBe(false)
+  })
+})
+
+describe('the rules read the same in both modes (CM-35, RL-5)', () => {
+  const rulesText = (page: Awaited<ReturnType<typeof openGamePage>>) =>
+    page.wrapper.get('section ol').text()
+
+  it('says "take turns" and "the other player", never "two players"', async () => {
+    const page = await openGamePage()
+    const computerRules = rulesText(page)
+    await page.chooseMode('twoPlayers')
+
+    expect(rulesText(page)).toBe(computerRules)
+    expect(computerRules).toContain('Take turns')
+    expect(computerRules).toContain('the other player')
+    expect(computerRules.toLowerCase()).not.toContain('two players')
+  })
+
+  it('reads neutrally in Ukrainian too', async () => {
+    const page = await openGamePage({ storage: { LOCALE: 'uk' } })
+    const rules = rulesText(page)
+
+    expect(rules).toContain('Гравці по черзі')
+    expect(rules).toContain('іншого гравця')
+    expect(rules.toLowerCase()).not.toContain('двоє')
+    expect(rules.toLowerCase()).not.toContain('два гравці')
   })
 })
 
@@ -227,5 +290,61 @@ describe('saving and reloading', () => {
     expect(page.turn()).toBe('Bohdan')
     expect(page.lineCount).toBe(1)
     expect(page.isBoardLocked).toBe(false)
+  })
+})
+
+describe('the result speaks to me (CM-27)', () => {
+  // a stopped 2x2 Versus computer game where I own `mine` squares and the computer owns `its`
+  function finishedGame(mine: number, its: number) {
+    const owners = [...Array(mine).fill(ANNA.name), ...Array(its).fill(COMPUTER_NAME)]
+    return {
+      player1: ANNA,
+      player2: { name: COMPUTER_NAME, color: '#00ff00' },
+      size: 2,
+      lines: [],
+      dirtySquares: owners.map((ownerName, i) => ({
+        row: Math.floor(i / 2),
+        col: i % 2,
+        ownerName,
+      })),
+      currentPlayerName: ANNA.name,
+      status: 'finished',
+      finishReason: 'stopped',
+      gameMode: 'computer',
+      difficulty: 'easy',
+    }
+  }
+
+  it('says "You won!" when I win, with both scores', async () => {
+    const page = await openGamePage({ storage: { [CURRENT_GAME]: finishedGame(2, 1) } })
+
+    expect(page.resultHeadline()).toBe('You won!')
+    expect(page.scores()).toEqual({ Anna: 2, [COMPUTER]: 1 })
+  })
+
+  it('says "Computer won" when the computer wins, with both scores', async () => {
+    const page = await openGamePage({ storage: { [CURRENT_GAME]: finishedGame(1, 2) } })
+
+    expect(page.resultHeadline()).toBe('Computer won')
+    expect(page.scores()).toEqual({ [COMPUTER]: 2, Anna: 1 })
+  })
+
+  it('says "Draw" on equal scores', async () => {
+    const page = await openGamePage({ storage: { [CURRENT_GAME]: finishedGame(1, 1) } })
+
+    expect(page.resultHeadline()).toBe('Draw')
+    expect(page.scores()).toEqual({ Anna: 1, [COMPUTER]: 1 })
+  })
+
+  it('says it in Ukrainian too', async () => {
+    const won = await openGamePage({
+      storage: { LOCALE: 'uk', [CURRENT_GAME]: finishedGame(2, 1) },
+    })
+    expect(won.wrapper.get('h3').text()).toBe('Ви перемогли!')
+
+    const lost = await openGamePage({
+      storage: { LOCALE: 'uk', [CURRENT_GAME]: finishedGame(0, 2) },
+    })
+    expect(lost.wrapper.get('h3').text()).toBe('Комп’ютер переміг')
   })
 })

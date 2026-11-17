@@ -19,6 +19,7 @@
             parent-form="player1"
             :legend="t('setup.you')"
             :other-player-names="[]"
+            reject-computer-name
           />
           <ComputerOpponentField :color="computerColorFor(values.player1?.color)" />
         </template>

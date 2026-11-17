@@ -9,7 +9,7 @@
           :style="{ backgroundColor: winner.color }"
         ></span>
         <h3 class="min-w-0 text-xl font-bold wrap-break-word text-gray-900">
-          {{ t('result.wins', { name: displayName(winner.name) }) }}
+          {{ winnerTitle }}
         </h3>
       </div>
       <h3 v-else class="text-xl font-bold text-gray-900">{{ t('result.draw') }}</h3>
@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DotLineGame } from '@/models'
+import { isComputerPlayer, type DotLineGame } from '@/models'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseButton from '@/shared/components/BaseButton.vue'
@@ -59,6 +59,15 @@ const { t } = useI18n()
 const displayName = useDisplayName()
 
 const winner = computed(() => props.dotLineGame.winner)
+
+// Versus computer speaks to the person; Two players names the winner (CM-27)
+const winnerTitle = computed(() => {
+  const name = winner.value?.name
+  if (props.dotLineGame.isComputerGame) {
+    return isComputerPlayer(name) ? t('result.computerWon') : t('result.youWon')
+  }
+  return t('result.wins', { name: displayName(name ?? '') })
+})
 
 const reason = computed(() =>
   props.dotLineGame.finishReason === 'stopped' ? t('result.stopped') : t('result.completed'),

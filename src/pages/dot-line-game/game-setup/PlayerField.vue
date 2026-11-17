@@ -6,7 +6,7 @@
     <Field
       :name="`${props.parentForm}.name`"
       :label="legend ? t('setup.name') : t('setup.playerName', { number })"
-      :rules="`required|max:${MAX_NAME_LENGTH}|differentFromAll:${otherPlayerNames}`"
+      :rules="nameRules"
       v-slot="{ field, errorMessage }"
     >
       <div class="flex min-w-0 flex-1 flex-col gap-2">
@@ -40,7 +40,9 @@
 <script setup lang="ts">
 import { Field, defineRule } from 'vee-validate'
 import { required, max } from '@vee-validate/rules'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { i18n, SUPPORTED_LOCALES } from '@/i18n'
 import BaseLabel from '@/shared/components/BaseLabel.vue'
 import BaseInput from '@/shared/components/BaseInput.vue'
 import BaseFieldError from '@/shared/components/BaseFieldError.vue'
@@ -57,15 +59,36 @@ defineRule('differentFromAll', (fieldValue: string, otherValues: string[]) => {
     ?.includes(fieldValue?.toLowerCase())
 })
 
+// apostrophe variants count as the same letter: Комп’ютер = Комп'ютер = Компʼютер
+function normalizeName(name: string) {
+  return name.trim().replace(/['ʼ’]/g, '’').toLocaleLowerCase()
+}
+
+// a person can't take the computer's display name in any language (CM-8);
+// the message comes from the i18n generateMessage config (validation.computerName)
+defineRule('notComputerName', (fieldValue: string) => {
+  const computerNames = SUPPORTED_LOCALES.map((locale) =>
+    normalizeName(i18n.global.getLocaleMessage(locale).players.computer),
+  )
+  return !computerNames.includes(normalizeName(fieldValue ?? ''))
+})
+
 const props = defineProps<{
   number: 1 | 2
   parentForm: string
   otherPlayerNames: string[]
   // replaces "Player N", e.g. "You" in Versus computer mode
   legend?: string
+  // Versus computer mode: reject the computer's name (CM-8)
+  rejectComputerName?: boolean
 }>()
 
 const { t } = useI18n()
+
+const nameRules = computed(() => {
+  const rules = `required|max:${MAX_NAME_LENGTH}|differentFromAll:${props.otherPlayerNames}`
+  return props.rejectComputerName ? `${rules}|notComputerName` : rules
+})
 </script>
 
 <style lang="scss" scoped></style>
