@@ -23,6 +23,9 @@ const uk: typeof en = {
     modeTwoPlayers: 'Двоє гравців',
     you: 'Ви',
     opponent: 'Суперник',
+    difficulty: 'Складність',
+    easy: 'Легко',
+    normal: 'Нормально',
   },
   players: {
     computer: 'Комп’ютер',
@@ -30,6 +33,7 @@ const uk: typeof en = {
   validation: {
     invalid: 'Поле «{field}» заповнено некоректно.',
     maxLength: 'Поле «{field}» може містити не більше {length} символів.',
+    computerName: 'Це ім’я належить комп’ютеру',
     differentNames: 'Імена гравців мають відрізнятися',
   },
   game: {
@@ -53,6 +57,8 @@ const uk: typeof en = {
   result: {
     title: 'Результат',
     wins: 'Перемагає {name}',
+    youWon: 'Ви перемогли!',
+    computerWon: 'Комп’ютер переміг',
     draw: 'Нічия',
     completed: 'Усі квадрати заповнено.',
     stopped: 'Гру зупинено.',

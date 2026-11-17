@@ -21,6 +21,9 @@ const en = {
     modeTwoPlayers: 'Two players',
     you: 'You',
     opponent: 'Opponent',
+    difficulty: 'Difficulty',
+    easy: 'Easy',
+    normal: 'Normal',
   },
   players: {
     computer: 'Computer',
@@ -28,6 +31,7 @@ const en = {
   validation: {
     invalid: '{field} is not valid.',
     maxLength: '{field} can be at most {length} characters.',
+    computerName: 'This name belongs to the computer',
     differentNames: 'Values must be different',
   },
   game: {
@@ -51,6 +55,8 @@ const en = {
   result: {
     title: 'Result',
     wins: '{name} wins',
+    youWon: 'You won!',
+    computerWon: 'Computer won',
     draw: 'Draw',
     completed: 'All squares are filled.',
     stopped: 'The game was stopped.',

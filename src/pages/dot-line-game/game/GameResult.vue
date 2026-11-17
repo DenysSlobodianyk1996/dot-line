@@ -11,7 +11,7 @@
         <!-- the robot sits between the swatch and the heading (CM-13) -->
         <RobotIcon v-if="isComputerPlayer(winner.name)" :size="24" class="mt-0.5" />
         <h3 class="min-w-0 text-xl font-bold wrap-break-word text-gray-900">
-          {{ t('result.wins', { name: displayName(winner.name) }) }}
+          {{ winnerTitle }}
         </h3>
       </div>
       <h3 v-else class="text-xl font-bold text-gray-900">{{ t('result.draw') }}</h3>
@@ -62,6 +62,15 @@ const { t } = useI18n()
 const displayName = useDisplayName()
 
 const winner = computed(() => props.dotLineGame.winner)
+
+// Versus computer speaks to the person; Two players names the winner (CM-27)
+const winnerTitle = computed(() => {
+  const name = winner.value?.name
+  if (props.dotLineGame.isComputerGame) {
+    return isComputerPlayer(name) ? t('result.computerWon') : t('result.youWon')
+  }
+  return t('result.wins', { name: displayName(name ?? '') })
+})
 
 const reason = computed(() =>
   props.dotLineGame.finishReason === 'stopped' ? t('result.stopped') : t('result.completed'),
