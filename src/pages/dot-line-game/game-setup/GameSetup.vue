@@ -76,7 +76,6 @@ import {
   type Difficulty,
   type GameMode,
   type GameSetupForm,
-  type Player,
 } from '@/models'
 
 import BaseLabel from '@/shared/components/BaseLabel.vue'
@@ -98,8 +97,17 @@ const { t } = useI18n()
 
 // Setup opens with the game mode and difficulty of the last game started; on a first visit,
 // Versus computer and Normal (CM-2, CM-3, CM-7, CM-29)
-const GAME_MODES: GameMode[] = ['computer', 'twoPlayers']
-const DIFFICULTIES: Difficulty[] = ['easy', 'normal']
+// each value with its label's message key, listed once; the switches show them in this order
+const GAME_MODE_OPTIONS: { value: GameMode; labelKey: string }[] = [
+  { value: 'computer', labelKey: 'setup.modeComputer' },
+  { value: 'twoPlayers', labelKey: 'setup.modeTwoPlayers' },
+]
+const DIFFICULTY_OPTIONS: { value: Difficulty; labelKey: string }[] = [
+  { value: 'easy', labelKey: 'setup.easy' },
+  { value: 'normal', labelKey: 'setup.normal' },
+]
+const GAME_MODES = GAME_MODE_OPTIONS.map(({ value }) => value)
+const DIFFICULTIES = DIFFICULTY_OPTIONS.map(({ value }) => value)
 
 function remembered<T extends string>(key: string, allowed: T[], fallback: T): T {
   const value = StorageService.getItem(key)
@@ -110,21 +118,15 @@ const gameMode = ref<GameMode>(remembered(GAME_MODE, GAME_MODES, 'computer'))
 const difficulty = ref<Difficulty>(remembered(DIFFICULTY, DIFFICULTIES, 'normal'))
 const isComputerMode = computed(() => gameMode.value === 'computer')
 
-const modeOptions = computed<{ value: GameMode; label: string }[]>(() => [
-  { value: 'computer', label: t('setup.modeComputer') },
-  { value: 'twoPlayers', label: t('setup.modeTwoPlayers') },
-])
+const modeOptions = computed(() =>
+  GAME_MODE_OPTIONS.map(({ value, labelKey }) => ({ value, label: t(labelKey) })),
+)
+const difficultyOptions = computed(() =>
+  DIFFICULTY_OPTIONS.map(({ value, labelKey }) => ({ value, label: t(labelKey) })),
+)
 
-const difficultyOptions = computed<{ value: Difficulty; label: string }[]>(() => [
-  { value: 'easy', label: t('setup.easy') },
-  { value: 'normal', label: t('setup.normal') },
-])
-
-interface SetupFormValues {
-  player1: Player
-  player2: Player
-  size: number
-}
+// what the form fields hold; the game mode and difficulty come from the switches
+type SetupFormValues = Omit<GameSetupForm, 'gameMode' | 'difficulty'>
 
 const formInitialValues: SetupFormValues = {
   player1: {
@@ -145,7 +147,7 @@ const emit = defineEmits<{
 // In Versus computer mode the second player is the computer player; values typed for a second
 // person stay in the form (CM-10) but aren't used.
 function submit(values: Record<string, unknown>) {
-  const { player1, player2, size } = values as unknown as SetupFormValues
+  const { player1, player2, size } = values as SetupFormValues
   // the difficulty is remembered even in Two players, for the next Versus computer game (CM-7)
   StorageService.setItem(GAME_MODE, gameMode.value)
   StorageService.setItem(DIFFICULTY, difficulty.value)
