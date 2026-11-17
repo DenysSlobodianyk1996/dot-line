@@ -6,18 +6,18 @@
     <Field
       :name="`${props.parentForm}.name`"
       :label="t('setup.playerName', { number })"
-      :rules="`required|differentFromAll:${otherPlayerNames}`"
+      :rules="`required|max:${MAX_NAME_LENGTH}|differentFromAll:${otherPlayerNames}`"
       v-slot="{ field, errorMessage }"
     >
       <div class="flex min-w-0 flex-1 flex-col gap-2">
         <BaseLabel :for="field.name">{{ t('setup.name') }}</BaseLabel>
-        <!-- names are at most 15 characters; the field doesn't accept more (GS-1) -->
+        <!-- names are at most 15 characters: the field doesn't accept more, and a longer value fails `max` (GS-1) -->
         <BaseInput
           v-bind="field"
           :id="field.name"
           :title="field.value"
           type="text"
-          maxlength="15"
+          :maxlength="MAX_NAME_LENGTH"
         />
         <BaseFieldError :errorMessage />
       </div>
@@ -39,13 +39,16 @@
 
 <script setup lang="ts">
 import { Field, defineRule } from 'vee-validate'
-import { required } from '@vee-validate/rules'
+import { required, max } from '@vee-validate/rules'
 import { useI18n } from 'vue-i18n'
 import BaseLabel from '@/shared/components/BaseLabel.vue'
 import BaseInput from '@/shared/components/BaseInput.vue'
 import BaseFieldError from '@/shared/components/BaseFieldError.vue'
 
 defineRule('required', required)
+defineRule('max', max)
+
+const MAX_NAME_LENGTH = 15
 // the message comes from the i18n generateMessage config (validation.differentNames)
 defineRule('differentFromAll', (fieldValue: string, otherValues: string[]) => {
   return !otherValues

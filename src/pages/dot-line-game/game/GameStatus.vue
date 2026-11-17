@@ -4,12 +4,13 @@
     <div class="grid grid-cols-2 gap-4 sm:flex sm:flex-col">
       <div class="flex min-w-0 flex-col gap-1">
         <div class="text-sm font-medium text-gray-700">{{ t('status.turn') }}</div>
-        <div class="flex items-center gap-2 font-semibold text-gray-900">
+        <!-- the whole name, wrapping if needed (GB-5) -->
+        <div class="flex items-start gap-2 leading-6 font-semibold text-gray-900">
           <span
-            class="size-3 shrink-0 rounded-full"
+            class="mt-1.5 size-3 shrink-0 rounded-full"
             :style="{ backgroundColor: dotLineGame.currentPlayer?.color }"
           ></span>
-          <span class="min-w-0 truncate">{{ dotLineGame.currentPlayer?.name }}</span>
+          <span class="min-w-0 wrap-break-word">{{ dotLineGame.currentPlayer?.name }}</span>
         </div>
       </div>
 
@@ -60,11 +61,7 @@
           />
         </div>
         <div class="grid grid-cols-2 gap-2 sm:flex sm:justify-end">
-          <BaseButton
-            color="secondary"
-            class="min-h-11 sm:min-h-0"
-            @click="isConfirmOpen = false"
-          >
+          <BaseButton color="secondary" class="min-h-11 sm:min-h-0" @click="isConfirmOpen = false">
             {{ t('status.cancel') }}
           </BaseButton>
           <BaseButton color="primary" class="min-h-11 sm:min-h-0" @click="confirmStop">

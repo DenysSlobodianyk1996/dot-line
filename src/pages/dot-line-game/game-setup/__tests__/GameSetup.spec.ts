@@ -61,6 +61,36 @@ describe('game setup', () => {
     expect(inputLabelled(page, 'Гравець 2', 'Ім’я').attributes('maxlength')).toBe('15')
   })
 
+  it('blocks the start when a name that got in anyway is longer than 15 characters (GS-1)', async () => {
+    const page = await mountGamePage()
+
+    // setValue bypasses maxlength, like a value restored into the field
+    await fillSetup(page, { name1: 'Олександра-Марія', name2: 'Bob', size: '3' })
+    await submit(page)
+
+    expect(page.find('form').exists()).toBe(true)
+    expect(errors(page)).toEqual(['Поле «Ім’я гравця 1» може містити не більше 15 символів.'])
+  })
+
+  it('accepts a name of exactly 15 characters (GS-1)', async () => {
+    const page = await mountGamePage()
+
+    await fillSetup(page, { name1: 'Олександра-Марі', name2: 'Bob', size: '3' })
+    await submit(page)
+
+    expect(page.find('form').exists()).toBe(false)
+  })
+
+  it('explains the name limit in English when English is chosen (GS-1, I18N-1)', async () => {
+    const page = await mountGamePage({ storage: { LOCALE: 'en' } })
+
+    await inputLabelled(page, 'Player 2', 'Name').setValue('Bartholomew-John')
+    await page.get('form').trigger('submit')
+    await flushPromises()
+
+    expect(errors(page)).toContain('Player 2 name can be at most 15 characters.')
+  })
+
   it.each(['Alice', 'ALICE', 'alice'])(
     'shows that names must differ when player 2 is "%s" (GS-1)',
     async (name2) => {

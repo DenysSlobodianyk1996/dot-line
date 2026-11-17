@@ -305,3 +305,48 @@ describe('game screen: reload (PS-1, PS-2)', () => {
     expect(reloaded.square([0, 0])).toEqual({ initial: 'B', color: BLUE })
   })
 })
+
+describe('game screen: long names (GB-5)', () => {
+  // two 15-character names, the most GS-1 allows; the first is one long word
+  const LONG_1 = { name: 'Wolfgangwilhelm', color: '#ff0000' }
+  const LONG_2 = { name: 'Maria-Magdalena', color: '#0000ff' }
+
+  it('shows the whole name in the turn and the scores, wrapping instead of cutting (GB-5)', async () => {
+    const page = await startGame({ player1: LONG_1, player2: LONG_2 })
+
+    expect(page.turn()).toBe(LONG_1.name)
+    expect(page.scores()).toEqual({ [LONG_1.name]: 0, [LONG_2.name]: 0 })
+    expect(page.nameDisplays(LONG_1.name)).toEqual([
+      { text: LONG_1.name, shownInFull: true }, // turn
+      { text: LONG_1.name, shownInFull: true }, // score
+    ])
+  })
+
+  it('shows the whole names in the Stop dialog (GB-5)', async () => {
+    const page = await startGame({ player1: LONG_1, player2: LONG_2 })
+
+    await page.click('Stop')
+
+    expect(page.dialog.text()).toContain(LONG_1.name)
+    expect(page.dialog.text()).toContain(LONG_2.name)
+    // turn, score, and the dialog's score
+    expect(page.nameDisplays(LONG_1.name)).toEqual([
+      { text: LONG_1.name, shownInFull: true },
+      { text: LONG_1.name, shownInFull: true },
+      { text: LONG_1.name, shownInFull: true },
+    ])
+  })
+
+  it('shows the whole winner name in the result headline and scores (GB-5)', async () => {
+    const page = await startGame({ player1: LONG_1, player2: LONG_2 })
+    await page.drawLines(BOHDAN_OWNS_ONE) // player 2 closes a square
+
+    await page.stopGame()
+
+    expect(page.resultHeadline()).toBe(`${LONG_2.name} wins`)
+    expect(page.nameDisplays(LONG_2.name)).toEqual([
+      { text: `${LONG_2.name} wins`, shownInFull: true }, // headline
+      { text: LONG_2.name, shownInFull: true }, // score
+    ])
+  })
+})

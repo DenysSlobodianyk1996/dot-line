@@ -2,9 +2,13 @@
   <div class="flex w-full flex-col gap-4 sm:w-53 sm:shrink-0">
     <div class="flex flex-col gap-1">
       <div class="text-sm font-medium text-gray-700">{{ t('result.title') }}</div>
-      <div v-if="winner" class="flex items-center gap-2">
-        <span class="size-4 shrink-0 rounded-full" :style="{ backgroundColor: winner.color }"></span>
-        <h3 class="min-w-0 truncate text-xl font-bold text-gray-900">
+      <!-- the whole name, wrapping if needed (GB-5) -->
+      <div v-if="winner" class="flex items-start gap-2">
+        <span
+          class="mt-1.5 size-4 shrink-0 rounded-full"
+          :style="{ backgroundColor: winner.color }"
+        ></span>
+        <h3 class="min-w-0 text-xl font-bold wrap-break-word text-gray-900">
           {{ t('result.wins', { name: winner.name }) }}
         </h3>
       </div>

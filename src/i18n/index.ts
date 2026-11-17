@@ -36,10 +36,15 @@ export function setLocale(locale: AppLocale) {
 
 // validation messages are generated in the current language when a field validates (GS-1, I18N-6)
 configure({
-  generateMessage: ({ field, rule }) =>
-    rule?.name === 'differentFromAll'
-      ? i18n.global.t('validation.differentNames')
-      : i18n.global.t('validation.invalid', { field }),
+  generateMessage: ({ field, rule }) => {
+    if (rule?.name === 'differentFromAll') return i18n.global.t('validation.differentNames')
+    if (rule?.name === 'max') {
+      // string rules pass params as a list: `max:15` → ['15']
+      const [length] = Array.isArray(rule.params) ? rule.params : []
+      return i18n.global.t('validation.maxLength', { field, length })
+    }
+    return i18n.global.t('validation.invalid', { field })
+  },
 })
 
 applyDocumentLocale(i18n.global.locale.value as AppLocale)

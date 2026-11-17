@@ -19,6 +19,7 @@ const en = {
   },
   validation: {
     invalid: '{field} is not valid.',
+    maxLength: '{field} can be at most {length} characters.',
     differentNames: 'Values must be different',
   },
   game: {

@@ -252,6 +252,23 @@ export class GamePage {
     await this.click('New game')
   }
 
+  // ---- names (GB-5) ----
+
+  // Where the name appears on screen (turn, scores, Stop dialog, result), each place says whether the
+  // whole name is shown: nothing around it clips it with "…" or keeps it on one line, and a long
+  // single word may break onto the next line. jsdom has no layout, so this reads the Tailwind classes.
+  nameDisplays(name: string) {
+    const holders = [...(this.wrapper.element as HTMLElement).querySelectorAll('span, h3')].filter(
+      (el) =>
+        el.textContent!.includes(name) &&
+        ![...el.children].some((child) => child.textContent!.includes(name)),
+    )
+    return holders.map((el) => ({
+      text: el.textContent!.trim(),
+      shownInFull: !ancestry(el).some(clips) && ancestry(el).some(breaksLongWords),
+    }))
+  }
+
   // ---- helpers ----
 
   private async withFirstPlayer(first: 1 | 2, action: () => Promise<void>) {
@@ -262,6 +279,20 @@ export class GamePage {
       random.mockRestore()
     }
   }
+}
+
+function ancestry(el: Element): Element[] {
+  return el.parentElement ? [el, ...ancestry(el.parentElement)] : [el]
+}
+
+const CLIPPING = /^(truncate|text-ellipsis|text-clip|whitespace-nowrap|text-nowrap|line-clamp-\d+)$/
+function clips(el: Element) {
+  return [...el.classList].some((c) => CLIPPING.test(c))
+}
+
+const BREAKING = /^(wrap-break-word|wrap-anywhere|break-words|break-all)$/
+function breaksLongWords(el: Element) {
+  return [...el.classList].some((c) => BREAKING.test(c))
 }
 
 function readScores(section: Element): Record<string, number> {
