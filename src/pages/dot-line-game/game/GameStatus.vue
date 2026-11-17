@@ -21,9 +21,10 @@
             :icon-size="20"
           />
         </div>
-        <!-- always rendered, so screen readers announce "Thinking…" when it appears (CM-14, CM-37) -->
+        <!-- always rendered, so screen readers announce "Thinking…" and then the computer's line
+             (CM-14, CM-37) -->
         <p aria-live="polite" class="text-sm text-gray-500" :class="{ 'animate-pulse': thinking }">
-          {{ thinking ? t('status.thinking') : '' }}
+          {{ announcement }}
         </p>
       </div>
 
@@ -88,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DotLineGame } from '@/models'
+import { isComputerPlayer, type DotLineGame } from '@/models'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseButton from '@/shared/components/BaseButton.vue'
@@ -106,11 +107,27 @@ const isPersonTurn = computed(
   () => props.dotLineGame.isComputerGame && !props.dotLineGame.isComputerTurn,
 )
 
+const { t } = useI18n()
+
+// what the live region says: "Thinking…" while the computer's move is pending, then what its line
+// did until the next line is drawn (CM-37)
+const announcement = computed(() => {
+  if (props.thinking) return t('status.thinking')
+  const { lines } = props.dotLineGame
+  const newest = lines[lines.length - 1]
+  if (!newest || !isComputerPlayer(newest.ownerName)) return ''
+  // an owned square next to the newest line was closed by it
+  const claimed = props.dotLineGame
+    .squaresNextTo(newest)
+    .filter(({ row, col }) => props.dotLineGame.getSquare(row, col)).length
+  if (claimed === 2) return t('status.computerClaimedTwo')
+  if (claimed === 1) return t('status.computerClaimedOne')
+  return t('status.computerDrew')
+})
+
 const emit = defineEmits<{
   stop: []
 }>()
-
-const { t } = useI18n()
 
 // the Stop dialog is open; Game pauses the computer's move meanwhile (VC-13)
 const isConfirmOpen = defineModel<boolean>('confirming', { default: false })

@@ -77,6 +77,9 @@ Message keys added to both locales (`src/i18n/locales`):
 | `validation.maxLength` | {field} can be at most {length} characters. | Поле «{field}» може містити не більше {length} символів. |
 | `status.thinking` | Thinking… | Думає… |
 | `status.yourTurn` | Your turn | Ваш хід |
+| `status.computerDrew` | Computer drew a line | Комп’ютер провів лінію |
+| `status.computerClaimedOne` | Computer drew a line and claimed a square | Комп’ютер провів лінію і зайняв квадрат |
+| `status.computerClaimedTwo` | Computer drew a line and claimed two squares | Комп’ютер провів лінію і зайняв два квадрати |
 | `result.youWon` | You won! | Ви перемогли! |
 | `result.computerWon` | Computer won | Комп’ютер переміг |
 
@@ -359,7 +362,7 @@ src/shared/components/LanguageToggle.vue
 
 ### Status and board [VC-10, VC-14, VC-15]
 
-- `GameStatus.vue`: on the person's turn in a computer game (`isComputerGame && !isComputerTurn`) the Turn reads `status.yourTurn` next to the person's swatch; otherwise it shows `PlayerName`. Under it, an always-rendered `<p aria-live="polite">` shows `status.thinking` with `animate-pulse` while `thinking`, and the hint (`data-hint`) is hidden then.
+- `GameStatus.vue`: on the person's turn in a computer game (`isComputerGame && !isComputerTurn`) the Turn reads `status.yourTurn` next to the person's swatch; otherwise it shows `PlayerName`. Under it, an always-rendered `<p aria-live="polite">` shows `status.thinking` with `animate-pulse` while `thinking`, and the hint (`data-hint`) is hidden then. Once the computer has drawn, and until the next line, it shows `status.computerDrew`, or `status.computerClaimedOne` / `status.computerClaimedTwo` when owned squares lie next to that newest line (`squaresNextTo`), so screen readers hear the move [CM-37]. It's derived from `lines`, so a reload on the person's turn shows it too, without announcing it.
 - `GameBoard.vue`: `lastComputerLine` is the newest line when its owner is the computer player and the game isn't finished. It's derived from `lines`, so it survives a reload. That line gets `box-shadow: 0 0 0 4px color-mix(in srgb, <color> 40%, transparent)`.
 
 ### Result [VC-19]

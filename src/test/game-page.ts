@@ -39,6 +39,9 @@ export const COMPUTER = 'Computer'
 // the Turn area in Versus computer mode (CM-14, CM-19)
 export const THINKING = 'Thinking…'
 export const YOUR_TURN = 'Your turn'
+// what the live region says after the computer's line (CM-37)
+export const COMPUTER_DREW = 'Computer drew a line'
+export const COMPUTER_CLAIMED = 'Computer drew a line and claimed a square'
 
 const MODE_LABELS: Record<TestGameMode, string> = {
   twoPlayers: 'Two players',
@@ -334,7 +337,8 @@ export class GamePage {
     return this.panelSection('Turn').children[1]!.textContent!.trim()
   }
 
-  // the polite live region under the turn: "Thinking…" while the computer's move is pending, else ''
+  // the polite live region under the turn: "Thinking…" while the computer's move is pending, then
+  // what it drew (CM-37), else ''
   thinking() {
     const region = this.panelSection('Turn').querySelector('[aria-live="polite"]')
     if (!region) throw new Error('No live region in the Turn area')

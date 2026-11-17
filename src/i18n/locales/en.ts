@@ -45,6 +45,10 @@ const en = {
     turn: 'Turn',
     yourTurn: 'Your turn',
     thinking: 'Thinking…',
+    // announced politely after the computer's line (CM-37)
+    computerDrew: 'Computer drew a line',
+    computerClaimedOne: 'Computer drew a line and claimed a square',
+    computerClaimedTwo: 'Computer drew a line and claimed two squares',
     score: 'Score',
     stop: 'Stop',
     stopTitle: 'Stop the game?',

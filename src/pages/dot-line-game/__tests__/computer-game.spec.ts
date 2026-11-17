@@ -9,6 +9,8 @@ import {
   openGamePage,
   startComputerGame,
   startGame,
+  COMPUTER_CLAIMED,
+  COMPUTER_DREW,
   THINKING,
   YOUR_TURN,
 } from '@/test/game-page'
@@ -426,8 +428,45 @@ describe("the computer's turn on screen", () => {
 
     await page.waitForComputer()
 
-    expect(page.thinking()).toBe('')
+    expect(page.thinking()).toBe(COMPUTER_DREW)
+    expect(page.isThinkingPulsing()).toBe(false)
     expect(page.hasHint()).toBe(true)
+  })
+
+  it('announces its line politely until its next turn (CM-37)', async () => {
+    const page = await startComputerGame({ first: 2 })
+    await page.waitForComputer()
+    expect(page.thinking()).toBe(COMPUTER_DREW)
+
+    await page.drawAnyLine()
+
+    expect(page.thinking()).toBe(THINKING)
+  })
+
+  it('announces when its line claimed a square (CM-37)', async () => {
+    // Normal; square 0,0 misses only 0,1-1,1, so the computer claims it
+    const saved = {
+      player1: ANNA,
+      player2: { name: COMPUTER_NAME, color: '#32a06e' },
+      size: 2,
+      lines: [
+        { from: { row: 0, col: 0 }, to: { row: 0, col: 1 }, ownerName: 'Anna' },
+        { from: { row: 0, col: 0 }, to: { row: 1, col: 0 }, ownerName: COMPUTER_NAME },
+        { from: { row: 1, col: 0 }, to: { row: 1, col: 1 }, ownerName: 'Anna' },
+      ],
+      dirtySquares: [],
+      currentPlayerName: COMPUTER_NAME,
+      status: 'playing',
+      finishReason: null,
+      gameMode: 'computer',
+      difficulty: 'normal',
+    }
+    const page = await openGamePage({ storage: { [CURRENT_GAME]: saved } })
+
+    await page.waitForComputer()
+
+    expect(page.scores()).toEqual({ Anna: 0, [COMPUTER]: 1 })
+    expect(page.thinking()).toBe(COMPUTER_CLAIMED)
   })
 
   it('says "Your turn" on my turn (CM-19)', async () => {
@@ -542,6 +581,7 @@ describe("the computer's turn on screen", () => {
     expect(page.wrapper.text()).toContain('Думає…')
     await page.waitForComputer()
     expect(page.wrapper.text()).toContain('Ваш хід')
+    expect(page.wrapper.text()).toContain('Комп’ютер провів лінію')
   })
 })
 
