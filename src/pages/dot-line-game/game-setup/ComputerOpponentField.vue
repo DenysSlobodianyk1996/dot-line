@@ -7,6 +7,7 @@
       <div
         class="flex min-h-9.5 items-center gap-1.5 rounded-md border border-gray-200 bg-gray-100 px-3 py-2 text-sm text-gray-700"
       >
+        <RobotIcon :size="18" />
         <span data-name>{{ displayName(COMPUTER_NAME) }}</span>
       </div>
     </div>
@@ -23,6 +24,7 @@
 import { useI18n } from 'vue-i18n'
 import { COMPUTER_NAME } from '@/models'
 import { useDisplayName } from '@/shared/composables/useDisplayName'
+import RobotIcon from '@/shared/components/RobotIcon.vue'
 
 defineProps<{
   color: string

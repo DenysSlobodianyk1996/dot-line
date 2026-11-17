@@ -33,10 +33,17 @@ export const COMPUTER_DELAY_MS = 1000
 // the computer player's name as the English page shows it (CM-12)
 export const COMPUTER = 'Computer'
 
+// the Turn area in Versus computer mode (CM-14, CM-19)
+export const THINKING = 'Thinking…'
+export const YOUR_TURN = 'Your turn'
+
 const MODE_LABELS: Record<TestGameMode, string> = {
   twoPlayers: 'Two players',
   computer: 'Versus computer',
 }
+
+// the robot icon that marks the computer player (CM-13)
+const ROBOT = 'svg[data-icon="robot"]'
 
 export const ANNA: TestPlayer = { name: 'Anna', color: '#ff0000' }
 export const BOHDAN: TestPlayer = { name: 'Bohdan', color: '#0000ff' }
@@ -145,6 +152,7 @@ export class GamePage {
     return {
       name: fieldset.find('[data-name]').text(),
       color: swatch.element.style.backgroundColor,
+      hasRobot: fieldset.find(ROBOT).exists(),
     }
   }
 
@@ -232,6 +240,11 @@ export class GamePage {
     return line ? { color: line.element.style.backgroundColor } : null
   }
 
+  // the drawn lines highlighted as the computer's last line: a 4 px box-shadow halo (CM-18)
+  get highlightedLineCount() {
+    return this.lineElements.filter(({ element }) => !!element.style.boxShadow).length
+  }
+
   private get squareElements() {
     return this.wrapper.findAll<HTMLElement>('.font-bold.absolute')
   }
@@ -279,9 +292,36 @@ export class GamePage {
     return heading.element.parentElement!
   }
 
-  // name of the player whose turn it is
+  // name of the player whose turn it is, or "Your turn" on the person's turn in Versus computer mode
   turn() {
-    return this.panelSection('Turn').lastElementChild!.textContent!.trim()
+    return this.panelSection('Turn').children[1]!.textContent!.trim()
+  }
+
+  // the polite live region under the turn: "Thinking…" while the computer's move is pending, else ''
+  thinking() {
+    const region = this.panelSection('Turn').querySelector('[aria-live="polite"]')
+    if (!region) throw new Error('No live region in the Turn area')
+    return region.textContent!.trim()
+  }
+
+  isThinkingPulsing() {
+    return !!this.panelSection('Turn').querySelector('[aria-live="polite"].animate-pulse')
+  }
+
+  hasHint() {
+    return this.wrapper.find('p[data-hint]').exists()
+  }
+
+  // The text shown beside each robot icon in a part of the screen (a panel section by its label, or
+  // the Stop dialog), e.g. ['Computer']; also checks every icon is decorative inline SVG.
+  robotsIn(where: 'Turn' | 'Score' | 'Result' | 'dialog') {
+    const scope = where === 'dialog' ? this.dialog.element : this.panelSection(where)
+    return [...scope.querySelectorAll(ROBOT)].map((icon) => {
+      if (icon.tagName.toLowerCase() !== 'svg' || icon.getAttribute('aria-hidden') !== 'true') {
+        throw new Error('The robot icon must be an aria-hidden inline <svg>')
+      }
+      return icon.parentElement!.textContent!.trim()
+    })
   }
 
   // { name: owned squares } as the Score section lists them, top to bottom
@@ -290,7 +330,7 @@ export class GamePage {
   }
 
   hint() {
-    return this.wrapper.find('p.text-sm.text-gray-500').text()
+    return this.wrapper.find('p[data-hint]').text()
   }
 
   button(label: string) {

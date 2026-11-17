@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { Dot, type DotLineGame, type Line, type Square } from '@/models'
+import { Dot, isComputerPlayer, type DotLineGame, type Line, type Square } from '@/models'
 import { computed, onBeforeUnmount, onMounted, ref, type CSSProperties } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDisplayName } from '@/shared/composables/useDisplayName'
@@ -56,6 +56,7 @@ const MIN_CELL = 24
 const PADDING = 16
 const BORDER = 1
 const LINE_WIDTH = 4
+const HALO_WIDTH = 4
 const MAX_TAP_AREA = 44
 // horizontal space taken by the app's p-2 gutters
 const APP_GUTTERS = 16
@@ -159,15 +160,29 @@ function squareStyle(square: Square): CSSProperties {
   }
 }
 
+// The computer's last line stays highlighted until the person draws: the newest line, if the computer
+// player drew it and the game is still playing. Derived from the saved lines, so it survives a reload (CM-32).
+const lastComputerLine = computed(() => {
+  const game = props.dotLineGame
+  const newest = game.lines[game.lines.length - 1]
+  return !game.isFinished && newest && isComputerPlayer(newest.ownerName) ? newest : null
+})
+
 function lineStyle(line: Line): CSSProperties {
   const { x, y } = toPoint(line.from)
   const length = cell.value + LINE_WIDTH
+  const color = colorOf(line.ownerName)
   return {
     left: `${x - LINE_WIDTH / 2}px`,
     top: `${y - LINE_WIDTH / 2}px`,
     width: `${line.isHorizontal ? length : LINE_WIDTH}px`,
     height: `${line.isHorizontal ? LINE_WIDTH : length}px`,
-    backgroundColor: colorOf(line.ownerName),
+    backgroundColor: color,
+    // a 4 px halo in the computer's color at 40% (CM-18)
+    boxShadow:
+      line.key === lastComputerLine.value?.key
+        ? `0 0 0 ${HALO_WIDTH}px color-mix(in srgb, ${color} 40%, transparent)`
+        : undefined,
   }
 }
 

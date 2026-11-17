@@ -39,6 +39,8 @@ const en = {
   },
   status: {
     turn: 'Turn',
+    yourTurn: 'Your turn',
+    thinking: 'Thinking…',
     score: 'Score',
     stop: 'Stop',
     stopTitle: 'Stop the game?',

@@ -8,6 +8,8 @@
           class="mt-1.5 size-4 shrink-0 rounded-full"
           :style="{ backgroundColor: winner.color }"
         ></span>
+        <!-- the robot sits between the swatch and the heading (CM-13) -->
+        <RobotIcon v-if="isComputerPlayer(winner.name)" :size="24" class="mt-0.5" />
         <h3 class="min-w-0 text-xl font-bold wrap-break-word text-gray-900">
           {{ t('result.wins', { name: displayName(winner.name) }) }}
         </h3>
@@ -39,10 +41,11 @@
 </template>
 
 <script setup lang="ts">
-import type { DotLineGame } from '@/models'
+import { isComputerPlayer, type DotLineGame } from '@/models'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseButton from '@/shared/components/BaseButton.vue'
+import RobotIcon from '@/shared/components/RobotIcon.vue'
 import PlayerScore from './PlayerScore.vue'
 import { useDisplayName } from '@/shared/composables/useDisplayName'
 

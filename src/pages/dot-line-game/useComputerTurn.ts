@@ -29,7 +29,10 @@ export function useComputerTurn(game: () => DotLineGame, delay = COMPUTER_DELAY_
     const current = game()
     if (!current.isComputerTurn) return
     const line = chooseComputerLine(current, current.difficulty ?? 'easy')
-    if (line) current.drawLine(line.from, line.to)
+    if (!line) return
+    // a Line's ends are stored in board order, so its valid start may be either end
+    if (current.canDraw(line.from, line.to)) current.drawLine(line.from, line.to)
+    else current.drawLine(line.to, line.from)
   }
 
   // changes on every computer turn: null when it isn't one, else the number of lines drawn so far

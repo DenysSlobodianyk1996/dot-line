@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { COMPUTER_NAME } from '@/models'
 import { CURRENT_GAME } from '@/static'
 import {
   ANNA,
@@ -7,6 +8,8 @@ import {
   COMPUTER_DELAY_MS,
   openGamePage,
   startComputerGame,
+  THINKING,
+  YOUR_TURN,
 } from '@/test/game-page'
 
 // ANNA is #ff0000; the page reports colors as CSS rgb()
@@ -77,7 +80,7 @@ describe('setup in Versus computer mode', () => {
 describe('playing against the computer', () => {
   it('waits about a second on its turn with the board locked, then draws one line (CM-15, CM-16, CM-20)', async () => {
     const page = await startComputerGame({ first: 1 })
-    expect(page.turn()).toBe('Anna')
+    expect(page.turn()).toBe(YOUR_TURN)
     expect(page.isBoardLocked).toBe(false)
 
     await page.drawAnyLine()
@@ -90,7 +93,7 @@ describe('playing against the computer', () => {
     await page.waitForComputer(1)
 
     expect(page.lineCount).toBe(2)
-    expect(page.turn()).toBe('Anna')
+    expect(page.turn()).toBe(YOUR_TURN)
     expect(page.isBoardLocked).toBe(false)
   })
 
@@ -111,7 +114,7 @@ describe('playing against the computer', () => {
     await page.waitForComputer()
 
     expect(page.lineCount).toBe(1)
-    expect(page.turn()).toBe('Anna')
+    expect(page.turn()).toBe(YOUR_TURN)
   })
 
   it('shows its name in my language and follows the language toggle (CM-12)', async () => {
@@ -147,6 +150,29 @@ describe('playing against the computer', () => {
     const scores = Object.values(page.scores())
     expect(scores.reduce((a, b) => a + b, 0)).toBe(4)
   })
+
+  it('draws a line whose valid end comes second, e.g. up from a drawn line (CM-20)', async () => {
+    // Anna drew [1,0]-[1,1]; the computer's first legal move is [0,0]-[1,0], which starts at [1,0]
+    const saved = {
+      player1: ANNA,
+      player2: { name: COMPUTER_NAME, color: '#32a06e' },
+      size: 2,
+      lines: [{ from: { row: 1, col: 0 }, to: { row: 1, col: 1 }, ownerName: 'Anna' }],
+      dirtySquares: [],
+      currentPlayerName: COMPUTER_NAME,
+      status: 'playing',
+      finishReason: null,
+      gameMode: 'computer',
+      difficulty: 'easy',
+    }
+    vi.spyOn(Math, 'random').mockReturnValue(0)
+    const page = await openGamePage({ storage: { [CURRENT_GAME]: saved } })
+
+    await page.waitForComputer()
+
+    expect(page.lineCount).toBe(2)
+    expect(page.turn()).toBe(YOUR_TURN)
+  })
 })
 
 describe('stopping and starting again', () => {
@@ -168,7 +194,7 @@ describe('stopping and starting again', () => {
     await page.waitForComputer()
 
     expect(page.lineCount).toBe(1)
-    expect(page.turn()).toBe('Anna')
+    expect(page.turn()).toBe(YOUR_TURN)
     expect(page.scores()).toEqual({ Anna: 0, [COMPUTER]: 0 })
   })
 
@@ -205,7 +231,7 @@ describe('saving and reloading', () => {
     await reloaded.waitForComputer()
 
     expect(reloaded.lineCount).toBe(2)
-    expect(reloaded.turn()).toBe('Anna')
+    expect(reloaded.turn()).toBe(YOUR_TURN)
   })
 
   it('loads a game saved before game modes as Two players (CM-33)', async () => {
@@ -227,5 +253,135 @@ describe('saving and reloading', () => {
     expect(page.turn()).toBe('Bohdan')
     expect(page.lineCount).toBe(1)
     expect(page.isBoardLocked).toBe(false)
+  })
+})
+
+describe("the computer's turn on screen", () => {
+  it('shows a pulsing "Thinking…" in a polite live region in place of the hint (CM-14, CM-37)', async () => {
+    const page = await startComputerGame({ first: 2 })
+
+    expect(page.turn()).toBe(COMPUTER)
+    expect(page.thinking()).toBe(THINKING)
+    expect(page.isThinkingPulsing()).toBe(true)
+    expect(page.hasHint()).toBe(false)
+
+    await page.waitForComputer()
+
+    expect(page.thinking()).toBe('')
+    expect(page.hasHint()).toBe(true)
+  })
+
+  it('says "Your turn" on my turn (CM-19)', async () => {
+    const page = await startComputerGame({ first: 1 })
+
+    expect(page.turn()).toBe(YOUR_TURN)
+    expect(page.thinking()).toBe('')
+  })
+
+  it('marks the computer with a robot icon in the turn, scores and Stop dialog (CM-13)', async () => {
+    const page = await startComputerGame({ first: 2 })
+
+    expect(page.robotsIn('Turn')).toEqual([COMPUTER])
+    expect(page.robotsIn('Score')).toEqual([COMPUTER])
+    await page.click('Stop')
+    expect(page.robotsIn('dialog')).toEqual([COMPUTER])
+  })
+
+  it('marks the computer in the result scores, and beside the heading when it wins (CM-13)', async () => {
+    // a stopped game the computer leads by one square
+    const computer = { name: COMPUTER_NAME, color: '#32a06e' }
+    const side = (from: [number, number], to: [number, number]) => ({
+      from: { row: from[0], col: from[1] },
+      to: { row: to[0], col: to[1] },
+      ownerName: COMPUTER_NAME,
+    })
+    const finished = {
+      player1: ANNA,
+      player2: computer,
+      size: 2,
+      lines: [
+        side([0, 0], [0, 1]),
+        side([0, 1], [1, 1]),
+        side([1, 1], [1, 0]),
+        side([1, 0], [0, 0]),
+      ],
+      dirtySquares: [{ row: 0, col: 0, ownerName: COMPUTER_NAME }],
+      currentPlayerName: 'Anna',
+      status: 'finished',
+      finishReason: 'stopped',
+      gameMode: 'computer',
+      difficulty: 'easy',
+    }
+    const page = await openGamePage({ storage: { [CURRENT_GAME]: finished } })
+    expect(page.isResultShown).toBe(true)
+    expect(page.scores()).toEqual({ [COMPUTER]: 1, Anna: 0 })
+
+    // beside the heading, whatever its wording (#17)
+    const [heading, ...rest] = page.robotsIn('Result')
+    expect(heading).toMatch(/Computer/)
+    expect(rest).toEqual([])
+    expect(page.robotsIn('Score')).toEqual([COMPUTER])
+  })
+
+  it('shows the robot in the setup Opponent field (CM-13)', async () => {
+    const page = await openGamePage()
+
+    expect(page.setupOpponent()?.hasRobot).toBe(true)
+  })
+
+  it('shows no robot and no "Your turn" in a Two players game', async () => {
+    const page = await openGamePage()
+    await page.submitSetup({
+      mode: 'twoPlayers',
+      player1: ANNA,
+      player2: BOHDAN,
+      size: 2,
+      first: 1,
+    })
+
+    expect(page.turn()).toBe('Anna')
+    expect(page.robotsIn('Score')).toEqual([])
+  })
+
+  it("highlights the computer's last line until I draw (CM-18)", async () => {
+    const page = await startComputerGame({ first: 2 })
+    await page.waitForComputer()
+
+    expect(page.lineCount).toBe(1)
+    expect(page.highlightedLineCount).toBe(1)
+
+    await page.drawAnyLine()
+
+    expect(page.highlightedLineCount).toBe(0)
+    await page.waitForComputer()
+    expect(page.highlightedLineCount).toBe(1)
+  })
+
+  it("keeps the computer's line highlighted after a reload on my turn (CM-32)", async () => {
+    const page = await startComputerGame({ first: 2 })
+    await page.waitForComputer()
+
+    const reloaded = await page.reload()
+
+    expect(reloaded.turn()).toBe(YOUR_TURN)
+    expect(reloaded.highlightedLineCount).toBe(1)
+  })
+
+  it('drops the highlight once the game is over (CM-18)', async () => {
+    const page = await startComputerGame({ first: 2 })
+    await page.waitForComputer()
+
+    await page.stopGame()
+
+    expect(page.highlightedLineCount).toBe(0)
+  })
+
+  it('shows the new texts in Ukrainian (CM-36)', async () => {
+    const page = await startComputerGame({ first: 2 })
+    await page.wrapper.get('button[lang="uk"]').trigger('click')
+
+    expect(page.wrapper.text()).toContain('Думає…')
+    await page.waitForComputer()
+    expect(page.wrapper.text()).toContain('Ваш хід')
   })
 })

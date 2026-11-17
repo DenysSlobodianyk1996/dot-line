@@ -10,10 +10,21 @@
             class="mt-1.5 size-3 shrink-0 rounded-full"
             :style="{ backgroundColor: dotLineGame.currentPlayer?.color }"
           ></span>
-          <span class="min-w-0 wrap-break-word">{{
-            displayName(dotLineGame.currentPlayer?.name)
+          <!-- Versus computer: the person's own turn reads "Your turn" (CM-19) -->
+          <span v-if="isPersonTurn" class="min-w-0 wrap-break-word">{{
+            t('status.yourTurn')
           }}</span>
+          <PlayerName
+            v-else
+            class="min-w-0 wrap-break-word"
+            :name="dotLineGame.currentPlayer?.name"
+            :icon-size="20"
+          />
         </div>
+        <!-- always rendered, so screen readers announce "Thinking…" when it appears (CM-14, CM-37) -->
+        <p aria-live="polite" class="text-sm text-gray-500" :class="{ 'animate-pulse': thinking }">
+          {{ thinking ? t('status.thinking') : '' }}
+        </p>
       </div>
 
       <div class="flex min-w-0 flex-col gap-1">
@@ -27,7 +38,8 @@
       </div>
     </div>
 
-    <p class="text-sm text-gray-500">{{ hint }}</p>
+    <!-- "Thinking…" takes the hint's place on the computer's turn (CM-14) -->
+    <p v-if="!thinking" data-hint class="text-sm text-gray-500">{{ hint }}</p>
 
     <div class="flex">
       <BaseButton
@@ -77,23 +89,28 @@
 
 <script setup lang="ts">
 import type { DotLineGame } from '@/models'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseButton from '@/shared/components/BaseButton.vue'
+import PlayerName from '@/shared/components/PlayerName.vue'
 import PlayerScore from './PlayerScore.vue'
-import { useDisplayName } from '@/shared/composables/useDisplayName'
 
-defineProps<{
+const props = defineProps<{
   dotLineGame: DotLineGame
   hint: string
+  // the computer's move is pending (CM-14)
+  thinking?: boolean
 }>()
+
+const isPersonTurn = computed(
+  () => props.dotLineGame.isComputerGame && !props.dotLineGame.isComputerTurn,
+)
 
 const emit = defineEmits<{
   stop: []
 }>()
 
 const { t } = useI18n()
-const displayName = useDisplayName()
 
 const isConfirmOpen = ref(false)
 

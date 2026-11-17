@@ -41,6 +41,8 @@ const uk: typeof en = {
   },
   status: {
     turn: 'Хід',
+    yourTurn: 'Ваш хід',
+    thinking: 'Думає…',
     score: 'Рахунок',
     stop: 'Зупинити',
     stopTitle: 'Зупинити гру?',

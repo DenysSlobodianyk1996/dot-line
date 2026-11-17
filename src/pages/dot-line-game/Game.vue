@@ -12,7 +12,13 @@
         @new-game="newGame"
         @rematch="rematch"
       />
-      <GameStatus v-else :dot-line-game="dotLineGame" :hint="hint" @stop="stop" />
+      <GameStatus
+        v-else
+        :dot-line-game="dotLineGame"
+        :hint="hint"
+        :thinking="isBoardLocked"
+        @stop="stop"
+      />
     </div>
 
     <RulesToggle class="w-full sm:max-w-130" />
