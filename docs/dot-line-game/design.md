@@ -30,6 +30,57 @@ Languages: every screen has the UA / EN toggle at the top right. Screens 1–13 
 
 Source files for the artboards are in [design-canvas/](design-canvas/) (`*.dc.html` plus `canvas.json`). They were generated from the board data, so board state and highlights are consistent with the rules below.
 
+### Versus computer mode (draft for review, issue #7)
+
+Spec: [computer-opponent/spec.md](../computer-opponent/spec.md) (stories CM-n). These artboards are a proposal for the product owner's review and are not yet approved. The setup screens 1, 7, 14 and 15 now start with the game mode switch, with **Two players** selected; the rest of each screen is unchanged [CM-1, CM-6, CM-34]. The sample person is Ярослава Петрук on Ukrainian screens and Alexandra Brown on English ones, both exactly 15 characters and never cut [GS-1, GB-5]. The person's color is red and the computer's automatic color is green [CM-9]. Desktop game screens are in Ukrainian and mobile game screens in English, so every new string appears in both languages.
+
+Desktop page (second row):
+
+16. Setup, Versus computer: game mode switch (Versus computer selected), difficulty switch (Normal selected), "Ви" fieldset with name and color, and a read-only "Суперник" fieldset with the robot, "Комп’ютер" and its automatic color [CM-1, CM-2, CM-4..7, CM-9]
+17. Setup, Versus computer, English [CM-36, I18N-1]
+18. Computer thinking: Turn shows the color swatch, robot and "Комп’ютер", with a pulsing "Думає…" (polite live region) in place of the hint. Every dot is idle, so the board is locked, and Stop is still available [CM-13, CM-14, CM-16, CM-17, CM-37]
+19. Computer line highlighted, "Ваш хід": the computer's last line (a safe line, CM-24) has a 4 px halo in its color, valid starts are highlighted again, and Turn says "Ваш хід" [CM-18, CM-19]
+20. Result, "Ви перемогли!" (9 : 7), with the person first in the scores [CM-27]
+21. Result, "Комп’ютер переміг" (robot next to the heading), with the computer first in the scores [CM-13, CM-27]
+
+Mobile page (second row, 390 px):
+
+22. Setup, Versus computer, with the switches 44 px tall [CM-38, MB-8]
+23. Setup, Versus computer, English
+24. Computer thinking, English: Turn and Score in two columns, with "Thinking…" under the computer's name [CM-14, CM-16, CM-38]
+25. "Your turn", English, with the computer's line highlighted [CM-18, CM-19]
+26. Result, "You won!", English [CM-27]
+27. Result, "Computer won", English [CM-27]
+
+Visual rules used on these screens:
+
+- **Mode and difficulty switches**: a labelled `role="radiogroup"` styled like the language toggle (`rounded-md border border-gray-300 bg-white p-0.5 shadow-sm`), stretched to full width with equal-width options. The selected option is `bg-blue-600 text-white`. Options are `min-h-8` from `sm` up and `min-h-11` on phones. Difficulty sits right under the mode switch and is shown only in Versus computer mode [CM-6].
+- **Robot icon**: Material Symbols `smart_toy` (outlined, `viewBox="0 -960 960 960"`) as inline SVG with `fill: currentColor` and `aria-hidden="true"`. It is 20 px in Turn, 16 px in score rows, 24 px in the result heading and 18 px in the setup Opponent field. It always sits between the color swatch and the written name, which stays the accessible text [CM-13, CM-37].
+- **Thinking**: `text-sm text-gray-500 animate-pulse` in an `aria-live="polite"` element. It replaces the hint while the computer's move is pending.
+- **Last computer line**: the normal line plus `box-shadow: 0 0 0 4px` in the computer's color at 40%. It is shown only while the game is playing and the newest line is the computer's.
+- **Owned squares** keep the existing style with the first letter of the displayed name ("К" / "C" for the computer).
+
+Proposed message keys (none exist yet; add both languages to `src/i18n/locales` when the feature is implemented):
+
+| Key | English | Українська |
+| --- | --- | --- |
+| `setup.mode` | Game mode | Режим гри |
+| `setup.modeComputer` | Versus computer | Проти комп’ютера |
+| `setup.modeTwoPlayers` | Two players | Двоє гравців |
+| `setup.difficulty` | Difficulty | Складність |
+| `setup.easy` | Easy | Легко |
+| `setup.normal` | Normal | Нормально |
+| `setup.you` | You | Ви |
+| `setup.opponent` | Opponent | Суперник |
+| `players.computer` | Computer | Комп’ютер |
+| `validation.computerName` | This name belongs to the computer | Це ім’я належить комп’ютеру |
+| `status.thinking` | Thinking… | Думає… |
+| `status.yourTurn` | Your turn | Ваш хід |
+| `result.youWon` | You won! | Ви перемогли! |
+| `result.computerWon` | Computer won | Комп’ютер переміг |
+
+`validation.computerName` (CM-8) isn't shown on an artboard. The rules text (`rules.step1`–`step5`) already reads neutrally in both languages ("Take turns…" / "Гравці по черзі…", "the other player"), so CM-35 needs no new wording unless the review asks for it.
+
 ## Data model (`src/models/`)
 
 Lines used to live inside each `Square` (`Square.lines` with `LinePosition`), so every shared edge existed twice. The model keeps one game-level list of lines as the single source of truth instead. `dirtySquares` holds only owned squares.
