@@ -386,7 +386,7 @@ src/shared/components/LanguageToggle.vue
 
 ## Tests
 
-Vitest with Vue Test Utils on jsdom (`npm test`). CI runs type-check, `npm run lint-check` and the tests on every pull request, and the deploy runs the tests first (CM-40).
+Vitest with Vue Test Utils on jsdom (`npm test`). CI runs type-check, `npm run lint-check` and the tests on every pull request, and the deploy runs the same three checks before building; any failure blocks it (CM-40).
 
 - Specs live in `__tests__/*.spec.ts` next to the code and are type-checked through `tsconfig.vitest.json`. `src/test/setup.ts` unmounts every wrapper and clears localStorage after each test.
 - Model seam: `src/models/__tests__/` (game model, legal moves, game mode rehydration, and `computer-strategy.spec.ts` with a fixed random source).

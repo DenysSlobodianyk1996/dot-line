@@ -42,7 +42,13 @@ jobs:
 
       - run: npm ci
 
-      # a failing test blocks the deploy (CM-40)
+      # a failing type-check, lint or test blocks the deploy (CM-40)
+      - name: Type-check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint-check
+
       - name: Test
         run: npm test
 
