@@ -14,11 +14,14 @@ export interface TestPlayer {
 }
 
 export type TestGameMode = 'twoPlayers' | 'computer'
+export type TestDifficulty = 'easy' | 'normal'
 
 export interface StartGameOptions {
   // Two players by default, so earlier specs keep testing that mode; 'computer' plays player1
   // against the computer player (player2 is then ignored)
   mode?: TestGameMode
+  // Versus computer only; when left out, setup's preselected difficulty is kept
+  difficulty?: TestDifficulty
   player1?: TestPlayer
   player2?: TestPlayer
   size?: number
@@ -38,6 +41,11 @@ const MODE_LABELS: Record<TestGameMode, string> = {
   computer: 'Versus computer',
 }
 
+const DIFFICULTY_LABELS: Record<TestDifficulty, string> = {
+  easy: 'Easy',
+  normal: 'Normal',
+}
+
 export const ANNA: TestPlayer = { name: 'Anna', color: '#ff0000' }
 export const BOHDAN: TestPlayer = { name: 'Bohdan', color: '#0000ff' }
 
@@ -50,13 +58,14 @@ export async function openGamePage({ storage = {} }: MountGamePageOptions = {}) 
 // Opens the page, fills in the setup form and submits it.
 export async function startGame({
   mode = 'twoPlayers',
+  difficulty,
   player1 = ANNA,
   player2 = BOHDAN,
   size = 2,
   first = 1,
 }: StartGameOptions = {}) {
   const page = await openGamePage()
-  await page.submitSetup({ mode, player1, player2, size, first })
+  await page.submitSetup({ mode, difficulty, player1, player2, size, first })
   return page
 }
 
@@ -91,8 +100,16 @@ export class GamePage {
     return this.wrapper.find('form').exists()
   }
 
-  async submitSetup({ mode, player1, player2, size, first }: Required<StartGameOptions>) {
+  async submitSetup({
+    mode,
+    difficulty,
+    player1,
+    player2,
+    size,
+    first,
+  }: Required<Omit<StartGameOptions, 'difficulty'>> & Pick<StartGameOptions, 'difficulty'>) {
     await this.chooseMode(mode)
+    if (mode === 'computer' && difficulty) await this.chooseDifficulty(difficulty)
     await this.input('player1.name').setValue(player1.name)
     await this.input('player1.color').setValue(player1.color)
     if (mode === 'twoPlayers') {
@@ -110,24 +127,45 @@ export class GamePage {
     return this.wrapper.find<HTMLInputElement>(`[id="${id}"]`)
   }
 
-  private get modeOptions() {
-    return this.wrapper
-      .find('[role="radiogroup"][aria-label="Game mode"]')
-      .findAll('[role="radio"]')
+  // the options of a labelled switch (radiogroup), e.g. 'Game mode'
+  private switchOptions(label: string) {
+    const group = this.wrapper.find(`[role="radiogroup"][aria-label="${label}"]`)
+    return group.exists() ? group.findAll('[role="radio"]') : []
   }
 
-  async chooseMode(mode: TestGameMode) {
-    const option = this.modeOptions.find((el) => el.text() === MODE_LABELS[mode])
-    if (!option) throw new Error(`No "${MODE_LABELS[mode]}" game mode`)
+  private async chooseOption(label: string, optionLabel: string) {
+    const option = this.switchOptions(label).find((el) => el.text() === optionLabel)
+    if (!option) throw new Error(`No "${optionLabel}" in "${label}"`)
     await option.trigger('click')
     await flushPromises()
   }
 
+  private selectedOption<T extends string>(label: string, labels: Record<T, string>): T | null {
+    const checked = this.switchOptions(label).find((el) => el.attributes('aria-checked') === 'true')
+    const entry = Object.entries(labels).find(([, text]) => text === checked?.text())
+    return (entry?.[0] as T) ?? null
+  }
+
+  async chooseMode(mode: TestGameMode) {
+    await this.chooseOption('Game mode', MODE_LABELS[mode])
+  }
+
   // the checked game mode
   selectedMode(): TestGameMode | null {
-    const checked = this.modeOptions.find((el) => el.attributes('aria-checked') === 'true')
-    const entry = Object.entries(MODE_LABELS).find(([, label]) => label === checked?.text())
-    return (entry?.[0] as TestGameMode) ?? null
+    return this.selectedOption('Game mode', MODE_LABELS)
+  }
+
+  get hasDifficultySwitch() {
+    return this.switchOptions('Difficulty').length > 0
+  }
+
+  async chooseDifficulty(difficulty: TestDifficulty) {
+    await this.chooseOption('Difficulty', DIFFICULTY_LABELS[difficulty])
+  }
+
+  // the checked difficulty, or null when the switch isn't shown
+  selectedDifficulty(): TestDifficulty | null {
+    return this.selectedOption('Difficulty', DIFFICULTY_LABELS)
   }
 
   // the fieldsets of the setup form by legend, e.g. ['You', 'Opponent'] or ['Player 1', 'Player 2']

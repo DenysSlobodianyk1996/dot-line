@@ -10,7 +10,13 @@
       v-slot="{ values }"
     >
       <BaseSegmentedControl v-model="gameMode" :label="t('setup.mode')" :options="modeOptions" />
-      <!-- #15: the difficulty switch goes here, shown only in Versus computer mode (CM-5, CM-6) -->
+      <!-- difficulty only in Versus computer mode (CM-5, CM-6) -->
+      <BaseSegmentedControl
+        v-if="isComputerMode"
+        v-model="difficulty"
+        :label="t('setup.difficulty')"
+        :options="difficultyOptions"
+      />
 
       <div class="flex flex-col gap-2 sm:flex-row">
         <template v-if="isComputerMode">
@@ -79,6 +85,8 @@ import BaseButton from '@/shared/components/BaseButton.vue'
 import BaseSegmentedControl from '@/shared/components/BaseSegmentedControl.vue'
 
 import { computerColorFor, randomHexColor } from '@/utils'
+import { StorageService } from '@/services'
+import { DIFFICULTY, GAME_MODE } from '@/static'
 
 defineRule('required', required)
 defineRule('integer', integer)
@@ -87,15 +95,28 @@ defineRule('max_value', max_value)
 
 const { t } = useI18n()
 
-// Versus computer by default (CM-2). #15 reads the remembered mode and difficulty here (CM-3, CM-7)
-// and adds the difficulty switch; until then the computer plays Easy.
-const gameMode = ref<GameMode>('computer')
-const difficulty = ref<Difficulty>('easy')
+// Setup opens with the game mode and difficulty of the last game started; on a first visit,
+// Versus computer and Normal (CM-2, CM-3, CM-7, CM-29)
+const GAME_MODES: GameMode[] = ['computer', 'twoPlayers']
+const DIFFICULTIES: Difficulty[] = ['easy', 'normal']
+
+function remembered<T extends string>(key: string, allowed: T[], fallback: T): T {
+  const value = StorageService.getItem(key)
+  return allowed.find((item) => item === value) ?? fallback
+}
+
+const gameMode = ref<GameMode>(remembered(GAME_MODE, GAME_MODES, 'computer'))
+const difficulty = ref<Difficulty>(remembered(DIFFICULTY, DIFFICULTIES, 'normal'))
 const isComputerMode = computed(() => gameMode.value === 'computer')
 
 const modeOptions = computed<{ value: GameMode; label: string }[]>(() => [
   { value: 'computer', label: t('setup.modeComputer') },
   { value: 'twoPlayers', label: t('setup.modeTwoPlayers') },
+])
+
+const difficultyOptions = computed<{ value: Difficulty; label: string }[]>(() => [
+  { value: 'easy', label: t('setup.easy') },
+  { value: 'normal', label: t('setup.normal') },
 ])
 
 interface SetupFormValues {
@@ -124,6 +145,9 @@ const emit = defineEmits<{
 // person stay in the form (CM-10) but aren't used.
 function submit(values: Record<string, unknown>) {
   const { player1, player2, size } = values as unknown as SetupFormValues
+  // the difficulty is remembered even in Two players, for the next Versus computer game (CM-7)
+  StorageService.setItem(GAME_MODE, gameMode.value)
+  StorageService.setItem(DIFFICULTY, difficulty.value)
   emit(
     'gameSetup',
     isComputerMode.value
