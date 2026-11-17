@@ -166,14 +166,16 @@ Follows the existing pattern where the model owns its logic.
 | `isFinished` | `status === 'finished'`. | END-7 |
 | `isComputerGame` | `gameMode === 'computer'`. | VC-1 |
 | `isComputerTurn` | Computer game, not finished, and the current player is the computer player. | VC-10, VC-12 |
-| `setGameMode(mode, difficulty)` | Sets the mode; the difficulty is kept only in `'computer'` (default `'easy'`), else `null`. | VC-1, VC-4 |
+| `setGameMode(mode, difficulty)` | Sets the mode; the difficulty is kept only in `'computer'` (default `'easy'`), else `null`. The constructor applies the same rule through one shared helper, so the default exists once. | VC-1, VC-4, VC-20 |
 | `hasLine(a, b)` | Some line has key `Line.key(a, b)`. | MV-3 |
 | `neighbors(dot)` | Up to 4 orthogonal dots inside `0..size`. | MV-3 |
 | `validNeighbors(dot)` | `neighbors(dot)` without drawn edges. | MV-3, MV-5 |
 | `isValidStartDot(dot)` | Not finished, inside the board, (`lines.length === 0` or some line touches `dot`), and at least one valid neighbor. | MV-1, MV-2, MV-4 |
 | `canDraw(a, b)` | `isValidStartDot(a)` and `b` is in `validNeighbors(a)`. | MV-3 |
 | `legalMoves()` | Every line the current player may draw now, each listed once with no owner: valid starts × their `validNeighbors`. The strategy uses it, so the rules stay in one place (ADR-0003). | VC-11 |
-| `drawLine(a, b)` | Guard `canDraw`. Push a `Line` owned by the current player. Each adjacent square (see below) with 4 drawn edges and no owner becomes a `Square` owned by the drawer. Pass the turn to the opponent. When all N² squares are owned, finish with `'completed'`. Returns the squares it closed. | SQ-1..3, TR-1, END-1 |
+| `drawLine(a, b)` / `drawLine(line)` | Given a `Line` (e.g. from `legalMoves()`), draw it from whichever end is a valid start, since a `Line` stores its ends in board order. Guard `canDraw`. Push a `Line` owned by the current player. Each adjacent square (see below) with 4 drawn edges and no owner becomes a `Square` owned by the drawer. Pass the turn to the opponent. When all N² squares are owned, finish with `'completed'`. Returns the squares it closed. | SQ-1..3, TR-1, END-1 |
+| `drawnSideCount(r, c)` | How many of the square's four edges are drawn (0..4); `isSquareClosed` is `=== 4`. | SQ-1, VC-17 |
+| `squaresNextTo(line)` | The squares on either side of a line (see below), inside the board. Used by `drawLine` and the computer strategy, so square geometry lives in one place. | SQ-1, SQ-2, VC-17 |
 | `stop()` | If playing, finish with `'stopped'`. | END-2 |
 | `scoreOf(name)` | Number of squares owned by that player. | GB-4 |
 | `winner` | The `Player` with the higher score, or `null` for a draw. | END-3 |
@@ -340,16 +342,16 @@ src/shared/components/LanguageToggle.vue
 ### Computer strategy (`src/models/computer-strategy.ts`) [VC-16, VC-17]
 
 - `chooseComputerLine(game, difficulty, random = Math.random)` is pure (CM-39): it reads `game.legalMoves()`, returns `null` when there are none, and otherwise hands them to `STRATEGIES[difficulty]`. It never changes the game.
-- For each move it looks at the squares on either side and how many of their sides are drawn now: a move **claims** each square that has 3 sides and **gives away** each square that has 2.
+- For each move it looks at the squares on either side (`game.squaresNextTo`) and how many of their sides are drawn now (`game.drawnSideCount`): a move **claims** each square that has 3 sides and **gives away** each square that has 2.
 - **Easy**: `pickRandom(moves, random)`.
 - **Normal**: if some move claims a square, a random one among those claiming the most; otherwise a random one among those giving away the fewest. A safe line gives away 0, so this picks a random safe line when one exists (CM-24), and otherwise the line handing the person the fewest squares (CM-25). Since the turn always passes (ADR-0002), the person can then claim only the squares this line gave a third side.
 - `pickRandom` uses `Math.min(n - 1, floor(random() * n))`, so tests can pass a fixed random source.
 
 ### Computer turn (`src/pages/dot-line-game/useComputerTurn.ts`) [VC-9..13, VC-21]
 
-- `useComputerTurn(() => game, paused = () => false, delay = COMPUTER_DELAY_MS)` (1000 ms) returns `{ isThinking, cancel }`.
-- It watches `isComputerTurn && !paused() ? lines.length : null` with `immediate: true`, so a restored game resumes on mount. Every change cancels any pending move; when the value isn't `null`, it sets `isThinking` and schedules the move.
-- The move re-checks `isComputerTurn`, asks `chooseComputerLine(game, game.difficulty ?? 'easy')` and draws the line through the normal `drawLine`, trying `from → to` and else `to → from` (a `Line` stores its ends in board order, so either end may be the valid start).
+- `useComputerTurn(() => game, paused)` returns `{ isThinking, cancel }`.
+- It watches `isComputerTurn && !paused() ? lines.length : null` with `immediate: true`, so a restored game resumes on mount. Every change cancels any pending move; when the value isn't `null`, it sets `isThinking` and schedules the move `COMPUTER_DELAY_MS` (1000 ms) later.
+- The move re-checks `isComputerTurn`, asks `chooseComputerLine(game, game.difficulty)` (the model guarantees a computer game has one) and draws the line through the normal `drawLine(line)`, which picks the valid end as the start.
 - `Game.vue` calls `cancel()` in `stop`, `rematch` and `newGame`; unmounting cancels too.
 - `GameStatus` exposes its Stop dialog through `v-model:confirming`; `Game.vue` passes that as `paused`, so the computer waits while the dialog is open and gets a fresh pause after Cancel (VC-13). The board stays locked meanwhile because `isComputerTurn` still holds.
 - `Game.vue` passes `isThinking || isComputerTurn` to `GameBoard` as `locked` (every dot `idle`, clicks ignored) and to `GameStatus` as `thinking`.

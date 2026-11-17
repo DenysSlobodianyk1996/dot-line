@@ -1,5 +1,4 @@
 import type { Difficulty, DotLineGame } from './dot-line-game.model'
-import { Dot } from './dot.model'
 import type { Line } from './line.model'
 
 /** Returns a number in [0, 1), like Math.random. Tests pass a fixed one. */
@@ -16,32 +15,9 @@ function pickRandom<T>(items: T[], random: RandomSource): T {
 // Easy: any legal move, uniformly at random (CM-22)
 const easy: Strategy = (_game, moves, random) => pickRandom(moves, random)
 
-// The squares on either side of a line, each with how many of its sides are drawn now.
-function squaresBeside(game: DotLineGame, line: Line): number[] {
-  const size = game.size ?? 0
-  const { row, col } = line.from
-  const squares = line.isHorizontal
-    ? [
-        [row - 1, col],
-        [row, col],
-      ]
-    : [
-        [row, col - 1],
-        [row, col],
-      ]
-  return squares
-    .filter(([r, c]) => r! >= 0 && c! >= 0 && r! < size && c! < size)
-    .map(([r, c]) => drawnSides(game, r!, c!))
-}
-
-function drawnSides(game: DotLineGame, row: number, col: number): number {
-  const dot = (r: number, c: number) => new Dot({ row: r, col: c })
-  return [
-    [dot(row, col), dot(row, col + 1)],
-    [dot(row + 1, col), dot(row + 1, col + 1)],
-    [dot(row, col), dot(row + 1, col)],
-    [dot(row, col + 1), dot(row + 1, col + 1)],
-  ].filter(([a, b]) => game.hasLine(a!, b!)).length
+// how many sides are drawn now on each square beside a line
+function sideCountsBeside(game: DotLineGame, line: Line): number[] {
+  return game.squaresNextTo(line).map(({ row, col }) => game.drawnSideCount(row, col))
 }
 
 // how many squares this line closes (each had three sides drawn)
@@ -59,8 +35,8 @@ function best(moves: Line[], score: (move: Line) => number): Line[] {
 // Normal: claim the most squares (two before one, CM-23); else a random safe line (CM-24);
 // else the line giving away the fewest squares (CM-25). Ties go to the random source.
 const normal: Strategy = (game, moves, random) => {
-  const sides = new Map(moves.map((move) => [move.key, squaresBeside(game, move)]))
-  const sidesOf = (move: Line) => sides.get(move.key) ?? []
+  const sideCountsByMove = new Map(moves.map((move) => [move.key, sideCountsBeside(game, move)]))
+  const sidesOf = (move: Line) => sideCountsByMove.get(move.key) ?? []
 
   const claiming = best(moves, (move) => claims(sidesOf(move)))
   if (claims(sidesOf(claiming[0]!)) > 0) return pickRandom(claiming, random)

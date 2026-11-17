@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { COMPUTER_NAME, Dot, DotLineGame } from '@/models'
+import { COMPUTER_NAME, Dot, DotLineGame, Line } from '@/models'
 
 const ann = { name: 'Ann', color: '#ff0000' }
 const bob = { name: 'Bob', color: '#0000ff' }
@@ -436,5 +436,54 @@ describe('legal moves', () => {
     game.stop()
 
     expect(game.legalMoves()).toEqual([])
+  })
+
+  it('draws a listed line whichever of its ends is the valid start (MV-2, CM-20)', () => {
+    const game = newGame(2)
+    play(game, [[1, 0, 1, 1]])
+    // stored in board order as 0,0-1,0, but only its second end 1,0 is a valid start
+    const up = game.legalMoves().find((line) => line.key === '0,0-1,0')!
+
+    game.drawLine(up)
+
+    expect(game.hasLine(dot(0, 0), dot(1, 0))).toBe(true)
+    expect(game.currentPlayerName).toBe('Ann')
+  })
+
+  it('rejects a line given as a Line when neither end is a valid start (MV-2)', () => {
+    const game = newGame(2)
+    play(game, [[0, 0, 0, 1]])
+
+    game.drawLine(new Line({ from: dot(2, 1), to: dot(2, 2) }))
+
+    expect(game.lines).toHaveLength(1)
+    expect(game.currentPlayerName).toBe('Bob')
+  })
+})
+
+describe('square geometry', () => {
+  it('finds the squares on either side of a line, inside the board', () => {
+    const game = newGame(2)
+    const at = (line: Line) => game.squaresNextTo(line).map(({ row, col }) => `${row},${col}`)
+
+    expect(at(new Line({ from: dot(1, 0), to: dot(1, 1) }))).toEqual(['0,0', '1,0'])
+    expect(at(new Line({ from: dot(0, 1), to: dot(1, 1) }))).toEqual(['0,0', '0,1'])
+    expect(at(new Line({ from: dot(0, 0), to: dot(0, 1) }))).toEqual(['0,0'])
+    expect(at(new Line({ from: dot(1, 2), to: dot(2, 2) }))).toEqual(['1,1'])
+  })
+
+  it('counts how many sides of a square are drawn', () => {
+    const game = newGame(2)
+    expect(game.drawnSideCount(0, 0)).toBe(0)
+
+    play(game, [
+      [0, 0, 0, 1],
+      [0, 1, 1, 1],
+      [1, 1, 1, 0],
+    ])
+
+    expect(game.drawnSideCount(0, 0)).toBe(3)
+    expect(game.drawnSideCount(0, 1)).toBe(1)
+    expect(game.drawnSideCount(1, 1)).toBe(0)
   })
 })

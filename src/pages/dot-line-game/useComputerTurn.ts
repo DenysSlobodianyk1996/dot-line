@@ -18,8 +18,7 @@ export const COMPUTER_DELAY_MS = 1000
  */
 export function useComputerTurn(
   game: () => DotLineGame,
-  paused: () => boolean = () => false,
-  delay = COMPUTER_DELAY_MS,
+  paused: () => boolean,
 ) {
   const isThinking = ref(false)
   let pendingMove: ReturnType<typeof setTimeout> | null = null
@@ -34,12 +33,10 @@ export function useComputerTurn(
     pendingMove = null
     isThinking.value = false
     const current = game()
-    if (!current.isComputerTurn) return
-    const line = chooseComputerLine(current, current.difficulty ?? 'easy')
-    if (!line) return
-    // a Line's ends are stored in board order, so its valid start may be either end
-    if (current.canDraw(line.from, line.to)) current.drawLine(line.from, line.to)
-    else current.drawLine(line.to, line.from)
+    // a computer game always has a difficulty (the model defaults it)
+    if (!current.isComputerTurn || !current.difficulty) return
+    const line = chooseComputerLine(current, current.difficulty)
+    if (line) current.drawLine(line)
   }
 
   // changes on every computer turn: null when it isn't one (or it's paused), else the number of
@@ -50,7 +47,7 @@ export function useComputerTurn(
       cancel()
       if (turn === null) return
       isThinking.value = true
-      pendingMove = setTimeout(move, delay)
+      pendingMove = setTimeout(move, COMPUTER_DELAY_MS)
     },
     { immediate: true },
   )

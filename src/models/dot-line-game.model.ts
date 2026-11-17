@@ -9,6 +9,12 @@ export type FinishReason = 'completed' | 'stopped'
 export type GameMode = 'twoPlayers' | 'computer'
 export type Difficulty = 'easy' | 'normal'
 
+// the difficulty a game in this mode plays at: Easy when a Versus computer game has none (CM-30),
+// none in Two players
+function difficultyFor(gameMode: GameMode, difficulty: Difficulty | null | undefined) {
+  return gameMode === 'computer' ? (difficulty ?? 'easy') : null
+}
+
 const DIRECTIONS: [number, number][] = [
   [-1, 0],
   [1, 0],
@@ -50,7 +56,7 @@ export class DotLineGame {
     this.finishReason = finishReason ?? null
     // saves from before game modes existed load as Two players (CM-33)
     this.gameMode = gameMode ?? 'twoPlayers'
-    this.difficulty = this.gameMode === 'computer' ? (difficulty ?? 'easy') : null
+    this.difficulty = difficultyFor(this.gameMode, difficulty)
   }
 
   setPlayer1(player1: Player) {
@@ -63,7 +69,7 @@ export class DotLineGame {
   }
   setGameMode(gameMode: GameMode, difficulty: Difficulty | null = null) {
     this.gameMode = gameMode
-    this.difficulty = gameMode === 'computer' ? (difficulty ?? 'easy') : null
+    this.difficulty = difficultyFor(gameMode, difficulty)
     return this
   }
   setSize(size: number) {
@@ -175,18 +181,55 @@ export class DotLineGame {
     return this.dirtySquares.find((square) => square.row === row && square.col === col) ?? null
   }
 
-  isSquareClosed(row: number, col: number): boolean {
+  /** How many of the four sides of the square at (row, col) are drawn: 0 to 4. */
+  drawnSideCount(row: number, col: number): number {
     const dot = (r: number, c: number) => new Dot({ row: r, col: c })
-    return (
-      this.hasLine(dot(row, col), dot(row, col + 1)) &&
-      this.hasLine(dot(row + 1, col), dot(row + 1, col + 1)) &&
-      this.hasLine(dot(row, col), dot(row + 1, col)) &&
-      this.hasLine(dot(row, col + 1), dot(row + 1, col + 1))
-    )
+    return [
+      [dot(row, col), dot(row, col + 1)],
+      [dot(row + 1, col), dot(row + 1, col + 1)],
+      [dot(row, col), dot(row + 1, col)],
+      [dot(row, col + 1), dot(row + 1, col + 1)],
+    ].filter(([a, b]) => this.hasLine(a!, b!)).length
   }
 
-  /** Draws a line for the current player and returns the squares it closed. */
-  drawLine(from: Dot, to: Dot): Square[] {
+  isSquareClosed(row: number, col: number): boolean {
+    return this.drawnSideCount(row, col) === 4
+  }
+
+  /** The squares on either side of a line (one for a line on the board's edge). */
+  squaresNextTo(line: Line): { row: number; col: number }[] {
+    const { row, col } = line.from
+    const size = this.size ?? 0
+    const candidates = line.isHorizontal
+      ? [
+          { row: row - 1, col },
+          { row, col },
+        ]
+      : [
+          { row, col: col - 1 },
+          { row, col },
+        ]
+    return candidates.filter((s) => s.row >= 0 && s.col >= 0 && s.row < size && s.col < size)
+  }
+
+  /**
+   * Draws a line for the current player and returns the squares it closed. Takes Dot1 and Dot2, or
+   * a `Line` (e.g. from `legalMoves()`), which is drawn from whichever of its ends is a valid start.
+   */
+  drawLine(line: Line): Square[]
+  drawLine(from: Dot, to: Dot): Square[]
+  drawLine(fromOrLine: Dot | Line, maybeTo?: Dot): Square[] {
+    let from: Dot
+    let to: Dot
+    if (fromOrLine instanceof Line) {
+      // a Line stores its ends in board order, so its valid start may be either end
+      const forward = this.canDraw(fromOrLine.from, fromOrLine.to)
+      from = forward ? fromOrLine.from : fromOrLine.to
+      to = forward ? fromOrLine.to : fromOrLine.from
+    } else {
+      from = fromOrLine
+      to = maybeTo!
+    }
     const ownerName = this.currentPlayerName
     if (!ownerName || !this.canDraw(from, to)) return []
 
@@ -223,21 +266,6 @@ export class DotLineGame {
 
   reset(game?: Partial<DotLineGame> | null) {
     Object.assign(this, new DotLineGame(game ?? {}))
-  }
-
-  private squaresNextTo(line: Line): { row: number; col: number }[] {
-    const { row, col } = line.from
-    const size = this.size ?? 0
-    const candidates = line.isHorizontal
-      ? [
-          { row: row - 1, col },
-          { row, col },
-        ]
-      : [
-          { row, col: col - 1 },
-          { row, col },
-        ]
-    return candidates.filter((s) => s.row >= 0 && s.col >= 0 && s.row < size && s.col < size)
   }
 
   private finish(reason: FinishReason) {

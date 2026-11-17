@@ -1,5 +1,5 @@
 import type { Player } from './player.model'
-import { computerColorFor } from '@/utils/computer-color'
+import { computerColorFor } from '@/utils'
 
 // The computer player is always the second player, stored under this fixed internal name (ADR-0001).
 // It's never shown: the UI goes through the display helper (`useDisplayName`), which translates it.
