@@ -87,3 +87,17 @@ A new game with the same players, size, game mode and difficulty, on an empty bo
 
 **New game**:
 Leaving the current game for the setup screen, where everything can be chosen again.
+
+## App
+
+**Swatch**:
+One of the fixed, named player colors a player picks from on the setup screen (coral, teal, sunflower, sky, lavender, leaf, berry, tangerine).
+_Avoid_: color picker, palette color
+
+**Rules panel**:
+The panel with the "How to play" rules, opened from the info button in the header and closed with ✕, a tap outside or Esc.
+_Avoid_: rules drawer, rules modal, rules toggle
+
+**Theme**:
+The light or dark version of the app's look; follows the device until the player switches it.
+_Avoid_: mode (that word belongs to game mode), skin
