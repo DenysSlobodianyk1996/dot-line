@@ -23,7 +23,7 @@
       <Field
         name="size"
         :label="t('setup.size')"
-        :rules="`required|min_value:2|max_value:10`"
+        :rules="`required|integer|min_value:2|max_value:10`"
         v-slot="{ field, errorMessage }"
       >
         <div class="flex flex-col gap-2">
@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import { Form, Field, defineRule } from 'vee-validate'
-import { required, min_value, max_value } from '@vee-validate/rules'
+import { required, integer, min_value, max_value } from '@vee-validate/rules'
 import { useI18n } from 'vue-i18n'
 import PlayerField from './PlayerField.vue'
 import RulesToggle from '../rules/RulesToggle.vue'
@@ -56,6 +56,7 @@ import BaseButton from '@/shared/components/BaseButton.vue'
 import { randomHexColor } from '@/utils'
 
 defineRule('required', required)
+defineRule('integer', integer)
 defineRule('min_value', min_value)
 defineRule('max_value', max_value)
 
