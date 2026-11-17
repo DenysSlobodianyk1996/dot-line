@@ -11,7 +11,14 @@
     >
       <div class="flex min-w-0 flex-1 flex-col gap-2">
         <BaseLabel :for="field.name">{{ t('setup.name') }}</BaseLabel>
-        <BaseInput v-bind="field" :id="field.name" :title="field.value" type="text" />
+        <!-- names are at most 15 characters; the field doesn't accept more (GS-1) -->
+        <BaseInput
+          v-bind="field"
+          :id="field.name"
+          :title="field.value"
+          type="text"
+          maxlength="15"
+        />
         <BaseFieldError :errorMessage />
       </div>
     </Field>
