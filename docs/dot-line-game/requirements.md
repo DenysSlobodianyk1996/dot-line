@@ -170,7 +170,7 @@ Playing:
 - **VC-14**: The computer player's newest line has a halo in its color until the person draws the next line. A finished game shows no halo (CM-18).
 - **VC-15**: On the person's turn, the turn reads "Your turn" (with the person's swatch) instead of the person's name (CM-19).
 - **VC-16**: **Easy** draws a random line among all the lines allowed right now (CM-22).
-- **VC-17**: **Normal** draws, in order of preference: a line that claims the most squares (two before one); otherwise a random **safe line**; otherwise a line that gives the fewest squares a third side, so the person can claim the fewest on their next turn. Ties are broken at random (CM-23, CM-24, CM-25).
+- **VC-17**: **Normal** draws, in order of preference: a line that claims the most squares (two before one); otherwise a random **safe line**; otherwise the line that leaves the person the fewest squares to claim on their next turn and, among those, gives the fewest squares a third side. Since the turn always passes (ADR-0002), the person's next line then claims at most one square whichever line the computer drew (the two squares beside a line share no other side), so in practice the choice comes down to the fewest squares given a third side. Remaining ties are broken at random (CM-23, CM-24, CM-25).
 
 Result and saving:
 

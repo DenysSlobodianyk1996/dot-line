@@ -79,6 +79,9 @@ function normalGame(size: number, lineKeys: string[]) {
   }).setGameMode('computer', 'normal')
 }
 
+// an independent copy, so trying a line doesn't change the original
+const copyOf = (game: DotLineGame) => new DotLineGame(JSON.parse(JSON.stringify(game)))
+
 const RANDOM_VALUES = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.999]
 
 // every line Normal picks over a spread of random values
@@ -133,6 +136,33 @@ describe('computer strategy: Normal', () => {
     expect(normalPicks(game)).toEqual(
       new Set(['1,0-1,1', '1,2-1,3', '2,0-2,1', '2,2-2,3', '1,1-2,1', '1,2-2,2']),
     )
+  })
+
+  it('with no safe line left, leaves me the fewest squares to claim on my next turn (CM-25, ADR-0002)', () => {
+    // same board as above: every legal line gives some square its third side
+    // prettier-ignore
+    const game = normalGame(3, [
+      '0,0-0,1', '0,1-0,2', '0,2-0,3',
+      '3,0-3,1', '3,1-3,2', '3,2-3,3',
+      '0,0-1,0', '1,0-2,0', '2,0-3,0',
+      '0,3-1,3', '1,3-2,3', '2,3-3,3',
+      '1,1-1,2', '2,1-2,2',
+    ])
+    // the most squares any one line of mine claims after the computer draws `line`
+    const myBestReply = (line: Line) => {
+      const after = copyOf(game)
+      after.drawLine(line)
+      return Math.max(...after.legalMoves().map((reply) => copyOf(after).drawLine(reply).length))
+    }
+    const fewest = Math.min(...game.legalMoves().map(myBestReply))
+
+    for (const value of RANDOM_VALUES) {
+      const line = chooseComputerLine(game, 'normal', fixed(value))!
+      expect(myBestReply(line)).toBe(fewest)
+    }
+    // two squares given a third side sit on opposite sides of the line and share no other side,
+    // so one line of mine closes at most one of them
+    expect(fewest).toBe(1)
   })
 
   it('does not change the game', () => {
