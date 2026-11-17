@@ -37,6 +37,10 @@ _Avoid_: end point, target
 **Valid start**:
 A dot that can be Dot1 right now: any dot on an empty board, otherwise an end of an existing line that still has a free neighbor.
 
+**Legal move**:
+A line the current player may draw right now: from a valid start to one of its free neighbors.
+_Avoid_: valid move, possible line
+
 **Safe line**:
 A line that doesn't give any square its third drawn side, so the opponent can't claim a square with their next line.
 

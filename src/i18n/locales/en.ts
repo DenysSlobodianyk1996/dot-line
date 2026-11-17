@@ -16,9 +16,22 @@ const en = {
     color: 'Color',
     size: 'Size',
     save: 'Save',
+    mode: 'Game mode',
+    modeComputer: 'Versus computer',
+    modeTwoPlayers: 'Two players',
+    you: 'You',
+    opponent: 'Opponent',
+    difficulty: 'Difficulty',
+    easy: 'Easy',
+    normal: 'Normal',
+  },
+  players: {
+    computer: 'Computer',
   },
   validation: {
     invalid: '{field} is not valid.',
+    maxLength: '{field} can be at most {length} characters.',
+    computerName: 'This name belongs to the computer',
     differentNames: 'Values must be different',
   },
   game: {
@@ -30,6 +43,12 @@ const en = {
   },
   status: {
     turn: 'Turn',
+    yourTurn: 'Your turn',
+    thinking: 'Thinking…',
+    // announced politely after the computer's line (CM-37)
+    computerDrew: 'Computer drew a line',
+    computerClaimedOne: 'Computer drew a line and claimed a square',
+    computerClaimedTwo: 'Computer drew a line and claimed two squares',
     score: 'Score',
     stop: 'Stop',
     stopTitle: 'Stop the game?',
@@ -40,6 +59,8 @@ const en = {
   result: {
     title: 'Result',
     wins: '{name} wins',
+    youWon: 'You won!',
+    computerWon: 'Computer won',
     draw: 'Draw',
     completed: 'All squares are filled.',
     stopped: 'The game was stopped.',

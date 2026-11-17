@@ -1,0 +1,35 @@
+name: CI
+
+# type-check, lint and tests on every pull request (CM-40)
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check
+        run: npm run type-check
+
+      # lint-check never applies fixes, so a lint error fails the job instead of being rewritten
+      - name: Lint
+        run: npm run lint-check
+
+      - name: Test
+        run: npm test

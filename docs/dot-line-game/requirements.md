@@ -1,14 +1,14 @@
 # Dot-line game: requirements
 
-Two players take turns drawing lines between neighboring dots on a square grid. Closing a square makes the player who closed it its owner. Whoever owns more squares wins.
+Two players take turns drawing lines between neighboring dots on a square grid. Closing a square makes the player who closed it its owner. Whoever owns more squares wins. The two players are either two people on one device (**Two players**) or one person and the computer player (**Versus computer**, see [VC](#vc-versus-computer)).
 
 Domain terms (Dot, Line, Square, Owned square, Dot1/Dot2, Turn, …) are defined in [GLOSSARY.md](../../GLOSSARY.md). Decisions behind the rules are in [docs/adr/](../adr/).
 
 ## GS: Game setup (existing screen)
 
-- **GS-1**: Each player enters a name and a color. Names are required, at most 15 characters (the field doesn't accept more), and must differ case-insensitively. The color is used for that player's lines and owned squares. Validation messages use readable, translated field names ("Ім’я гравця 1" / "Player 1 name", "Розмір поля" / "Size"), never internal names like `player1.name` (I18N-1).
-- **GS-2**: Size N is required, integer, 2 ≤ N ≤ 10.
-- **GS-3**: Submitting a valid form starts the game. The first player is chosen at random (see TR-2).
+- **GS-1**: Each player enters a name and a color. Names are required, at most 15 characters, and must differ case-insensitively. The field doesn't accept more than 15 characters, and a longer value that gets in anyway (pasted or restored) fails validation with "<field> can be at most 15 characters." The color is used for that player's lines and owned squares. Validation messages use readable, translated field names ("Ім’я гравця 1" / "Player 1 name", "Розмір поля" / "Size"), never internal names like `player1.name` (I18N-1). In Versus computer mode only the person's name and color are entered (VC-3), and the name must not be the computer's (VC-5).
+- **GS-2**: Size N is required, a whole number, 2 ≤ N ≤ 10. A fractional size such as 2.5 is rejected.
+- **GS-3**: Submitting a valid form starts the game in the chosen game mode (VC-1). The first player is chosen at random (see TR-2).
 
 Acceptance:
 - Given the language is English and both names are "Ann" and "ann", when I submit, then I see "Values must be different" and the game doesn't start.
@@ -16,14 +16,15 @@ Acceptance:
 - Given the language is Ukrainian and Player 1's name is empty, when I submit, then I see "Поле «Ім’я гравця 1» заповнено некоректно." and the game doesn't start.
 - Given a valid form, when I submit, then the game screen opens with an empty board of size N.
 - Given I type a 20-character name, then the field keeps only the first 15 characters.
+- Given the language is English and the size is 2.5, when I submit, then I see "Size is not valid." and the game doesn't start.
 
 ## GB: Game board
 
 - **GB-1**: The board shows (N+1)×(N+1) dots. Each square is 48×48 px.
 - **GB-2**: Every drawn line uses its owner's color.
-- **GB-3**: An owned square is filled with the owner's color at about 30% opacity, with the first letter of the owner's name in the middle.
+- **GB-3**: An owned square is filled with the owner's color at about 30% opacity, with the first letter of the owner's displayed name in the middle ("К" / "C" for the computer player, VC-8).
 - **GB-4**: The screen always shows the current player (name and color swatch) and both players' scores (owned squares).
-- **GB-5**: Player names are always shown in full, never cut with "…": in the turn, the scores, the Stop dialog and the result panel. A name too long for its space wraps onto the next line.
+- **GB-5**: Player names are always shown in full, never cut with "…": in the turn, the scores, the Stop dialog and the result panel. A name too long for its space wraps onto the next line. The computer player's name is shown as described in VC-8.
 
 Acceptance:
 - Given N=4, then 25 dots and 16 square cells of 48×48 px are rendered.
@@ -60,7 +61,7 @@ Acceptance:
 ## TR: Turns
 
 - **TR-1**: After every drawn line, the turn passes to the other player, even if the line closed a square.
-- **TR-2**: The first player of a game is chosen at random (both at start and on Rematch).
+- **TR-2**: The first player of a game is chosen at random (both at start and on Rematch), in both game modes; in Versus computer mode the computer may open (VC-9).
 
 Acceptance:
 - Given Ann closes a square, then it's Bob's turn next.
@@ -72,7 +73,7 @@ Acceptance:
 - **END-3**: The winner is the player with more owned squares. Equal scores (including 0–0) are a **Draw**.
 - **END-4**: When the game ends, the final board stays visible and a result panel shows the winner (name and color), or "Draw", plus both scores.
 - **END-5**: **New game** in the result panel clears the saved game and opens the setup screen.
-- **END-6**: **Rematch** in the result panel keeps both players and size, clears all lines and owned squares, and picks a new random first player.
+- **END-6**: **Rematch** in the result panel keeps both players, the size, the game mode and the difficulty, clears all lines and owned squares, and picks a new random first player (VC-18).
 - **END-7**: No moves are possible after the game ends.
 
 Acceptance:
@@ -82,9 +83,10 @@ Acceptance:
 
 ## PS: Persistence
 
-- **PS-1**: The game state (players, size, lines, owned squares, current player, status) is saved to localStorage on every change.
-- **PS-2**: On reload, a saved game is restored as it was: an in-progress game continues with the same current player, and a finished game shows the result panel. The current Dot1 selection isn't saved.
+- **PS-1**: The game state (players, size, lines, owned squares, current player, status, game mode, difficulty) is saved to localStorage on every change.
+- **PS-2**: On reload, a saved game is restored as it was: an in-progress game continues with the same current player, and a finished game shows the result panel. The current Dot1 selection isn't saved. For a reload during the computer player's turn, see VC-21.
 - **PS-3**: A game saved before gameplay existed (players and size set, but no current player) starts on load with a random first player.
+- **PS-4**: A game saved before game modes existed loads as a Two players game (VC-22).
 
 Acceptance:
 - Given a game in progress with 5 lines, when I reload, then the same 5 lines, owners and current player are shown.
@@ -108,11 +110,11 @@ Acceptance:
 
 ## RL: Rules
 
-- **RL-1**: A short "How to play" rules section explains the game in five points: how lines are drawn, where a line can start, how squares are claimed, that turns alternate, and how the game ends and who wins.
+- **RL-1**: A short "How to play" rules section explains the game in five points: how lines are drawn, where a line can start, how squares are claimed, that turns alternate, and how the game ends and who wins. The wording is neutral ("Take turns…" / "Гравці по черзі…", "the other player"), so the same rules read correctly in both game modes (VC-23).
 - **RL-2**: The setup screen and the game screen both end with a rules toggle button, with the rules shown below it when open. Both screens use the same rules component.
 - **RL-3**: The rules are shown by default on the setup screen ("Hide rules") and hidden by default on the game screen ("Show rules"). Pressing the button switches them, and the open/closed state isn't saved.
 - **RL-4**: The toggle button tells assistive technology whether the rules are shown (`aria-expanded`). Below 640 px wide it is full width and at least 44 px tall.
-- **RL-5**: The rules text matches the game rules (MV-1..3, SQ-1..2, TR-1, END-1..3). When a rule changes, its text changes with it.
+- **RL-5**: The rules text matches the game rules (MV-1..3, SQ-1..2, TR-1, END-1..3). When a rule changes, its text changes with it. The computer player follows the same rules (VC-11), so computer mode adds no rules text.
 
 ## APP: App
 
@@ -127,7 +129,7 @@ Acceptance:
 
 ## I18N: Languages
 
-- **I18N-1**: Every text the UI shows is available in Ukrainian and English: labels, buttons, hints, the Stop dialog, the result panel, the rules, validation messages, dot `aria-label`s and the browser tab title. Player names are shown exactly as typed.
+- **I18N-1**: Every text the UI shows is available in Ukrainian and English: labels, buttons, hints, the Stop dialog, the result panel, the rules, validation messages, dot `aria-label`s and the browser tab title, plus the Versus computer texts (VC-24). Player names are shown exactly as typed; only the computer player's name is translated (VC-8).
 - **I18N-2**: Ukrainian is the default language on the first visit.
 - **I18N-3**: A language toggle ("UA" / "EN") sits at the top right of every screen. Switching changes all text at once, along with the page's `lang` attribute and the tab title.
 - **I18N-4**: The chosen language is saved in localStorage and restored on reload.
@@ -142,3 +144,61 @@ Acceptance:
 - Given I chose English, when I reload, then the app is still in English.
 - Given a game in progress in Ukrainian, then the panel shows "Хід", "Рахунок" and "Зупинити", and player names are unchanged.
 - Given a 390 px wide phone, then each toggle button is at least 44×44 px.
+
+## VC: Versus computer
+
+One person plays against the **computer player**. Stories CM-1..40 and the decisions behind them are in [computer-opponent/spec.md](../computer-opponent/spec.md); each rule names the stories it covers.
+
+Setup:
+
+- **VC-1**: The setup screen starts with a **Game mode** switch: **Versus computer** or **Two players**. Two players works exactly as before computer mode existed (CM-1, CM-34).
+- **VC-2**: On a first visit setup opens with Versus computer and Normal selected. Afterwards it opens with the game mode and difficulty of the last game started, including after New game. These choices are saved only when a game starts, not when the switches are pressed, and the difficulty is saved even when a Two players game starts, for the next Versus computer game (CM-2, CM-3, CM-7, CM-29).
+- **VC-3**: In Versus computer mode the form asks only for the person's name and color (a "You" fieldset) and the size. A read-only "Opponent" fieldset shows the robot icon, "Computer" and the computer player's color (CM-4).
+- **VC-4**: A **Difficulty** switch (**Easy** / **Normal**) sits right under the game mode switch and is shown only in Versus computer mode (CM-5, CM-6).
+- **VC-5**: In Versus computer mode the person's name is rejected with "This name belongs to the computer" when it matches the computer player's name in any supported language ("Комп’ютер", "Computer"), ignoring case, surrounding spaces and the apostrophe variant (', ’ or ʼ). Two players mode has no such check (CM-8).
+- **VC-6**: The computer player's color is chosen automatically from a fixed palette as the color that looks most different from the person's color, and follows the person's color while it's being picked. It can't be edited (CM-9).
+- **VC-7**: Switching the game mode keeps everything already typed: names, colors and size (CM-10).
+
+Playing:
+
+- **VC-8**: The computer player is shown as "Комп’ютер" / "Computer" in the current language, following the language toggle, with a robot icon in front of the name in the turn, the scores, the Stop dialog and the setup Opponent field, and beside the result heading. The icon is decorative; the written name is the accessible text. Its owned squares show "К" / "C" (CM-12, CM-13, CM-37).
+- **VC-9**: The first player is chosen at random (TR-2). When the computer player goes first, it moves on its own (CM-11).
+- **VC-10**: On the computer player's turn, the turn shows its swatch, robot and name with a pulsing "Thinking…" below, announced politely to assistive technology, and the hint is hidden. After about one second the computer draws its line. In the same place a short message then says what it did, also announced politely: "Computer drew a line", or "Computer drew a line and claimed a square" ("…two squares"), until the person draws (CM-14, CM-15, CM-37).
+- **VC-11**: The computer player follows the same rules as a person: only lines allowed by MV-1..3, one line per turn, the turn always passes (TR-1), the squares it closes become its owned squares and count toward its score (SQ-1..3), and the game ends as soon as the last square is owned (END-1) (CM-20, CM-21, CM-26).
+- **VC-12**: During the computer player's turn the board is locked: no dot is highlighted and clicks on dots do nothing (CM-16).
+- **VC-13**: Stop works during the computer player's turn, and stopping cancels its pending move. While the Stop dialog is open the computer player waits; Cancel gives it its usual pause again. Rematch, New game and leaving the game screen cancel it too (CM-17).
+- **VC-14**: The computer player's newest line has a halo in its color until the person draws the next line. A finished game shows no halo (CM-18).
+- **VC-15**: On the person's turn, the turn reads "Your turn" (with the person's swatch) instead of the person's name (CM-19).
+- **VC-16**: **Easy** draws a random line among all the lines allowed right now (CM-22).
+- **VC-17**: **Normal** draws, in order of preference: a line that claims the most squares (two before one); otherwise a random **safe line**; otherwise the line that leaves the person the fewest squares to claim on their next turn and, among those, gives the fewest squares a third side. Since the turn always passes (ADR-0002), the person's next line then claims at most one square whichever line the computer drew (the two squares beside a line share no other side), so in practice the choice comes down to the fewest squares given a third side. Remaining ties are broken at random (CM-23, CM-24, CM-25).
+
+Result and saving:
+
+- **VC-18**: Rematch keeps the game mode, the difficulty, the person's name and color, the computer player and the size, with a new random first player (END-6). If the computer player starts the rematch, it moves on its own (CM-28).
+- **VC-19**: The result heading reads "You won!" or "Computer won" (with the robot), or "Draw", followed by both scores with the winner first. Two players keeps "<name> wins" (CM-27).
+- **VC-20**: The game mode and difficulty are saved with the game (PS-1) and restored with it (PS-2). A saved Versus computer game without a difficulty loads as Easy (CM-30).
+- **VC-21**: A reload during the computer player's turn restores the game, shows "Thinking…" and lets the computer move after the usual pause. A reload during the person's turn restores "Your turn" with the computer's newest line still highlighted (CM-31, CM-32).
+- **VC-22**: A game saved before game modes existed loads as a Two players game (PS-4, CM-33).
+
+Rules, languages and phones:
+
+- **VC-23**: The "How to play" rules are the same in both game modes and worded neutrally (RL-1, RL-5, CM-35).
+- **VC-24**: Every new text is available in Ukrainian and English: the mode and difficulty labels, "You" and "Opponent", the computer player's name, "Thinking…", "Your turn", "You won!", "Computer won" and the name-clash message (I18N-1, CM-36).
+- **VC-25**: The game mode and difficulty switches are full width with equal-width options, at least 44 px tall below 640 px wide, and the setup and thinking indicator fit from 320 px wide (MB-1, MB-8, CM-38).
+
+Acceptance (English UI):
+- Given a first visit, then setup shows "Versus computer" and "Normal" selected, a "You" fieldset and an "Opponent" fieldset with "Computer".
+- Given I switch to "Two players", then the difficulty switch disappears, the Player 1 and Player 2 fieldsets appear, and the name I typed is still there.
+- Given I last started a Two players game, when I open setup again, then "Two players" is selected, and switching to "Versus computer" shows the difficulty I last chose.
+- Given I switch the mode but don't start a game, when I reload, then setup opens with the mode of the last game started.
+- Given Versus computer mode and my name is "computer", "Комп'ютер" or " КОМП’ЮТЕР ", when I submit, then I see "This name belongs to the computer" and the game doesn't start.
+- Given my color is pure red (#ff0000), then the computer player gets the palette's teal (#1f9bb0).
+- Given it's the computer player's turn, then the turn shows the robot, "Computer" and "Thinking…", every dot is idle, and after about one second a new line appears and the turn reads "Your turn".
+- Given the computer player has just drawn a line, then that line has a halo until I draw mine.
+- Given it's the computer player's turn and I press Stop and confirm, then no line is drawn and the result panel appears.
+- Given it's the computer player's turn and the Stop dialog is open, then the computer doesn't move however long I wait; when I press Cancel, it moves after about one second.
+- Given Normal and a square with three sides drawn, when the computer moves, then it draws the fourth side; if one line would close two squares, it draws that one.
+- Given Normal, no square to claim and at least one safe line, when the computer moves, then it never gives a square its third side.
+- Given I win 5 : 4, then the result reads "You won!"; given the computer wins, it reads "Computer won" with the robot.
+- Given I reload during the computer player's turn, then "Thinking…" shows and the computer moves after about one second.
+- Given a saved game without a game mode, when I reload, then it continues as a Two players game.

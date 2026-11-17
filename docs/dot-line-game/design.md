@@ -30,6 +30,61 @@ Languages: every screen has the UA / EN toggle at the top right. Screens 1–13 
 
 Source files for the artboards are in [design-canvas/](design-canvas/) (`*.dc.html` plus `canvas.json`). They were generated from the board data, so board state and highlights are consistent with the rules below.
 
+### Versus computer mode (approved 2026-11-17, #8)
+
+Spec: [computer-opponent/spec.md](../computer-opponent/spec.md) (stories CM-n), shipped as [requirements VC](requirements.md#vc-versus-computer). The product owner approved these artboards on 2026-11-17 (#8). The setup screens 1, 7, 14 and 15 now start with the game mode switch, with **Two players** selected; the rest of each screen is unchanged [CM-1, CM-6, CM-34]. The sample person is Ярослава Петрук on Ukrainian screens and Alexandra Brown on English ones, both exactly 15 characters and never cut [GS-1, GB-5]. The person's color is red and the computer's automatic color is green [CM-9]. (The mockup color is illustrative: the built palette rule, see [Versus computer](#versus-computer-vc-125), gives pure red the palette's teal.) Desktop game screens are in Ukrainian and mobile game screens in English, so every new string appears in both languages.
+
+Desktop page (second row):
+
+16. Setup, Versus computer: game mode switch (Versus computer selected), difficulty switch (Normal selected), "Ви" fieldset with name and color, and a read-only "Суперник" fieldset with the robot, "Комп’ютер" and its automatic color [CM-1, CM-2, CM-4..7, CM-9]
+17. Setup, Versus computer, English [CM-36, I18N-1]
+18. Computer thinking: Turn shows the color swatch, robot and "Комп’ютер", with a pulsing "Думає…" (polite live region) under the name, and the hint hidden. Every dot is idle, so the board is locked, and Stop is still available [CM-13, CM-14, CM-16, CM-17, CM-37]
+19. Computer line highlighted, "Ваш хід": the computer's last line (a safe line, CM-24) has a 4 px halo in its color, valid starts are highlighted again, and Turn says "Ваш хід" [CM-18, CM-19]
+20. Result, "Ви перемогли!" (9 : 7), with the person first in the scores [CM-27]
+21. Result, "Комп’ютер переміг" (robot next to the heading), with the computer first in the scores [CM-13, CM-27]
+
+Mobile page (second row, 390 px):
+
+22. Setup, Versus computer, with the switches 44 px tall [CM-38, MB-8]
+23. Setup, Versus computer, English
+24. Computer thinking, English: Turn and Score in two columns, with "Thinking…" under the computer's name [CM-14, CM-16, CM-38]
+25. "Your turn", English, with the computer's line highlighted [CM-18, CM-19]
+26. Result, "You won!", English [CM-27]
+27. Result, "Computer won", English [CM-27]
+
+Visual rules used on these screens:
+
+- **Mode and difficulty switches**: a labelled `role="radiogroup"` styled like the language toggle (`rounded-md border border-gray-300 bg-white p-0.5 shadow-sm`), stretched to full width with equal-width options. The selected option is `bg-blue-600 text-white`. Options are `min-h-8` from `sm` up and `min-h-11` on phones. Difficulty sits right under the mode switch and is shown only in Versus computer mode [CM-6].
+- **Robot icon**: Material Symbols `smart_toy` (outlined, `viewBox="0 -960 960 960"`) as inline SVG with `fill: currentColor` and `aria-hidden="true"`. It is 20 px in Turn, 16 px in score rows, 24 px in the result heading and 18 px in the setup Opponent field. It always sits between the color swatch and the written name, which stays the accessible text [CM-13, CM-37].
+- **Thinking**: `text-sm text-gray-500 animate-pulse` in an `aria-live="polite"` element under the name in Turn (as on mobile artboard 24, on both layouts). The hint is hidden while the computer's move is pending.
+- **Last computer line**: the normal line plus `box-shadow: 0 0 0 4px` in the computer's color at 40%. It is shown only while the game is playing and the newest line is the computer's.
+- **Owned squares** keep the existing style with the first letter of the displayed name ("К" / "C" for the computer).
+
+Message keys added to both locales (`src/i18n/locales`):
+
+| Key | English | Українська |
+| --- | --- | --- |
+| `setup.mode` | Game mode | Режим гри |
+| `setup.modeComputer` | Versus computer | Проти комп’ютера |
+| `setup.modeTwoPlayers` | Two players | Двоє гравців |
+| `setup.difficulty` | Difficulty | Складність |
+| `setup.easy` | Easy | Легко |
+| `setup.normal` | Normal | Нормально |
+| `setup.you` | You | Ви |
+| `setup.opponent` | Opponent | Суперник |
+| `players.computer` | Computer | Комп’ютер |
+| `validation.computerName` | This name belongs to the computer | Це ім’я належить комп’ютеру |
+| `validation.maxLength` | {field} can be at most {length} characters. | Поле «{field}» може містити не більше {length} символів. |
+| `status.thinking` | Thinking… | Думає… |
+| `status.yourTurn` | Your turn | Ваш хід |
+| `status.computerDrew` | Computer drew a line | Комп’ютер провів лінію |
+| `status.computerClaimedOne` | Computer drew a line and claimed a square | Комп’ютер провів лінію і зайняв квадрат |
+| `status.computerClaimedTwo` | Computer drew a line and claimed two squares | Комп’ютер провів лінію і зайняв два квадрати |
+| `result.youWon` | You won! | Ви перемогли! |
+| `result.computerWon` | Computer won | Комп’ютер переміг |
+
+`validation.computerName` (CM-8) and `validation.maxLength` (GS-1) aren't shown on an artboard. The rules text (`rules.step1`–`step5`) already reads neutrally in both languages ("Take turns…" / "Гравці по черзі…", "the other player"), so CM-35 needed no new wording.
+
 ## Data model (`src/models/`)
 
 Lines used to live inside each `Square` (`Square.lines` with `LinePosition`), so every shared edge existed twice. The model keeps one game-level list of lines as the single source of truth instead. `dirtySquares` holds only owned squares.
@@ -64,6 +119,8 @@ export class Square {
 // dot-line-game.model.ts
 export type GameStatus = 'playing' | 'finished'
 export type FinishReason = 'completed' | 'stopped'
+export type GameMode = 'twoPlayers' | 'computer'
+export type Difficulty = 'easy' | 'normal'
 
 export class DotLineGame {
   player1: Player | null
@@ -74,14 +131,32 @@ export class DotLineGame {
   currentPlayerName: string | null
   status: GameStatus
   finishReason: FinishReason | null
+  gameMode: GameMode         // missing in a save → 'twoPlayers' [VC-22]
+  difficulty: Difficulty | null // only in 'computer'; a computer save without one → 'easy' [VC-20]
 }
+
+export interface GameSetupForm {
+  gameMode: GameMode
+  difficulty: Difficulty | null
+  player1: Player
+  player2: Player            // in Versus computer mode, the computer player
+  size: number
+}
+
+// computer-player.model.ts
+export const COMPUTER_NAME = '__computer_player__'
+export function isComputerPlayer(name): boolean
+export function createComputerPlayer(personColor): Player  // name COMPUTER_NAME, color computerColorFor(personColor)
+
+// computer-strategy.ts
+export type RandomSource = () => number
+export function chooseComputerLine(game, difficulty, random = Math.random): Line | null
 ```
 
 Rules for all model constructors:
 - The `Partial<Self>` constructor is also the JSON rehydrator used by `reset()` on load from localStorage (PS-2). It builds nested instances: `lines.map(l => new Line(l))`, `new Dot(...)`, `dirtySquares.map(s => new Square(s))`.
 - Default with `??`, not `||`, so `row`/`col` = 0 survive.
-- Keep the chainable `setX()` setters, `getPlayerByName`, `isGameStarted` and `reset(game?)` (which uses `Object.assign` to keep the reactive identity).
-- `GameSetupForm` stays as is.
+- Keep the chainable `setX()` setters (including `setGameMode(mode, difficulty)`), `getPlayerByName`, `isGameStarted` and `reset(game?)` (which uses `Object.assign` to keep the reactive identity).
 
 ## Rules (methods on `DotLineGame`)
 
@@ -92,16 +167,22 @@ Follows the existing pattern where the model owns its logic.
 | `players`, `currentPlayer`, `getPlayerByName(name)`, `getOpponent(name)` | Player lookups by name. | — |
 | `isGameStarted` | Both players and a size are set, so Page shows the game instead of setup. | GS-3 |
 | `isFinished` | `status === 'finished'`. | END-7 |
+| `isComputerGame` | `gameMode === 'computer'`. | VC-1 |
+| `isComputerTurn` | Computer game, not finished, and the current player is the computer player. | VC-10, VC-12 |
+| `setGameMode(mode, difficulty)` | Sets the mode; the difficulty is kept only in `'computer'` (default `'easy'`), else `null`. The constructor applies the same rule through one shared helper, so the default exists once. | VC-1, VC-4, VC-20 |
 | `hasLine(a, b)` | Some line has key `Line.key(a, b)`. | MV-3 |
 | `neighbors(dot)` | Up to 4 orthogonal dots inside `0..size`. | MV-3 |
 | `validNeighbors(dot)` | `neighbors(dot)` without drawn edges. | MV-3, MV-5 |
 | `isValidStartDot(dot)` | Not finished, inside the board, (`lines.length === 0` or some line touches `dot`), and at least one valid neighbor. | MV-1, MV-2, MV-4 |
 | `canDraw(a, b)` | `isValidStartDot(a)` and `b` is in `validNeighbors(a)`. | MV-3 |
-| `drawLine(a, b)` | Guard `canDraw`. Push a `Line` owned by the current player. Each adjacent square (see below) with 4 drawn edges and no owner becomes a `Square` owned by the drawer. Pass the turn to the opponent. When all N² squares are owned, finish with `'completed'`. Returns the squares it closed. | SQ-1..3, TR-1, END-1 |
+| `legalMoves()` | Every line the current player may draw now, each listed once with no owner: valid starts × their `validNeighbors`. The strategy uses it, so the rules stay in one place (ADR-0003). | VC-11 |
+| `drawLine(a, b)` / `drawLine(line)` | Given a `Line` (e.g. from `legalMoves()`), draw it from whichever end is a valid start, since a `Line` stores its ends in board order. Guard `canDraw`. Push a `Line` owned by the current player. Each adjacent square (see below) with 4 drawn edges and no owner becomes a `Square` owned by the drawer. Pass the turn to the opponent. When all N² squares are owned, finish with `'completed'`. Returns the squares it closed. | SQ-1..3, TR-1, END-1 |
+| `drawnSideCount(r, c)` | How many of the square's four edges are drawn (0..4); `isSquareClosed` is `=== 4`. | SQ-1, VC-17 |
+| `squaresNextTo(line)` | The squares on either side of a line (see below), inside the board. Used by `drawLine` and the computer strategy, so square geometry lives in one place. | SQ-1, SQ-2, VC-17 |
 | `stop()` | If playing, finish with `'stopped'`. | END-2 |
 | `scoreOf(name)` | Number of squares owned by that player. | GB-4 |
 | `winner` | The `Player` with the higher score, or `null` for a draw. | END-3 |
-| `start()` | Clear `lines` and `dirtySquares`, `status = 'playing'`, `finishReason = null`, random `currentPlayerName`. Used after setup, for rematch and for old saves. | GS-3, TR-2, END-6, PS-3 |
+| `start()` | Clear `lines` and `dirtySquares`, `status = 'playing'`, `finishReason = null`, random `currentPlayerName`. Keeps players, size, game mode and difficulty. Used after setup, for rematch and for old saves. | GS-3, TR-2, END-6, PS-3, VC-18 |
 | `reset(game?)` | Replace all state from a saved game (or an empty one), keeping the reactive identity. | END-5, PS-2 |
 
 Square (r, c) edges:
@@ -122,6 +203,11 @@ Skip squares that fall outside `0..N-1`. There are 2·N·(N+1) possible lines in
 src/pages/dot-line-game/
   Page.vue            # setup vs game via <component :is>; gameSetup() calls start() after the setters
   Game.vue            # board + side panel; owns selectedDot and the hint; saves the game in a watchEffect
+  useComputerTurn.ts  # plays the computer player's turns (pause, then its line)
+  game-setup/
+    GameSetup.vue     # mode and difficulty switches, player fields, size; remembers mode and difficulty
+    PlayerField.vue   # name + color fieldset ("Player N", or "You" in Versus computer)
+    ComputerOpponentField.vue # read-only Opponent fieldset: robot, "Computer", automatic color
   game/
     GameBoard.vue     # squares, lines and clickable dots; v-model:selected-dot
     GameStatus.vue    # turn, score, hint, Stop button and the Stop confirmation dialog
@@ -130,6 +216,12 @@ src/pages/dot-line-game/
   rules/
     GameRules.vue     # "How to play" card with the five numbered rules
     RulesToggle.vue   # Show/Hide rules button plus GameRules; used at the bottom of setup and game
+src/shared/
+  components/BaseSegmentedControl.vue # labelled radiogroup switch (game mode, difficulty)
+  components/PlayerName.vue           # displayed name, with the robot for the computer player
+  components/RobotIcon.vue            # inline-SVG smart_toy icon
+  composables/useDisplayName.ts       # stored name → displayed name
+src/utils/computer-color.ts           # COMPUTER_PALETTE, computerColorFor()
 ```
 
 All sizes and colors come from the approved canvas.
@@ -159,16 +251,19 @@ All sizes and colors come from the approved canvas.
 - **GameResult.vue** [END-3..6]: a `w-53` column with "Result", "`<name>` wins" with a swatch or "Draw", "All squares are filled." or "The game was stopped.", the scores with the winner first, and New game (secondary) and Rematch (primary).
   - New game: `StorageService.removeItem(CURRENT_GAME)` then `game.reset()`.
   - Rematch: `game.start()`.
-- **PlayerScore.vue**: a `text-sm leading-6` row with a 12 px swatch, the full name (wrapping, see Player names) and a `tabular-nums` score.
+- **PlayerScore.vue**: a `text-sm leading-6` row with a 12 px swatch, the full name through `PlayerName` (wrapping, see Player names) and a `tabular-nums` score.
+
+Versus computer changes to these components are described in [Versus computer](#versus-computer-vc-125).
 
 ## Player names [GS-1, GB-5]
 
-- **PlayerField.vue**: the name `<input>` has `maxlength="15"`, and the field's rules add `max:15` so a pasted or restored value is still validated (generic `validation.invalid` message).
+- **PlayerField.vue**: the name `<input>` has `maxlength="15"`, and the field's rules add `max:15` so a pasted or restored value is still validated, with its own message `validation.maxLength` ("Player 2 name can be at most 15 characters.").
+- **GameSetup.vue**: the size field's rules are `required|integer|min_value:2|max_value:10` [GS-2].
 - Names are never truncated. Every place that shows a name (GameStatus turn, PlayerScore, GameResult heading) drops `truncate` and uses `min-w-0 break-words`, so a long name wraps; the color swatch stays `shrink-0` and aligned to the first line.
 
 ## Persistence [PS-1..3]
 
-`Game.vue`'s `watchEffect` saves the whole reactive game with `StorageService.setItem(CURRENT_GAME, game)`. `Page.vue` restores it with `StorageService.getItem(CURRENT_GAME, { applyParse: true })` and `dotLineGame.reset(savedGame)`, and the constructors rebuild the `Line`, `Dot` and `Square` instances. A started, unfinished save without `currentPlayerName` (saved before gameplay existed) gets `start()` [PS-3]. `status` decides whether Game shows GameStatus or GameResult. The dot selection isn't saved.
+`Game.vue`'s `watchEffect` saves the whole reactive game (including `gameMode` and `difficulty`) with `StorageService.setItem(CURRENT_GAME, game)`. `Page.vue` restores it with `StorageService.getItem(CURRENT_GAME, { applyParse: true })` and `dotLineGame.reset(savedGame)`, and the constructors rebuild the `Line`, `Dot` and `Square` instances. A started, unfinished save without `currentPlayerName` (saved before gameplay existed) gets `start()` [PS-3]. `status` decides whether Game shows GameStatus or GameResult. The dot selection isn't saved.
 
 ## Mobile [MB-1..8]
 
@@ -184,7 +279,7 @@ The phone layout is the default, and `sm:` classes (640 px and up) restore the d
 - **GameStatus** on phones: Turn and Score in a two-column grid (`grid grid-cols-2 gap-4 sm:flex sm:flex-col`), then the hint, then Stop at full width with `min-h-11` (`w-full sm:w-auto sm:min-h-0`).
 - **Stop dialog** card: `w-full max-w-75`, inside the `p-4` backdrop.
 - **GameResult** on phones: New game and Rematch in `grid grid-cols-2 gap-2`, each `min-h-11`. From `sm` up they return to the wrapping row.
-- **GameSetup**: the player fieldsets row becomes `flex flex-col gap-2 sm:flex-row`.
+- **GameSetup**: the player fieldsets row becomes `flex flex-col gap-2 sm:flex-row`; each fieldset is `min-w-0 flex-1`, so the two share the row equally ("You" and "Opponent" included).
 
 ## Rules [RL-1..5, APP-1]
 
@@ -219,8 +314,8 @@ src/shared/components/LanguageToggle.vue
   - `SUPPORTED_LOCALES = ['uk', 'en']` and `DEFAULT_LOCALE = 'uk'` [I18N-2].
   - The initial locale is the saved `LOCALE` value from localStorage (through `StorageService`), if it's supported, otherwise `uk` [I18N-4]. `fallbackLocale` is `en`.
   - `setLocale(locale)` sets `i18n.global.locale.value`, saves `LOCALE`, then sets `document.documentElement.lang` and `document.title = t('app.title')` [I18N-3, APP-1]. The same document update runs once at startup.
-  - `configure({ generateMessage })` from vee-validate: the `differentFromAll` rule gets `validation.differentNames`, and every other rule gets `validation.invalid` with `{ field }`. `field` is the `<Field>`'s translated `label` [GS-1, I18N-1]. The custom rule returns `false`, not a hard-coded string. Messages are generated when validation runs, so a message already on screen updates on the next validation [I18N-6].
-- **Message keys**: `rules.step1`–`step5` for the rules, `game.hintFirstLine` / `hintSelected` / `hintStart` for hints, `game.dotLabel` with `{row}`/`{col}`, `result.wins` with `{name}`, `setup.player` / `setup.playerName` with `{number}`. Player names are passed in as parameters and never translated.
+  - `configure({ generateMessage })` from vee-validate: the `differentFromAll` rule gets `validation.differentNames`, `notComputerName` gets `validation.computerName`, `max` gets `validation.maxLength` with `{ field, length }`, and every other rule gets `validation.invalid` with `{ field }`. `field` is the `<Field>`'s translated `label` [GS-1, I18N-1]. The custom rule returns `false`, not a hard-coded string. Messages are generated when validation runs, so a message already on screen updates on the next validation [I18N-6].
+- **Message keys**: `rules.step1`–`step5` for the rules, `game.hintFirstLine` / `hintSelected` / `hintStart` for hints, `game.dotLabel` with `{row}`/`{col}`, `result.wins` with `{name}`, `players.computer` for the computer player's name, `setup.player` / `setup.playerName` with `{number}`. Player names are passed in as parameters and never translated.
 - **Components** call `const { t } = useI18n()`. `PlayerField` takes `number` (1 or 2) instead of a `label` string.
 - **LanguageToggle.vue** [I18N-3, I18N-5]:
   - A `role="group"` element labelled `t('language.label')`: `inline-flex rounded-md border border-gray-300 bg-white p-0.5 shadow-sm`.
@@ -229,3 +324,70 @@ src/shared/components/LanguageToggle.vue
 - **App.vue**: `<header class="mb-2 flex justify-end">` with `LanguageToggle`, above `RouterView`, so it's on every screen.
 - **vite.config.ts**: `define` sets the vue-i18n esm-bundler flags: `__VUE_I18N_FULL_INSTALL__: true`, `__VUE_I18N_LEGACY_API__: false`, `__INTLIFY_PROD_DEVTOOLS__: false`.
 - **StorageService.setItem** accepts a `string` as well as an `object`, and strings are stored as they are.
+
+## Versus computer [VC-1..25]
+
+### Computer player identity
+
+- The computer player is always `player2`, stored under `COMPUTER_NAME = '__computer_player__'` (ADR-0001). The name is longer than the 15-character limit, so a person can't type it. Lines, owned squares, scores and `currentPlayerName` keep working by name.
+- `createComputerPlayer(personColor)` builds it with `computerColorFor(personColor)` [VC-6]: the `COMPUTER_PALETTE` color (green, blue, red, orange, purple, teal) with the largest "redmean" distance from the person's color. An unreadable color gets the first one (green).
+
+### Display helper [VC-8]
+
+- `useDisplayName()` returns `displayName(name)`: `t('players.computer')` for the computer player, otherwise the name as typed. It's the only place that turns a stored name into a shown one, and it follows the language toggle.
+- `PlayerName.vue` wraps it, with a `RobotIcon` in front for the computer player (`iconSize`, default 16). It's used in the Turn (20 px) and in `PlayerScore` (score rows, the Stop dialog and the result scores).
+- `GameResult.vue` puts a 24 px `RobotIcon` between the swatch and the heading when the computer wins. `GameBoard.vue` uses `displayName(...)` for the owned-square initial, and `ComputerOpponentField.vue` shows an 18 px robot with `displayName(COMPUTER_NAME)`.
+
+### Icon
+
+- `RobotIcon.vue`: Material Symbols `smart_toy` (outlined) as inline SVG, `viewBox="0 -960 960 960"`, `fill-current`, `aria-hidden="true"`, `focusable="false"`, `data-icon="robot"`, with a `size` prop in px. It needs no network request; future icons follow the same pattern.
+
+### Computer strategy (`src/models/computer-strategy.ts`) [VC-16, VC-17]
+
+- `chooseComputerLine(game, difficulty, random = Math.random)` is pure (CM-39): it reads `game.legalMoves()`, returns `null` when there are none, and otherwise hands them to `STRATEGIES[difficulty]`. It never changes the game.
+- For each move it looks at the squares on either side (`game.squaresNextTo`) and how many of their sides are drawn now (`game.drawnSideCount`): a move **claims** each square that has 3 sides and **gives away** each square that has 2.
+- **Easy**: `pickRandom(moves, random)`.
+- **Normal**: if some move claims a square, a random one among those claiming the most; otherwise a random one among those giving away the fewest. A safe line gives away 0, so this picks a random safe line when one exists (CM-24).
+- CM-25 (no safe line): the primary criterion, "the fewest squares the person could claim on their next turn", is the most squares any single line of theirs closes after the computer's line. When step 3 is reached no square has three sides (step 1 would have claimed it, and the missing side of a three-sided square is always a legal move), so the only three-sided squares afterwards are the ones the computer's line gave away. Those lie on opposite sides of that line and share no other side, so the person's best reply claims exactly one square for every candidate: the primary criterion always ties. The strategy therefore doesn't compute it; it goes straight to the secondary criterion, fewest squares given a third side, then the random source. The spec `with no safe line left, leaves me the fewest squares to claim on my next turn` pins this property by playing out every reply.
+- `pickRandom` uses `Math.min(n - 1, floor(random() * n))`, so tests can pass a fixed random source.
+
+### Computer turn (`src/pages/dot-line-game/useComputerTurn.ts`) [VC-9..13, VC-21]
+
+- `useComputerTurn(() => game, paused)` returns `{ isThinking, cancel }`.
+- It watches `isComputerTurn && !paused() ? lines.length : null` with `immediate: true`, so a restored game resumes on mount. Every change cancels any pending move; when the value isn't `null`, it sets `isThinking` and schedules the move `COMPUTER_DELAY_MS` (1000 ms) later.
+- The move re-checks `isComputerTurn`, asks `chooseComputerLine(game, game.difficulty)` (the model guarantees a computer game has one) and draws the line through the normal `drawLine(line)`, which picks the valid end as the start.
+- `Game.vue` calls `cancel()` in `stop`, `rematch` and `newGame`; unmounting cancels too.
+- `GameStatus` exposes its Stop dialog through `v-model:confirming`; `Game.vue` passes that as `paused`, so the computer waits while the dialog is open and gets a fresh pause after Cancel (VC-13). The board stays locked meanwhile because `isComputerTurn` still holds.
+- `Game.vue` passes `isThinking || isComputerTurn` to `GameBoard` as `locked` (every dot `idle`, clicks ignored) and to `GameStatus` as `thinking`.
+
+### Status and board [VC-10, VC-14, VC-15]
+
+- `GameStatus.vue`: on the person's turn in a computer game (`isComputerGame && !isComputerTurn`) the Turn reads `status.yourTurn` next to the person's swatch; otherwise it shows `PlayerName`. Under it, an always-rendered `<p aria-live="polite">` shows `status.thinking` with `animate-pulse` while `thinking`, and the hint (`data-hint`) is hidden then. Once the computer has drawn, and until the next line, it shows `status.computerDrew`, or `status.computerClaimedOne` / `status.computerClaimedTwo` when owned squares lie next to that newest line (`squaresNextTo`), so screen readers hear the move [CM-37]. It's derived from `lines`, so a reload on the person's turn shows it too, without announcing it.
+- `GameBoard.vue`: `lastComputerLine` is the newest line when its owner is the computer player and the game isn't finished. It's derived from `lines`, so it survives a reload. That line gets `box-shadow: 0 0 0 4px color-mix(in srgb, <color> 40%, transparent)`.
+
+### Result [VC-19]
+
+- `GameResult.vue`: in a computer game the heading is `result.computerWon` or `result.youWon`; in Two players it's `result.wins` with the displayed name. Draw is unchanged, and the scores are sorted winner first.
+
+### Setup [VC-1..7]
+
+- `GameSetup.vue` has a `BaseSegmentedControl` for the game mode, and a second one for the difficulty only when the mode is `'computer'`. The vee-validate `<Form>` has `keep-values`, so values typed in either mode survive a switch [VC-7].
+  - Versus computer: a `PlayerField` with `legend="You"` (field label `setup.name`, so messages read "Name is not valid."), `reject-computer-name` and no other names to differ from, then `ComputerOpponentField` with `computerColorFor(values.player1.color)`.
+  - Two players: the two `PlayerField`s as before.
+  - `submit()` emits a `GameSetupForm`. In computer mode `player2 = createComputerPlayer(player1.color)`, and a second person typed earlier is ignored. `Page.vue` applies it with `setGameMode(...).setPlayer1(...).setPlayer2(...).setSize(...).start()`.
+- `BaseSegmentedControl.vue` (generic over the value type): a visible label (`aria-hidden`) plus a `role="radiogroup"` with the same `aria-label`. Each option is a `role="radio"` button with `aria-checked`, `flex-1` and `min-h-11 sm:min-h-8`; the selected one is `bg-blue-600 text-white`.
+- `PlayerField.vue` registers `notComputerName`: the name, trimmed, with `'`, `’` and `ʼ` unified and lower-cased, must not equal `players.computer` of any locale in `SUPPORTED_LOCALES`, normalized the same way [VC-5].
+
+### Preferences [VC-2]
+
+- Storage keys `GAME_MODE` and `DIFFICULTY` (`src/static/storage-keys.ts`), next to `LOCALE`, are written as plain strings through `StorageService`.
+- `GameSetup.vue` reads them when it's created. A missing or unknown value falls back to `'computer'` / `'normal'`.
+- `submit()` writes both, so they change only when a game starts. The difficulty is written in Two players too, so the next Versus computer setup shows the last chosen difficulty.
+
+## Tests
+
+Vitest with Vue Test Utils on jsdom (`npm test`). CI runs type-check, `npm run lint-check` and the tests on every pull request, and the deploy runs the same three checks before building; any failure blocks it (CM-40).
+
+- Specs live in `__tests__/*.spec.ts` next to the code and are type-checked through `tsconfig.vitest.json`. `src/test/setup.ts` unmounts every wrapper and clears localStorage after each test.
+- Model seam: `src/models/__tests__/` (game model, legal moves, game mode rehydration, and `computer-strategy.spec.ts` with a fixed random source).
+- Page seam: `src/test/mount-game-page.ts` mounts the whole app at `/game` with real i18n, router and localStorage. `src/test/game-page.ts` is the page driver (`startGame`, `startComputerGame`, `clickDot`, `drawLine`, `waitForComputer`, `reload`, …) and the only code that knows the board's DOM. Page specs fake `setTimeout`/`clearTimeout` and stub `Math.random` for the first player.

@@ -48,8 +48,14 @@ const componentConfig = computed(() => {
   }
 })
 
-function gameSetup({ player1, player2, size }: GameSetupForm) {
-  dotLineGame.setPlayer1(player1).setPlayer2(player2).setSize(size).start()
+// in Versus computer mode player2 is already the computer player (CM-9, ADR-0001)
+function gameSetup({ gameMode, difficulty, player1, player2, size }: GameSetupForm) {
+  dotLineGame
+    .setGameMode(gameMode, difficulty)
+    .setPlayer1(player1)
+    .setPlayer2(player2)
+    .setSize(size)
+    .start()
 }
 </script>
 

@@ -12,12 +12,12 @@
   "artboards": [
     {
       "file": "MobileSetup.dc.html",
-      "title": "7 · Mobile setup, rules shown",
+      "title": "7 · Mobile setup, Two players, rules shown",
       "page": "page-2",
       "x": 0,
       "y": 0,
       "w": 390,
-      "h": 1120
+      "h": 1200
     },
     {
       "file": "MobileGame.dc.html",
@@ -66,20 +66,20 @@
     },
     {
       "file": "MobileSetupEnglish.dc.html",
-      "title": "14 · Mobile setup, English",
+      "title": "14 · Mobile setup, Two players, English",
       "page": "page-2",
       "x": 2750,
       "y": 0,
       "w": 390,
-      "h": 1040
+      "h": 1120
     },
     {
       "file": "Setup.dc.html",
-      "title": "1 · Game setup, rules shown",
+      "title": "1 · Game setup, Two players, rules shown",
       "x": 0,
       "y": 0,
       "w": 560,
-      "h": 760
+      "h": 840
     },
     {
       "file": "FirstMove.dc.html",
@@ -131,11 +131,113 @@
     },
     {
       "file": "SetupEnglish.dc.html",
-      "title": "15 · Game setup, English",
+      "title": "15 · Game setup, Two players, English",
       "x": 1680,
       "y": 940,
       "w": 560,
-      "h": 720
+      "h": 800
+    },
+    {
+      "file": "ComputerSetup.dc.html",
+      "title": "16 · Setup, Versus computer",
+      "x": 0,
+      "y": 1900,
+      "w": 560,
+      "h": 920
+    },
+    {
+      "file": "ComputerSetupEnglish.dc.html",
+      "title": "17 · Setup, Versus computer, English",
+      "x": 640,
+      "y": 1900,
+      "w": 560,
+      "h": 880
+    },
+    {
+      "file": "ComputerThinking.dc.html",
+      "title": "18 · Computer thinking, board locked",
+      "x": 1280,
+      "y": 1900,
+      "w": 480,
+      "h": 460
+    },
+    {
+      "file": "ComputerYourTurn.dc.html",
+      "title": "19 · Computer line highlighted, Your turn",
+      "x": 1840,
+      "y": 1900,
+      "w": 480,
+      "h": 460
+    },
+    {
+      "file": "ComputerResultYouWon.dc.html",
+      "title": "20 · Result, You won!",
+      "x": 2400,
+      "y": 1900,
+      "w": 480,
+      "h": 460
+    },
+    {
+      "file": "ComputerResultComputerWon.dc.html",
+      "title": "21 · Result, Computer won",
+      "x": 2960,
+      "y": 1900,
+      "w": 480,
+      "h": 460
+    },
+    {
+      "file": "MobileComputerSetup.dc.html",
+      "title": "22 · Mobile setup, Versus computer",
+      "page": "page-2",
+      "x": 0,
+      "y": 1400,
+      "w": 390,
+      "h": 1280
+    },
+    {
+      "file": "MobileComputerSetupEnglish.dc.html",
+      "title": "23 · Mobile setup, Versus computer, English",
+      "page": "page-2",
+      "x": 470,
+      "y": 1400,
+      "w": 390,
+      "h": 1200
+    },
+    {
+      "file": "MobileComputerThinking.dc.html",
+      "title": "24 · Mobile computer thinking, English",
+      "page": "page-2",
+      "x": 940,
+      "y": 1400,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "MobileComputerYourTurn.dc.html",
+      "title": "25 · Mobile Your turn, English",
+      "page": "page-2",
+      "x": 1410,
+      "y": 1400,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "MobileComputerResultYouWon.dc.html",
+      "title": "26 · Mobile result, You won!, English",
+      "page": "page-2",
+      "x": 1880,
+      "y": 1400,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "MobileComputerResultComputerWon.dc.html",
+      "title": "27 · Mobile result, Computer won, English",
+      "page": "page-2",
+      "x": 2350,
+      "y": 1400,
+      "w": 390,
+      "h": 844
     }
   ],
   "annotations": [
@@ -153,6 +255,21 @@
       "y": 0,
       "w": 300,
       "text": "Mobile layout (below 640 px wide)\n• Board on top, centered; panel below at full width (MB-2)\n• Squares stay 48 px while the board fits, then shrink to fit the screen, 24 px minimum (MB-3)\n• Each dot is tappable across a whole square, up to 44 px (MB-4)\n• Buttons are at least 44 px tall (MB-8)\n• Rules: toggle at the bottom; shown by default on setup, hidden during a game (RL-2, RL-3)\n• Languages: UA / EN toggle at the top right, 44 × 44 px buttons, Ukrainian by default; screen 14 shows English (I18N-2, I18N-3, I18N-5)\n\nFrom 640 px up, the desktop layout on the Desktop page applies.\nOpen for confirmation: 640 px breakpoint, board-first order, shrink instead of scroll."
+    },
+    {
+      "id": "computer-mode",
+      "x": 3520,
+      "y": 1900,
+      "w": 320,
+      "text": "Versus computer mode (spec: docs/computer-opponent/spec.md, issue #6)\n• Game mode switch at the top of setup: Versus computer (default) | Two players (CM-1, CM-2, CM-6)\n• Difficulty switch Easy | Normal, only in Versus computer, Normal by default (CM-5..7)\n• Versus computer: the person enters name, color and size; the Opponent fieldset is read-only: robot + Computer with its automatic color (CM-4, CM-9)\n• Robot icon: Material Symbols smart_toy as inline SVG, currentColor, aria-hidden (CM-13, CM-37)\n• Computer's turn: robot + Computer in Turn, pulsing \"Thinking…\" in place of the hint, every dot idle (board locked), Stop still works (CM-14, CM-16, CM-17)\n• Person's turn: \"Your turn\"; the computer's last line keeps a 4 px halo in its color until the person draws (CM-18, CM-19)\n• Result: \"You won!\" or robot + \"Computer won\", winner first in the scores (CM-27)\n• Sample person: Ярослава Петрук / Alexandra Brown, 15 characters, never cut; names wrap when space runs out (GS-1, GB-5)\n• New text uses the proposed message keys listed in design.md"
+    },
+    {
+      "id": "computer-mode-mobile",
+      "page": "page-2",
+      "x": 2820,
+      "y": 1400,
+      "w": 320,
+      "text": "Versus computer mode (spec: docs/computer-opponent/spec.md, issue #6)\n• Game mode switch at the top of setup: Versus computer (default) | Two players (CM-1, CM-2, CM-6)\n• Difficulty switch Easy | Normal, only in Versus computer, Normal by default (CM-5..7)\n• Versus computer: the person enters name, color and size; the Opponent fieldset is read-only: robot + Computer with its automatic color (CM-4, CM-9)\n• Robot icon: Material Symbols smart_toy as inline SVG, currentColor, aria-hidden (CM-13, CM-37)\n• Computer's turn: robot + Computer in Turn, pulsing \"Thinking…\" in place of the hint, every dot idle (board locked), Stop still works (CM-14, CM-16, CM-17)\n• Person's turn: \"Your turn\"; the computer's last line keeps a 4 px halo in its color until the person draws (CM-18, CM-19)\n• Result: \"You won!\" or robot + \"Computer won\", winner first in the scores (CM-27)\n• Sample person: Ярослава Петрук / Alexandra Brown, 15 characters, never cut; names wrap when space runs out (GS-1, GB-5)\n• New text uses the proposed message keys listed in design.md\n• Phones: switches and buttons at least 44 px tall (CM-38, MB-8)"
     }
   ],
   "launch": {

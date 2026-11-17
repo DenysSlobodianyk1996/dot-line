@@ -10,7 +10,7 @@
         class="absolute flex items-center justify-center text-base font-bold"
         :style="squareStyle(square)"
       >
-        {{ square.ownerName?.charAt(0).toUpperCase() }}
+        {{ displayName(square.ownerName).charAt(0).toUpperCase() }}
       </div>
 
       <div
@@ -44,9 +44,10 @@
 </template>
 
 <script setup lang="ts">
-import { Dot, type DotLineGame, type Line, type Square } from '@/models'
+import { Dot, isComputerPlayer, type DotLineGame, type Line, type Square } from '@/models'
 import { computed, onBeforeUnmount, onMounted, ref, type CSSProperties } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useDisplayName } from '@/shared/composables/useDisplayName'
 
 type DotState = 'idle' | 'start' | 'selected' | 'target'
 
@@ -55,6 +56,7 @@ const MIN_CELL = 24
 const PADDING = 16
 const BORDER = 1
 const LINE_WIDTH = 4
+const HALO_WIDTH = 4
 const MAX_TAP_AREA = 44
 // horizontal space taken by the app's p-2 gutters
 const APP_GUTTERS = 16
@@ -79,11 +81,14 @@ const DOT_CLASS: Record<DotState, string> = {
 
 const props = defineProps<{
   dotLineGame: DotLineGame
+  // the computer's turn: every dot idle and clicks ignored (CM-16)
+  locked?: boolean
 }>()
 
 const selectedDot = defineModel<Dot | null>('selectedDot', { default: null })
 
 const { t } = useI18n()
+const displayName = useDisplayName()
 
 const sideBySideMedia = window.matchMedia(SIDE_BY_SIDE_QUERY)
 // clientWidth excludes a desktop scrollbar, unlike window.innerWidth
@@ -102,8 +107,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateViewport))
 const cell = computed(() => {
   const size = props.dotLineGame.size || 1
   const sidePanel = isSideBySide.value ? SIDE_PANEL_WITH_GAP : 0
-  const available =
-    viewportWidth.value - APP_GUTTERS - sidePanel - PADDING * 2 - BORDER * 2
+  const available = viewportWidth.value - APP_GUTTERS - sidePanel - PADDING * 2 - BORDER * 2
   return Math.min(MAX_CELL, Math.max(MIN_CELL, Math.floor(available / size)))
 })
 
@@ -125,7 +129,8 @@ const dots = computed(() => {
     for (let col = 0; col <= size; col++) {
       const dot = new Dot({ row, col })
       let state: DotState = 'idle'
-      if (dot.equals(selected)) state = 'selected'
+      if (props.locked) state = 'idle'
+      else if (dot.equals(selected)) state = 'selected'
       else if (targets.some((target) => target.equals(dot))) state = 'target'
       else if (game.isValidStartDot(dot)) state = 'start'
       result.push({ dot, state })
@@ -155,15 +160,29 @@ function squareStyle(square: Square): CSSProperties {
   }
 }
 
+// The computer's last line stays highlighted until the person draws: the newest line, if the computer
+// player drew it and the game is still playing. Derived from the saved lines, so it survives a reload (CM-32).
+const lastComputerLine = computed(() => {
+  const game = props.dotLineGame
+  const newest = game.lines[game.lines.length - 1]
+  return !game.isFinished && newest && isComputerPlayer(newest.ownerName) ? newest : null
+})
+
 function lineStyle(line: Line): CSSProperties {
   const { x, y } = toPoint(line.from)
   const length = cell.value + LINE_WIDTH
+  const color = colorOf(line.ownerName)
   return {
     left: `${x - LINE_WIDTH / 2}px`,
     top: `${y - LINE_WIDTH / 2}px`,
     width: `${line.isHorizontal ? length : LINE_WIDTH}px`,
     height: `${line.isHorizontal ? LINE_WIDTH : length}px`,
-    backgroundColor: colorOf(line.ownerName),
+    backgroundColor: color,
+    // a 4 px halo in the computer's color at 40% (CM-18)
+    boxShadow:
+      line.key === lastComputerLine.value?.key
+        ? `0 0 0 ${HALO_WIDTH}px color-mix(in srgb, ${color} 40%, transparent)`
+        : undefined,
   }
 }
 
@@ -192,7 +211,7 @@ function dotFillStyle(state: DotState): CSSProperties {
 function onDotClick(dot: Dot) {
   const game = props.dotLineGame
   const selected = selectedDot.value
-  if (game.isFinished) return
+  if (game.isFinished || props.locked) return
 
   if (dot.equals(selected)) {
     selectedDot.value = null

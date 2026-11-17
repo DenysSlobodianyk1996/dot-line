@@ -2,9 +2,18 @@ import type { Player } from './player.model'
 import { Dot } from './dot.model'
 import { Line } from './line.model'
 import { Square } from './square.model'
+import { isComputerPlayer } from './computer-player.model'
 
 export type GameStatus = 'playing' | 'finished'
 export type FinishReason = 'completed' | 'stopped'
+export type GameMode = 'twoPlayers' | 'computer'
+export type Difficulty = 'easy' | 'normal'
+
+// the difficulty a game in this mode plays at: Easy when a Versus computer game has none (CM-30),
+// none in Two players
+function difficultyFor(gameMode: GameMode, difficulty: Difficulty | null | undefined) {
+  return gameMode === 'computer' ? (difficulty ?? 'easy') : null
+}
 
 const DIRECTIONS: [number, number][] = [
   [-1, 0],
@@ -22,6 +31,8 @@ export class DotLineGame {
   public currentPlayerName: string | null
   public status: GameStatus
   public finishReason: FinishReason | null
+  public gameMode: GameMode
+  public difficulty: Difficulty | null // only in Versus computer mode
 
   constructor({
     player1,
@@ -32,6 +43,8 @@ export class DotLineGame {
     currentPlayerName,
     status,
     finishReason,
+    gameMode,
+    difficulty,
   }: Partial<DotLineGame> = {}) {
     this.player1 = player1 ?? null
     this.player2 = player2 ?? null
@@ -41,6 +54,9 @@ export class DotLineGame {
     this.currentPlayerName = currentPlayerName ?? null
     this.status = status ?? 'playing'
     this.finishReason = finishReason ?? null
+    // saves from before game modes existed load as Two players (CM-33)
+    this.gameMode = gameMode ?? 'twoPlayers'
+    this.difficulty = difficultyFor(this.gameMode, difficulty)
   }
 
   setPlayer1(player1: Player) {
@@ -49,6 +65,11 @@ export class DotLineGame {
   }
   setPlayer2(player2: Player) {
     this.player2 = player2
+    return this
+  }
+  setGameMode(gameMode: GameMode, difficulty: Difficulty | null = null) {
+    this.gameMode = gameMode
+    this.difficulty = difficultyFor(gameMode, difficulty)
     return this
   }
   setSize(size: number) {
@@ -71,6 +92,15 @@ export class DotLineGame {
 
   getOpponent(name: string): Player | null {
     return this.players.find((p) => p.name !== name) ?? null
+  }
+
+  get isComputerGame(): boolean {
+    return this.gameMode === 'computer'
+  }
+
+  /** Playing, and the current player is the computer player: the game screen moves for it. */
+  get isComputerTurn(): boolean {
+    return this.isComputerGame && !this.isFinished && isComputerPlayer(this.currentPlayerName)
   }
 
   get isGameStarted(): boolean {
@@ -127,22 +157,79 @@ export class DotLineGame {
     return this.isValidStartDot(from) && this.validNeighbors(from).some((dot) => dot.equals(to))
   }
 
+  /**
+   * Every line the current player may draw now, each listed once (owner not set).
+   * Built on the valid-start and free-neighbor checks so the rules live in one place (ADR-0003).
+   */
+  legalMoves(): Line[] {
+    const size = this.size ?? 0
+    const moves = new Map<string, Line>()
+    for (let row = 0; row <= size; row++) {
+      for (let col = 0; col <= size; col++) {
+        const from = new Dot({ row, col })
+        if (!this.isValidStartDot(from)) continue
+        for (const to of this.validNeighbors(from)) {
+          const line = new Line({ from, to })
+          if (!moves.has(line.key)) moves.set(line.key, line)
+        }
+      }
+    }
+    return [...moves.values()]
+  }
+
   getSquare(row: number, col: number): Square | null {
     return this.dirtySquares.find((square) => square.row === row && square.col === col) ?? null
   }
 
-  isSquareClosed(row: number, col: number): boolean {
+  /** How many of the four sides of the square at (row, col) are drawn: 0 to 4. */
+  drawnSideCount(row: number, col: number): number {
     const dot = (r: number, c: number) => new Dot({ row: r, col: c })
-    return (
-      this.hasLine(dot(row, col), dot(row, col + 1)) &&
-      this.hasLine(dot(row + 1, col), dot(row + 1, col + 1)) &&
-      this.hasLine(dot(row, col), dot(row + 1, col)) &&
-      this.hasLine(dot(row, col + 1), dot(row + 1, col + 1))
-    )
+    return [
+      [dot(row, col), dot(row, col + 1)],
+      [dot(row + 1, col), dot(row + 1, col + 1)],
+      [dot(row, col), dot(row + 1, col)],
+      [dot(row, col + 1), dot(row + 1, col + 1)],
+    ].filter(([a, b]) => this.hasLine(a!, b!)).length
   }
 
-  /** Draws a line for the current player and returns the squares it closed. */
-  drawLine(from: Dot, to: Dot): Square[] {
+  isSquareClosed(row: number, col: number): boolean {
+    return this.drawnSideCount(row, col) === 4
+  }
+
+  /** The squares on either side of a line (one for a line on the board's edge). */
+  squaresNextTo(line: Line): { row: number; col: number }[] {
+    const { row, col } = line.from
+    const size = this.size ?? 0
+    const candidates = line.isHorizontal
+      ? [
+          { row: row - 1, col },
+          { row, col },
+        ]
+      : [
+          { row, col: col - 1 },
+          { row, col },
+        ]
+    return candidates.filter((s) => s.row >= 0 && s.col >= 0 && s.row < size && s.col < size)
+  }
+
+  /**
+   * Draws a line for the current player and returns the squares it closed. Takes Dot1 and Dot2, or
+   * a `Line` (e.g. from `legalMoves()`), which is drawn from whichever of its ends is a valid start.
+   */
+  drawLine(line: Line): Square[]
+  drawLine(from: Dot, to: Dot): Square[]
+  drawLine(fromOrLine: Dot | Line, maybeTo?: Dot): Square[] {
+    let from: Dot
+    let to: Dot
+    if (fromOrLine instanceof Line) {
+      // a Line stores its ends in board order, so its valid start may be either end
+      const forward = this.canDraw(fromOrLine.from, fromOrLine.to)
+      from = forward ? fromOrLine.from : fromOrLine.to
+      to = forward ? fromOrLine.to : fromOrLine.from
+    } else {
+      from = fromOrLine
+      to = maybeTo!
+    }
     const ownerName = this.currentPlayerName
     if (!ownerName || !this.canDraw(from, to)) return []
 
@@ -181,21 +268,6 @@ export class DotLineGame {
     Object.assign(this, new DotLineGame(game ?? {}))
   }
 
-  private squaresNextTo(line: Line): { row: number; col: number }[] {
-    const { row, col } = line.from
-    const size = this.size ?? 0
-    const candidates = line.isHorizontal
-      ? [
-          { row: row - 1, col },
-          { row, col },
-        ]
-      : [
-          { row, col: col - 1 },
-          { row, col },
-        ]
-    return candidates.filter((s) => s.row >= 0 && s.col >= 0 && s.row < size && s.col < size)
-  }
-
   private finish(reason: FinishReason) {
     this.status = 'finished'
     this.finishReason = reason
@@ -203,7 +275,9 @@ export class DotLineGame {
 }
 
 export interface GameSetupForm {
+  gameMode: GameMode
+  difficulty: Difficulty | null
   player1: Player
-  player2: Player
+  player2: Player // in Versus computer mode, the computer player
   size: number
 }
