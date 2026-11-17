@@ -65,9 +65,9 @@ src/
   pages/dot-line-game/   setup screen, game screen, board and rules components
   services/              localStorage wrapper
   shared/components/     base UI components (button, input, label)
-docs/                    feature specs (requirements, design, tasks) + agent-skill config
+docs/                    specs, ADRs and agent-skill config (terms in GLOSSARY.md)
 ```
 
 ## Specs and design
 
-Features are built spec-first. The requirements (with IDs and acceptance criteria), the design and the task list are in [`docs/`](docs/README.md). The desktop and mobile screen designs (setup, gameplay, rules, stop confirmation and results) are in the [Claude Design canvas](https://claude.ai/artifact/H54pzHj9XtpJ6A4CVc3pnA). It opens on claude.ai, and the "Mobile" and "Desktop" pages are in its toolbar.
+Features are built spec-first. The requirements (with IDs and acceptance criteria) and the design are in [`docs/`](docs/README.md). The desktop and mobile screen designs (setup, gameplay, rules, stop confirmation and results) are in the [Claude Design canvas](https://claude.ai/artifact/H54pzHj9XtpJ6A4CVc3pnA). It opens on claude.ai, and the "Mobile" and "Desktop" pages are in its toolbar.

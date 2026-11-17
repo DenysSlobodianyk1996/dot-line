@@ -159,7 +159,12 @@ All sizes and colors come from the approved canvas.
 - **GameResult.vue** [END-3..6]: a `w-53` column with "Result", "`<name>` wins" with a swatch or "Draw", "All squares are filled." or "The game was stopped.", the scores with the winner first, and New game (secondary) and Rematch (primary).
   - New game: `StorageService.removeItem(CURRENT_GAME)` then `game.reset()`.
   - Rematch: `game.start()`.
-- **PlayerScore.vue**: a `text-sm leading-6` row with a 12 px swatch, the name (truncated) and a `tabular-nums` score.
+- **PlayerScore.vue**: a `text-sm leading-6` row with a 12 px swatch, the full name (wrapping, see Player names) and a `tabular-nums` score.
+
+## Player names [GS-1, GB-5]
+
+- **PlayerField.vue**: the name `<input>` has `maxlength="15"`, and the field's rules add `max:15` so a pasted or restored value is still validated (generic `validation.invalid` message).
+- Names are never truncated. Every place that shows a name (GameStatus turn, PlayerScore, GameResult heading) drops `truncate` and uses `min-w-0 break-words`, so a long name wraps; the color swatch stays `shrink-0` and aligned to the first line.
 
 ## Persistence [PS-1..3]
 
