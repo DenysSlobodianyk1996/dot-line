@@ -10,7 +10,7 @@ Stack: Vue 3 (`<script setup lang="ts">`), Vite, TypeScript, Tailwind CSS v4 (vi
 
 ## Specs
 
-Feature specs live in `.claude/docs/` (index and workflow in `.claude/docs/README.md`). Each feature has `requirements.md` → `design.md` → `tasks.md`. Read the spec before implementing a feature, update the spec first when behavior changes, and reference requirement IDs (for example `MV-2`) in commits. The gameplay spec is `.claude/docs/dot-line-game/`.
+Feature specs live in `docs/` (index and workflow in `docs/README.md`). Each feature has `requirements.md` → `design.md` → `tasks.md`. Read the spec before implementing a feature, update the spec first when behavior changes, and reference requirement IDs (for example `MV-2`) in commits. The gameplay spec is `docs/dot-line-game/`.
 
 ## Commands
 
@@ -45,3 +45,17 @@ Deployment: `.github/workflows/deploy.yml` publishes to GitHub Pages on every pu
 - TS is strict with `noUncheckedIndexedAccess` enabled, so indexed access returns `T | undefined`.
 - Linting: oxlint `correctness` category is set to error, and ESLint uses `vue/flat/essential` plus the vue-ts recommended config. Prettier owns formatting (`eslint-config-prettier`).
 - Node `^22.18.0 || >=24.12.0`.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues for `DenysSlobodianyk1996/dot-line`, managed via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` plus `docs/adr/` at the repo root, created lazily. See `docs/agents/domain.md`.

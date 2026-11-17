@@ -2,7 +2,7 @@
 
 Feature specs for spec-driven development. A spec here is the source of truth for a feature. Code follows the spec, not the other way round.
 
-For the project overview, rules and setup, see the [root README](../../README.md).
+For the project overview, rules and setup, see the [root README](../README.md).
 
 ## Workflow
 

@@ -144,7 +144,7 @@
       "x": 2320,
       "y": 0,
       "w": 300,
-      "text": "Dot states\n• Small gray dot: not clickable\n• Blue ring: valid start (MV-2, MV-4)\n• Solid dot in the current player's color: selected Dot1\n• Dashed ring in the current player's color: valid Dot2 neighbor (MV-3, MV-5)\n\nBoard shown at N=4, 48 px squares. Sample players: Оля and Богдан on Ukrainian screens, Ann and Bob on English ones.\n\nLanguages: the UA / EN toggle is at the top right of every screen. Ukrainian is the default (I18N-2, I18N-3); screen 15 shows English.\nAll text comes from src/i18n/locales.\nSpec: .claude/docs/dot-line-game/requirements.md"
+      "text": "Dot states\n• Small gray dot: not clickable\n• Blue ring: valid start (MV-2, MV-4)\n• Solid dot in the current player's color: selected Dot1\n• Dashed ring in the current player's color: valid Dot2 neighbor (MV-3, MV-5)\n\nBoard shown at N=4, 48 px squares. Sample players: Оля and Богдан on Ukrainian screens, Ann and Bob on English ones.\n\nLanguages: the UA / EN toggle is at the top right of every screen. Ukrainian is the default (I18N-2, I18N-3); screen 15 shows English.\nAll text comes from src/i18n/locales.\nSpec: docs/dot-line-game/requirements.md"
     },
     {
       "id": "mobile-notes",
