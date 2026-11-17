@@ -33,3 +33,4 @@ Rules:
 | Feature | Status | Docs |
 | --- | --- | --- |
 | Dot-line game (gameplay, mobile, rules, languages) | Implemented (browser QA pending) | [requirements](dot-line-game/requirements.md) · [design](dot-line-game/design.md) |
+| Versus computer game mode | Implemented on `feat/computer-opponent`, not yet on `master` (browser QA pending) | [spec](computer-opponent/spec.md) · [requirements VC](dot-line-game/requirements.md#vc-versus-computer) · [design](dot-line-game/design.md#versus-computer-vc-125) |

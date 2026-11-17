@@ -2,6 +2,8 @@
 
 Terms follow [GLOSSARY.md](../../GLOSSARY.md). Related decisions: [ADR-0001](../adr/0001-players-identified-by-name.md) (players identified by name), [ADR-0002](../adr/0002-turn-always-passes.md) (turn always passes), [ADR-0003](../adr/0003-lines-start-from-existing-lines.md) (lines start from existing lines). User stories carry IDs **CM-n** for commits.
 
+**Status**: implemented. Shipped behavior is in the gameplay [requirements, section VC](../dot-line-game/requirements.md#vc-versus-computer) and [design](../dot-line-game/design.md#versus-computer-vc-125); where they differ from this spec, they win.
+
 ## Problem Statement
 
 The dot-line game can only be played by two people sharing one device. Someone on their own can't play at all, and there's no way to practise against an opponent that always has time for a game.
