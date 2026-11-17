@@ -274,7 +274,7 @@ The phone layout is the default, and `sm:` classes (640 px and up) restore the d
 - **GameStatus** on phones: Turn and Score in a two-column grid (`grid grid-cols-2 gap-4 sm:flex sm:flex-col`), then the hint, then Stop at full width with `min-h-11` (`w-full sm:w-auto sm:min-h-0`).
 - **Stop dialog** card: `w-full max-w-75`, inside the `p-4` backdrop.
 - **GameResult** on phones: New game and Rematch in `grid grid-cols-2 gap-2`, each `min-h-11`. From `sm` up they return to the wrapping row.
-- **GameSetup**: the player fieldsets row becomes `flex flex-col gap-2 sm:flex-row`.
+- **GameSetup**: the player fieldsets row becomes `flex flex-col gap-2 sm:flex-row`; each fieldset is `min-w-0 flex-1`, so the two share the row equally ("You" and "Opponent" included).
 
 ## Rules [RL-1..5, APP-1]
 
@@ -347,10 +347,11 @@ src/shared/components/LanguageToggle.vue
 
 ### Computer turn (`src/pages/dot-line-game/useComputerTurn.ts`) [VC-9..13, VC-21]
 
-- `useComputerTurn(() => game, delay = COMPUTER_DELAY_MS)` (1000 ms) returns `{ isThinking, cancel }`.
-- It watches `isComputerTurn ? lines.length : null` with `immediate: true`, so a restored game resumes on mount. Every change cancels any pending move; when the value isn't `null`, it sets `isThinking` and schedules the move.
+- `useComputerTurn(() => game, paused = () => false, delay = COMPUTER_DELAY_MS)` (1000 ms) returns `{ isThinking, cancel }`.
+- It watches `isComputerTurn && !paused() ? lines.length : null` with `immediate: true`, so a restored game resumes on mount. Every change cancels any pending move; when the value isn't `null`, it sets `isThinking` and schedules the move.
 - The move re-checks `isComputerTurn`, asks `chooseComputerLine(game, game.difficulty ?? 'easy')` and draws the line through the normal `drawLine`, trying `from → to` and else `to → from` (a `Line` stores its ends in board order, so either end may be the valid start).
 - `Game.vue` calls `cancel()` in `stop`, `rematch` and `newGame`; unmounting cancels too.
+- `GameStatus` exposes its Stop dialog through `v-model:confirming`; `Game.vue` passes that as `paused`, so the computer waits while the dialog is open and gets a fresh pause after Cancel (VC-13). The board stays locked meanwhile because `isComputerTurn` still holds.
 - `Game.vue` passes `isThinking || isComputerTurn` to `GameBoard` as `locked` (every dot `idle`, clicks ignored) and to `GameStatus` as `thinking`.
 
 ### Status and board [VC-10, VC-14, VC-15]

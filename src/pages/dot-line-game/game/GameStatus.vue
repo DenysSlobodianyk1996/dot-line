@@ -89,7 +89,7 @@
 
 <script setup lang="ts">
 import type { DotLineGame } from '@/models'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseButton from '@/shared/components/BaseButton.vue'
 import PlayerName from '@/shared/components/PlayerName.vue'
@@ -112,7 +112,8 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const isConfirmOpen = ref(false)
+// the Stop dialog is open; Game pauses the computer's move meanwhile (VC-13)
+const isConfirmOpen = defineModel<boolean>('confirming', { default: false })
 
 function confirmStop() {
   isConfirmOpen.value = false

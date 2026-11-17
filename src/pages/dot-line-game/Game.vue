@@ -16,6 +16,7 @@
         v-else
         :dot-line-game="dotLineGame"
         :hint="hint"
+        v-model:confirming="isStopConfirmOpen"
         :thinking="isBoardLocked"
         @stop="stop"
       />
@@ -55,8 +56,14 @@ const hint = computed(() => {
   return t('game.hintStart')
 })
 
+// the Stop dialog is open: the computer waits for the answer (VC-13)
+const isStopConfirmOpen = ref(false)
+
 // the computer player's turns: ~1 s pause, then its line (CM-11, CM-15, CM-31)
-const computerTurn = useComputerTurn(() => props.dotLineGame)
+const computerTurn = useComputerTurn(
+  () => props.dotLineGame,
+  () => isStopConfirmOpen.value,
+)
 
 // on the computer's turn nothing can be picked and clicks are ignored (CM-16)
 const isBoardLocked = computed(
@@ -68,6 +75,7 @@ watchEffect(() => {
 })
 
 function stop() {
+  isStopConfirmOpen.value = false
   computerTurn.cancel()
   selectedDot.value = null
   props.dotLineGame.stop()

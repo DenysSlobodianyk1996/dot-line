@@ -330,6 +330,21 @@ describe('stopping and starting again', () => {
     expect(page.lineCount).toBe(0)
   })
 
+  it('waits while the Stop dialog is open and moves after Cancel (VC-13)', async () => {
+    const page = await startComputerGame({ first: 2 })
+
+    await page.click('Stop')
+    await page.waitForComputer(COMPUTER_DELAY_MS * 3)
+    expect(page.lineCount).toBe(0)
+    expect(page.turn()).toBe(COMPUTER)
+
+    await page.click('Cancel')
+    expect(page.lineCount).toBe(0)
+    await page.waitForComputer()
+    expect(page.lineCount).toBe(1)
+    expect(page.turn()).toBe(YOUR_TURN)
+  })
+
   it('a Rematch the computer opens makes it move on its own, once (CM-28)', async () => {
     const page = await startComputerGame({ first: 2 })
     await page.stopGame()

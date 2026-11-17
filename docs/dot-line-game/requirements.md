@@ -166,7 +166,7 @@ Playing:
 - **VC-10**: On the computer player's turn, the turn shows its swatch, robot and name with a pulsing "Thinking…" below, announced politely to assistive technology, and the hint is hidden. After about one second the computer draws its line (CM-14, CM-15, CM-37).
 - **VC-11**: The computer player follows the same rules as a person: only lines allowed by MV-1..3, one line per turn, the turn always passes (TR-1), the squares it closes become its owned squares and count toward its score (SQ-1..3), and the game ends as soon as the last square is owned (END-1) (CM-20, CM-21, CM-26).
 - **VC-12**: During the computer player's turn the board is locked: no dot is highlighted and clicks on dots do nothing (CM-16).
-- **VC-13**: Stop works during the computer player's turn, and stopping cancels its pending move. Rematch, New game and leaving the game screen cancel it too (CM-17).
+- **VC-13**: Stop works during the computer player's turn, and stopping cancels its pending move. While the Stop dialog is open the computer player waits; Cancel gives it its usual pause again. Rematch, New game and leaving the game screen cancel it too (CM-17).
 - **VC-14**: The computer player's newest line has a halo in its color until the person draws the next line. A finished game shows no halo (CM-18).
 - **VC-15**: On the person's turn, the turn reads "Your turn" (with the person's swatch) instead of the person's name (CM-19).
 - **VC-16**: **Easy** draws a random line among all the lines allowed right now (CM-22).
@@ -196,6 +196,7 @@ Acceptance (English UI):
 - Given it's the computer player's turn, then the turn shows the robot, "Computer" and "Thinking…", every dot is idle, and after about one second a new line appears and the turn reads "Your turn".
 - Given the computer player has just drawn a line, then that line has a halo until I draw mine.
 - Given it's the computer player's turn and I press Stop and confirm, then no line is drawn and the result panel appears.
+- Given it's the computer player's turn and the Stop dialog is open, then the computer doesn't move however long I wait; when I press Cancel, it moves after about one second.
 - Given Normal and a square with three sides drawn, when the computer moves, then it draws the fourth side; if one line would close two squares, it draws that one.
 - Given Normal, no square to claim and at least one safe line, when the computer moves, then it never gives a square its third side.
 - Given I win 5 : 4, then the result reads "You won!"; given the computer wins, it reads "Computer won" with the robot.
