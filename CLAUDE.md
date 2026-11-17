@@ -10,7 +10,7 @@ Stack: Vue 3 (`<script setup lang="ts">`), Vite, TypeScript, Tailwind CSS v4 (vi
 
 ## Specs
 
-Feature specs live in `docs/` (index and workflow in `docs/README.md`). Each feature has `requirements.md` → `design.md` → `tasks.md`. Read the spec before implementing a feature, update the spec first when behavior changes, and reference requirement IDs (for example `MV-2`) in commits. The gameplay spec is `docs/dot-line-game/`.
+Specs live in `docs/` (layout and workflow in `docs/README.md`). Domain terms are in the root `GLOSSARY.md` and decisions in `docs/adr/`; use the glossary's terms in code, docs and issues. Shipped behavior is in `docs/<feature>/requirements.md` (numbered rules such as `MV-2`) with `design.md` and the design canvas; new work starts as `docs/<feature>/spec.md`, mirrored to a GitHub issue, and is tracked as GitHub sub-issues (no `tasks.md`). Read the spec before implementing a feature, update the spec first when behavior changes, and reference requirement or story IDs in commits. The gameplay spec is `docs/dot-line-game/`.
 
 ## Commands
 

@@ -2,21 +2,11 @@
 
 Two players take turns drawing lines between neighboring dots on a square grid. Closing a square makes the player who closed it its owner. Whoever owns more squares wins.
 
-## Glossary
-
-| Term | Meaning |
-| --- | --- |
-| Size **N** | Number of squares per side (the game is NxN squares). Chosen in setup. |
-| Dot | Grid point `(row, col)`, `0 ≤ row, col ≤ N`. The board has (N+1)×(N+1) dots. |
-| Square | Cell `(row, col)`, `0 ≤ row, col ≤ N-1`, bounded by 4 edges. |
-| Line | A drawn edge between two orthogonally adjacent dots, owned by the player who drew it. The board has 2·N·(N+1) possible lines. |
-| Owned (dirty) square | A square whose 4 edges are all drawn. Stored in `DotLineGame.dirtySquares`. |
-| Dot1 / Dot2 | The first and second dot a player clicks to draw one line. |
-| Current player | The player whose turn it is. |
+Domain terms (Dot, Line, Square, Owned square, Dot1/Dot2, Turn, …) are defined in [GLOSSARY.md](../../GLOSSARY.md). Decisions behind the rules are in [docs/adr/](../adr/).
 
 ## GS: Game setup (existing screen)
 
-- **GS-1**: Each player enters a name and a color. Names are required and must differ case-insensitively. The color is used for that player's lines and owned squares. Validation messages use readable, translated field names ("Ім’я гравця 1" / "Player 1 name", "Розмір поля" / "Size"), never internal names like `player1.name` (I18N-1).
+- **GS-1**: Each player enters a name and a color. Names are required, at most 15 characters (the field doesn't accept more), and must differ case-insensitively. The color is used for that player's lines and owned squares. Validation messages use readable, translated field names ("Ім’я гравця 1" / "Player 1 name", "Розмір поля" / "Size"), never internal names like `player1.name` (I18N-1).
 - **GS-2**: Size N is required, integer, 2 ≤ N ≤ 10.
 - **GS-3**: Submitting a valid form starts the game. The first player is chosen at random (see TR-2).
 
@@ -25,6 +15,7 @@ Acceptance:
 - Given the language is English and Player 1's name is empty, when I submit, then I see "Player 1 name is not valid." and the game doesn't start.
 - Given the language is Ukrainian and Player 1's name is empty, when I submit, then I see "Поле «Ім’я гравця 1» заповнено некоректно." and the game doesn't start.
 - Given a valid form, when I submit, then the game screen opens with an empty board of size N.
+- Given I type a 20-character name, then the field keeps only the first 15 characters.
 
 ## GB: Game board
 
@@ -32,10 +23,12 @@ Acceptance:
 - **GB-2**: Every drawn line uses its owner's color.
 - **GB-3**: An owned square is filled with the owner's color at about 30% opacity, with the first letter of the owner's name in the middle.
 - **GB-4**: The screen always shows the current player (name and color swatch) and both players' scores (owned squares).
+- **GB-5**: Player names are always shown in full, never cut with "…": in the turn, the scores, the Stop dialog and the result panel. A name too long for its space wraps onto the next line.
 
 Acceptance:
 - Given N=4, then 25 dots and 16 square cells of 48×48 px are rendered.
 - Given Ann (red) owns square (0,0), then that cell has a translucent red fill with "A" in it.
+- Given a 15-character name on a 390 px wide phone, then the turn, scores and result show the whole name.
 
 ## MV: Moves
 
@@ -149,68 +142,3 @@ Acceptance:
 - Given I chose English, when I reload, then the app is still in English.
 - Given a game in progress in Ukrainian, then the panel shows "Хід", "Рахунок" and "Зупинити", and player names are unchanged.
 - Given a 390 px wide phone, then each toggle button is at least 44×44 px.
-
-## Confirmed in design review (2026-09-15)
-
-These started as assumptions and were accepted with the design canvas:
-- Stop asks for confirmation (END-2).
-- The existing "Back" button on the game screen is replaced by Stop. Setup is reached only through New game (END-5).
-- Rematch re-randomizes the first player (TR-2, END-6).
-- Finished games are restored with the result panel on reload (PS-2).
-- A dot with no undrawn adjacent edges isn't a valid Dot1 (MV-2).
-
-## Source requirements coverage
-
-Every statement from the product owner's brief and follow-up answers, and where it's specified.
-
-| Source statement | Covered by |
-| --- | --- |
-| Game setup sets the size (NxN) and each player's name and color | GS-1, GS-2 |
-| The player's color is used for their lines | GS-1, GB-2 |
-| When everything is entered, Game.vue opens and the game starts | GS-3 |
-| NxN squares shown as (N+1)×(N+1) dots; each square is 48×48 px | GB-1 |
-| First move: click any dot, then only its left/right/top/bottom neighbor | MV-1, MV-3 |
-| The line is drawn in the player's color | GB-2 |
-| Later lines can start only where existing lines are, not at any dot | MV-2 |
-| A player who closes a square with lines owns it, and `dirtySquares` is filled | SQ-1, SQ-2, SQ-3, design data model |
-| Winner is whoever owns more squares | END-3 |
-| The game ends when all squares are filled | END-1 |
-| The game can be stopped; the player with more squares wins | END-2, END-3 |
-| Answer: a line can start from the start or end of any line on the board | MV-2 |
-| Answer: turns always alternate | TR-1 |
-| Answer: equal scores show a draw | END-3 |
-| Answer: highlight valid starts and neighbors, re-click cancels, another start switches | MV-4, MV-5, MV-6, MV-7 |
-| Answer: result panel with New game and Rematch | END-4, END-5, END-6 |
-| Answer: random first player | TR-2 |
-| Answer: owned square has a translucent owner fill and the owner's initial | GB-3 |
-| Answer: one game-level list of lines in the model | design data model |
-| Existing app: the game is kept in localStorage | PS-1, PS-2, PS-3 |
-| Follow-up request: take the mobile version into account | MB-1..MB-8 |
-| Follow-up request: change the "Vite App" title to "Dot Line Game" | APP-1 |
-| Follow-up request: short, user-friendly rules based on the README, as a component | RL-1, RL-5 |
-| Follow-up request: rules on the setup screen, behind the same toggle button at the bottom, shown by default | RL-2, RL-3 |
-| Follow-up request: a toggle button at the bottom of the game screen that shows the same rules component | RL-2, RL-3 |
-| Follow-up request: i18n in the UI, Ukrainian by default, English supported, all visible text translated, with a language toggle | I18N-1..I18N-6, APP-1 |
-
-## Open / assumed (mobile)
-
-The mobile request didn't specify these details. They are shown on the "Mobile" page of the design canvas for confirmation:
-- The phone layout applies below 640 px wide (Tailwind `sm`) (MB-2, MB-6, MB-7, MB-8).
-- On phones the board comes first and the panel follows below it (MB-2).
-- Squares shrink to fit narrow screens instead of the board scrolling, with a 24 px minimum (MB-3).
-
-## Open / assumed (rules)
-
-The rules request didn't specify these details. They are shown on the design canvas for confirmation:
-- On the game screen the rules are hidden by default (RL-3).
-- The toggle button sits above the rules card, and its label switches between "Show rules" and "Hide rules" (RL-2, RL-3).
-- The rules use the five points in RL-1, headed "How to play" (RL-1).
-
-## Open / assumed (languages)
-
-The i18n request didn't specify these details:
-- The toggle is a "UA / EN" button pair in a header at the top right of every screen (I18N-3, I18N-5).
-- The chosen language is saved and restored; Ukrainian is used only when nothing is saved (I18N-2, I18N-4).
-- The Ukrainian tab title is "Точки й лінії", and the Ukrainian wording lives in `src/i18n/locales/uk.ts` (APP-1, I18N-1).
-- Validation keeps one generic message per field, translated, rather than a different message per rule (GS-1).
-- A validation message already on screen changes language on the next validation, not instantly (I18N-6).
