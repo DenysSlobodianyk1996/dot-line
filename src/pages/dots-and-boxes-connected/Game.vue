@@ -17,8 +17,7 @@
         v-else
         :dots-and-boxes-game="dotsAndBoxesGame"
         :hint="hint"
-        :confirming="stopDialog.isOpen.value"
-        @update:confirming="(open) => (open ? stopDialog.open() : stopDialog.close())"
+        v-model:confirming="isStopDialogOpen"
         :thinking="isBoardLocked"
         @stop="stop"
       />
@@ -63,6 +62,8 @@ const hint = computed(() => {
 // close it (AR-3); it never outlives the game screen.
 const rulesPanel = useRulesPanel()
 const stopDialog = useStopDialog()
+// a top-level ref, so the template unwraps it for v-model
+const isStopDialogOpen = stopDialog.isOpen
 onUnmounted(stopDialog.close)
 
 // the computer player's turns: ~1 s pause, then its line (CM-11, CM-15, CM-31)
