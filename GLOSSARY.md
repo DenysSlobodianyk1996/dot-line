@@ -93,14 +93,22 @@ _Avoid_: settings screen, config
 Leaving a finished game for setup, where everything can be chosen again.
 _Avoid_: new game, change settings, config
 
+**Result card**:
+The hero card at the top of the result panel when a game ends: trophy (or robot), the winner or "Draw", the score as `5 : 3` and the reason (completed or stopped).
+_Avoid_: game over screen, result screen, popup
+
 ## App
+
+**App name**:
+"Dots and Boxes: Connected" (uk «Крапки й квадрати: ланцюжок»). Dots and Boxes is the classic game; "Connected" names this app's house rule that every line after the first starts from an existing one (see Valid start). A product name only: inside the game the term stays Square.
+_Avoid_: Dot-line game, Dots & Lines, Точки й лінії, box (for a square)
 
 **Swatch**:
 One of the 8 fixed, named player colors (coral, teal, sunflower, sky, lavender, leaf, berry, tangerine). A person picks one on the setup screen; the computer player gets the one that looks most different from the person's.
 _Avoid_: color picker, palette color
 
 **Rules panel**:
-The panel with the "How to play" rules, opened from the info button in the header and closed with ✕, a tap outside or Esc.
+The panel with the "How to play" rules, opened from the info button in the header (or next to the setup title) and closed with ✕, a tap outside or Esc.
 _Avoid_: rules drawer, rules modal, rules toggle
 
 **Theme**:
