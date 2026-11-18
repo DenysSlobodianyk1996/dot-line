@@ -249,8 +249,28 @@ export class GamePage {
     }
   }
 
-  async openRules() {
-    await this.rulesButton.trigger('click')
+  // the info button next to the setup title (UP-1)
+  private get setupRulesButton() {
+    return this.wrapper.find<HTMLButtonElement>('button[data-setup-rules-button]')
+  }
+
+  // what the setup's info button tells assistive technology, or null when setup shows none (UP-1)
+  setupRulesButtonState() {
+    const button = this.setupRulesButton
+    if (!button.exists()) return null
+    return {
+      label: button.attributes('aria-label'),
+      haspopup: button.attributes('aria-haspopup'),
+      expanded: button.attributes('aria-expanded'),
+    }
+  }
+
+  // Opens the panel with the header's info button or the one next to the setup title (UP-1).
+  // Focuses the button first, as a click does in the browser.
+  async openRules({ from = 'header' }: { from?: 'header' | 'setup' } = {}) {
+    const button = from === 'setup' ? this.setupRulesButton : this.rulesButton
+    ;(button.element as HTMLElement).focus()
+    await button.trigger('click')
     await flushPromises()
   }
 
@@ -351,12 +371,15 @@ export class GamePage {
   }
 
   // where keyboard focus is
-  focus(): 'rules panel' | 'info button' | 'elsewhere' {
+  focus(): 'rules panel' | 'info button' | 'setup info button' | 'elsewhere' {
     const active = document.activeElement
     if (active && this.rulesPanel.exists() && this.rulesPanel.element.contains(active)) {
       return 'rules panel'
     }
     if (active === this.rulesButton.element) return 'info button'
+    if (this.setupRulesButton.exists() && active === this.setupRulesButton.element) {
+      return 'setup info button'
+    }
     return 'elsewhere'
   }
 
