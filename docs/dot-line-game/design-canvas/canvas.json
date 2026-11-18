@@ -393,7 +393,7 @@
       "x": 3000,
       "y": 0,
       "w": 320,
-      "text": "Visual refresh (spec: docs/visual-refresh/spec.md, issues #22, #23)\n• Warm cream palette: semantic tokens with light and dark values, listed in design.md (VR-1, VR-12)\n• Nunito, rounded corners (12 px controls, 20 px cards, 24 px rules panel edge) (VR-2, VR-3)\n• Header: logo + name, theme, info, UA / EN; 44 px tap targets on phones (VR-18, VR-21)\n• Rules panel replaces the Show/Hide rules toggle (VR-23..VR-29)\n• Swatch picker replaces the color input; the computer takes the most different swatch (VR-32..VR-37)\n• Logo combo 1, scheme-aware SVG favicon, install icons on a cream tile (VR-40..VR-43)\nApproved prototype: branch prototype/visual-refresh, /game?variant=A and /prototype-icons combo 1."
+      "text": "Visual refresh (spec: docs/visual-refresh/spec.md, issues #22, #23)\n• Warm cream palette: semantic tokens with light and dark values, listed in design.md (VR-1, VR-12)\n• Nunito, rounded corners (12 px controls, 20 px cards, 24 px rules panel edge) (VR-2, VR-3)\n• Header: logo + name, theme, info, UA / EN; 44 px tap targets on phones (VR-18, VR-21)\n• Rules panel replaces the Show/Hide rules toggle (VR-23..VR-29)\n• Swatch picker replaces the color input; the computer takes the most different swatch (VR-32..VR-37)\n• Logo combo 1, scheme-aware SVG favicon, install icons on a cream tile (VR-40..VR-43)\nApproved prototype: game layout A, logo combo 1 (prototype branch deleted after the build)."
     }
   ],
   "launch": {

@@ -87,7 +87,7 @@ Message keys added to both locales (`src/i18n/locales`):
 
 ### Visual refresh (approved 2026-11-18, #23)
 
-Spec: [visual-refresh/spec.md](../visual-refresh/spec.md) (stories VR-n). The design is the approved prototype on branch `prototype/visual-refresh` (`/game?variant=A`, `/prototype-icons` combo 1). Every artboard above is restyled in light Warm cream: the header replaces the bare language toggle, the swatch picker replaces the color input, and the Show/Hide rules toggle is gone [VR-1..VR-10, VR-18, VR-28, VR-32]. The sample players are now coral (Оля, Ярослава Петрук, Ann) and teal (Богдан, Bob, the computer); teal is exactly the swatch the computer picks against coral [VR-37]. Desktop game artboards are 520 px wide so the 212 px result panel fits beside the board.
+Spec: [visual-refresh/spec.md](../visual-refresh/spec.md) (stories VR-n). The design follows the approved prototype (game layout A, logo combo 1); the prototype branch was deleted after the refresh was built. Every artboard above is restyled in light Warm cream: the header replaces the bare language toggle, the swatch picker replaces the color input, and the Show/Hide rules toggle is gone [VR-1..VR-10, VR-18, VR-28, VR-32]. The sample players are now coral (Оля, Ярослава Петрук, Ann) and teal (Богдан, Bob, the computer); teal is exactly the swatch the computer picks against coral [VR-37]. Desktop game artboards are 520 px wide so the 212 px result panel fits beside the board.
 
 Desktop page, D row (dark):
 
