@@ -61,7 +61,10 @@
             :title="field.value"
             type="number"
             aria-required="true"
+            :aria-describedby="sizeHintId"
           />
+          <!-- the hint always shows; a validation error goes below it (GS-2) -->
+          <BaseHint :id="sizeHintId">{{ t('setup.sizeHint') }}</BaseHint>
           <BaseFieldError :errorMessage />
         </div>
       </Field>
@@ -74,7 +77,7 @@
 <script setup lang="ts">
 import { Form, Field, defineRule } from 'vee-validate'
 import { required, integer, min_value, max_value } from '@vee-validate/rules'
-import { computed, ref } from 'vue'
+import { computed, ref, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 import PlayerField from './PlayerField.vue'
 import ComputerOpponentField from './ComputerOpponentField.vue'
@@ -85,6 +88,7 @@ import BaseInput from '@/shared/components/BaseInput.vue'
 import BaseFieldError from '@/shared/components/BaseFieldError.vue'
 import BaseButton from '@/shared/components/BaseButton.vue'
 import BaseSegmentedControl from '@/shared/components/BaseSegmentedControl.vue'
+import BaseHint from '@/shared/components/BaseHint.vue'
 
 import { computerColorFor, randomSwatch } from '@/utils'
 import { StorageService } from '@/services'
@@ -96,6 +100,7 @@ defineRule('min_value', min_value)
 defineRule('max_value', max_value)
 
 const { t } = useI18n()
+const sizeHintId = useId()
 
 // Setup opens with the game mode and difficulty of the last game started; on a first visit,
 // Versus computer and Normal (CM-2, CM-3, CM-7, CM-29)
@@ -140,7 +145,8 @@ const player1Color = randomSwatch()
 const formInitialValues: SetupFormValues = {
   player1: { name: '', color: player1Color },
   player2: { name: '', color: randomSwatch(player1Color) },
-  size: 2,
+  // 4 by default (GS-2)
+  size: 4,
 }
 
 const emit = defineEmits<{

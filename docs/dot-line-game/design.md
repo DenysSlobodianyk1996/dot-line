@@ -55,7 +55,7 @@ Mobile page (second row, 390 px):
 Visual rules used on these screens:
 
 - **Mode and difficulty switches**: a labelled `role="radiogroup"` styled like the language toggle (`rounded-md border border-border bg-surface p-0.5 shadow-sm`), stretched to full width with equal-width options. The selected option is `bg-accent text-on-accent`. Options are `min-h-8` from `sm` up and `min-h-11` on phones. Difficulty sits right under the mode switch and is shown only in Versus computer mode [CM-6].
-- **Hint under a control**: one line of muted text (`text-sm text-muted`) right below the control it explains, tied to it with `aria-describedby`. The difficulty switch has one describing only the selected difficulty [VC-26]; `BaseHint.vue` draws it, so other setup fields reuse the same style.
+- **Hint under a control**: one line of muted text (`text-sm text-muted`) right below the control it explains, tied to it with `aria-describedby`. The difficulty switch has one describing only the selected difficulty [VC-26], and the size input has "From 2 to 10" above its validation error [GS-2]; `BaseHint.vue` draws both.
 - **Robot icon**: Material Symbols `smart_toy` (outlined, `viewBox="0 -960 960 960"`) as inline SVG with `fill: currentColor` and `aria-hidden="true"`. It is 20 px in Turn, 16 px in score rows, 24 px in the result heading and 18 px in the setup Opponent field. It always sits between the color swatch and the written name, which stays the accessible text [CM-13, CM-37].
 - **Thinking**: `text-sm text-muted animate-pulse` in an `aria-live="polite"` element under the name in Turn (as on mobile artboard 24, on both layouts). The hint is hidden while the computer's move is pending.
 - **Last computer line**: the normal line plus `box-shadow: 0 0 0 4px` in the computer's color at 40%. It is shown only while the game is playing and the newest line is the computer's.
@@ -71,6 +71,7 @@ Message keys added to both locales (`src/i18n/locales`):
 | `setup.difficulty` | Difficulty | Складність |
 | `setup.easy` | Easy | Легко |
 | `setup.normal` | Normal | Нормально |
+| `setup.sizeHint` | From 2 to 10 | Від 2 до 10 |
 | `setup.easyHint` | The computer picks a random line. | Комп’ютер обирає випадкову лінію. |
 | `setup.normalHint` | The computer takes squares whenever it can and tries not to give you any. | Комп’ютер забирає квадрати, коли може, і намагається не віддавати їх вам. |
 | `setup.you` | You | Ви |
@@ -289,7 +290,7 @@ Versus computer changes to these components are described in [Versus computer](#
 
 - **Required marker** [GS-1, GS-2]: `BaseLabel` takes a `required` prop that appends ` *` in an `aria-hidden="true"` `text-danger` span, and the matching `BaseInput` gets `aria-required="true"`. Used on each player's Name and on Size; the color swatches aren't marked. No "* required" legend.
 - **PlayerField.vue**: the name `<input>` has `maxlength="15"`, and the field's rules add `max:15` so a pasted or restored value is still validated, with its own message `validation.maxLength` ("Player 2 name can be at most 15 characters.").
-- **GameSetup.vue**: the size field's rules are `required|integer|min_value:2|max_value:10` [GS-2].
+- **GameSetup.vue**: the size field starts at 4 and its rules are `required|integer|min_value:2|max_value:10` [GS-2]. Under the input sit the `setup.sizeHint` hint (`BaseHint`, the input's `aria-describedby`) and then any validation error, so the hint never disappears.
 - Names are never truncated. Every place that shows a name (GameStatus turn, PlayerScore, GameResult heading) drops `truncate` and uses `min-w-0 break-words`, so a long name wraps; the color swatch stays `shrink-0` and aligned to the first line.
 
 ## Persistence [PS-1..3]
