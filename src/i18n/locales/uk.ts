@@ -31,6 +31,17 @@ const uk: typeof en = {
     easy: 'Легко',
     normal: 'Нормально',
   },
+  colors: {
+    coral: 'Кораловий',
+    teal: 'Бірюзовий',
+    sunflower: 'Соняшниковий',
+    sky: 'Небесний',
+    lavender: 'Лавандовий',
+    leaf: 'Зелений',
+    berry: 'Ягідний',
+    tangerine: 'Мандариновий',
+    taken: 'Цей колір уже зайнятий',
+  },
   players: {
     computer: 'Комп’ютер',
   },

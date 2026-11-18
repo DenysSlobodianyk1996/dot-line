@@ -34,11 +34,13 @@
             :number="1"
             parent-form="player1"
             :other-player-names="[values.player2?.name]"
+            :other-player-color="values.player2?.color"
           />
           <PlayerField
             :number="2"
             parent-form="player2"
             :other-player-names="[values.player1?.name]"
+            :other-player-color="values.player1?.color"
           />
         </template>
       </div>
@@ -76,7 +78,7 @@ import BaseFieldError from '@/shared/components/BaseFieldError.vue'
 import BaseButton from '@/shared/components/BaseButton.vue'
 import BaseSegmentedControl from '@/shared/components/BaseSegmentedControl.vue'
 
-import { computerColorFor, randomHexColor } from '@/utils'
+import { computerColorFor, randomSwatch } from '@/utils'
 import { StorageService } from '@/services'
 import { DIFFICULTY, GAME_MODE } from '@/static'
 
@@ -120,15 +122,11 @@ const difficultyOptions = computed(() =>
 // what the form fields hold; the game mode and difficulty come from the switches
 type SetupFormValues = Omit<GameSetupForm, 'gameMode' | 'difficulty'>
 
+// two different random swatches (VR-35)
+const player1Color = randomSwatch()
 const formInitialValues: SetupFormValues = {
-  player1: {
-    name: '',
-    color: randomHexColor(),
-  },
-  player2: {
-    name: '',
-    color: randomHexColor(),
-  },
+  player1: { name: '', color: player1Color },
+  player2: { name: '', color: randomSwatch(player1Color) },
   size: 2,
 }
 

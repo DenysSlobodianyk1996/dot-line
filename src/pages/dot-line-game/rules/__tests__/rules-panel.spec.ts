@@ -1,5 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { COMPUTER, openGamePage, startComputerGame, startGame, YOUR_TURN } from '@/test/game-page'
+import {
+  ANNA,
+  BOHDAN,
+  COMPUTER,
+  openGamePage,
+  startComputerGame,
+  startGame,
+  YOUR_TURN,
+} from '@/test/game-page'
 
 const RULES_EN = [
   'Take turns drawing a line between two neighboring dots: left, right, up or down.',
@@ -37,8 +45,8 @@ describe('rules panel', () => {
 
     await page.submitSetup({
       mode: 'twoPlayers',
-      player1: { name: 'Anna', color: '#ff0000' },
-      player2: { name: 'Bohdan', color: '#0000ff' },
+      player1: ANNA,
+      player2: BOHDAN,
       size: 2,
       first: 1,
     })

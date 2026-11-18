@@ -8,9 +8,28 @@ import { mountGamePage, type MountGamePageOptions } from './mount-game-page'
 export type DotState = 'idle' | 'start' | 'selected' | 'target'
 export type DotPosition = [row: number, col: number]
 
+// the 8 player color swatches (VR-32): each one's English name and how the page reports it
+// (CSS rgb()); the hex values are in the spec
+export const SWATCHES = {
+  coral: { name: 'Coral', rgb: 'rgb(232, 115, 90)', hex: '#e8735a' },
+  teal: { name: 'Teal', rgb: 'rgb(42, 157, 143)', hex: '#2a9d8f' },
+  sunflower: { name: 'Sunflower', rgb: 'rgb(226, 169, 59)', hex: '#e2a93b' },
+  sky: { name: 'Sky', rgb: 'rgb(79, 147, 209)', hex: '#4f93d1' },
+  lavender: { name: 'Lavender', rgb: 'rgb(148, 121, 207)', hex: '#9479cf' },
+  leaf: { name: 'Leaf', rgb: 'rgb(106, 164, 90)', hex: '#6aa45a' },
+  berry: { name: 'Berry', rgb: 'rgb(208, 99, 140)', hex: '#d0638c' },
+  tangerine: { name: 'Tangerine', rgb: 'rgb(238, 138, 60)', hex: '#ee8a3c' },
+} as const
+export type SwatchKey = keyof typeof SWATCHES
+
 export interface TestPlayer {
   name: string
-  color: string // #rrggbb
+  color: SwatchKey
+}
+
+// a player as a saved game stores it: the color is a hex string
+export function savedPlayer({ name, color }: TestPlayer) {
+  return { name, color: SWATCHES[color].hex }
 }
 
 export type TestGameMode = 'twoPlayers' | 'computer'
@@ -55,8 +74,8 @@ const DIFFICULTY_LABELS: Record<TestDifficulty, string> = {
   normal: 'Normal',
 }
 
-export const ANNA: TestPlayer = { name: 'Anna', color: '#ff0000' }
-export const BOHDAN: TestPlayer = { name: 'Bohdan', color: '#0000ff' }
+export const ANNA: TestPlayer = { name: 'Anna', color: 'coral' }
+export const BOHDAN: TestPlayer = { name: 'Bohdan', color: 'sky' }
 
 // Opens the page in English. Pass storage (e.g. { CURRENT_GAME: game }) to load a saved game.
 export async function openGamePage({ storage = {} }: MountGamePageOptions = {}) {
@@ -150,6 +169,19 @@ export class GamePage {
   // the game name at the start of the header (VR-18, VR-22)
   headerTitle() {
     return this.header.get('[data-app-title]').text()
+  }
+
+  // the logo in the header: decorative (hidden from screen readers) and placed before the game name (VR-18)
+  headerLogo() {
+    const logo = this.header.find('[data-app-logo]')
+    if (!logo.exists()) return null
+    const title = this.header.get('[data-app-title]').element
+    return {
+      decorative: logo.attributes('aria-hidden') === 'true',
+      beforeTitle: Boolean(
+        logo.element.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ),
+    }
   }
 
   private get themeButton() {
@@ -282,10 +314,14 @@ export class GamePage {
     await this.chooseMode(mode)
     if (mode === 'computer' && difficulty) await this.chooseDifficulty(difficulty)
     await this.input('player1.name').setValue(player1.name)
-    await this.input('player1.color').setValue(player1.color)
     if (mode === 'twoPlayers') {
+      // the other player's default may be the swatch player 1 wants, so it moves first (VR-36)
+      if (this.selectedSwatch(2) === player1.color) await this.pickSwatch(2, player2.color)
+      await this.pickSwatch(1, player1.color)
       await this.input('player2.name').setValue(player2.name)
-      await this.input('player2.color').setValue(player2.color)
+      await this.pickSwatch(2, player2.color)
+    } else {
+      await this.pickSwatch(1, player1.color)
     }
     await this.input('size').setValue(String(size))
     await this.withFirstPlayer(first, async () => {
@@ -294,7 +330,7 @@ export class GamePage {
     })
   }
 
-  input(id: 'player1.name' | 'player1.color' | 'player2.name' | 'player2.color' | 'size') {
+  input(id: 'player1.name' | 'player2.name' | 'size') {
     return this.wrapper.find<HTMLInputElement>(`[id="${id}"]`)
   }
 
@@ -342,6 +378,48 @@ export class GamePage {
   // the fieldsets of the setup form by legend, e.g. ['You', 'Opponent'] or ['Player 1', 'Player 2']
   setupFieldsets() {
     return this.wrapper.findAll('fieldset legend').map((legend) => legend.text())
+  }
+
+  // a person's fieldset on setup: player 1 is "You" in Versus computer mode
+  private playerFieldset(player: 1 | 2) {
+    const legends = player === 1 ? ['Player 1', 'You'] : ['Player 2']
+    return this.wrapper.findAll('fieldset').find((el) => legends.includes(el.find('legend').text()))
+  }
+
+  // the color swatches of a person on setup, a radiogroup labelled "Color" (VR-32, VR-34)
+  private swatchOptions(player: 1 | 2) {
+    const group = this.playerFieldset(player)?.find('[role="radiogroup"][aria-label="Color"]')
+    return group?.exists() ? group.findAll('[role="radio"]') : []
+  }
+
+  // the swatch names a person can pick from, as a screen reader reads them, e.g. ['Coral', …]
+  swatchNames(player: 1 | 2) {
+    return this.swatchOptions(player).map((el) => el.attributes('aria-label'))
+  }
+
+  async pickSwatch(player: 1 | 2, color: SwatchKey) {
+    const swatch = this.swatchOptions(player).find(
+      (el) => el.attributes('aria-label') === SWATCHES[color].name,
+    )
+    if (!swatch) throw new Error(`No ${color} swatch for player ${player}`)
+    await swatch.trigger('click')
+    await flushPromises()
+  }
+
+  // the checked swatch of a person, or null
+  selectedSwatch(player: 1 | 2): SwatchKey | null {
+    const checked = this.swatchOptions(player).find(
+      (el) => el.attributes('aria-checked') === 'true',
+    )
+    const entry = Object.entries(SWATCHES).find(
+      ([, { name }]) => name === checked?.attributes('aria-label'),
+    )
+    return (entry?.[0] as SwatchKey) ?? null
+  }
+
+  // the validation messages the setup form shows
+  setupErrors() {
+    return this.wrapper.findAll('form [data-field-error]').map((el) => el.text())
   }
 
   // the setup's read-only Opponent field in Versus computer mode

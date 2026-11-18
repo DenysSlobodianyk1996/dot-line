@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { CURRENT_GAME } from '@/static'
-import { ANNA, BOHDAN, startGame, type DotPosition } from '@/test/game-page'
+import { ANNA, BOHDAN, startGame, SWATCHES, type DotPosition } from '@/test/game-page'
 
-// ANNA is #ff0000 and BOHDAN is #0000ff; the page reports colors as CSS rgb()
-const RED = 'rgb(255, 0, 0)'
-const BLUE = 'rgb(0, 0, 255)'
+// ANNA plays in coral and BOHDAN in sky
+const CORAL = SWATCHES.coral.rgb
+const SKY = SWATCHES.sky.rgb
 
 // Bohdan closes the top-left square; Anna is to move
 const BOHDAN_OWNS_ONE: [DotPosition, DotPosition][] = [
@@ -159,14 +159,14 @@ describe('game screen: lines and squares (GB-2..4, SQ-1)', () => {
 
     await page.drawLine([0, 0], [0, 1])
 
-    expect(page.line([0, 0], [0, 1])).toEqual({ color: RED })
+    expect(page.line([0, 0], [0, 1])).toEqual({ color: CORAL })
     expect(page.line([0, 1], [0, 2])).toBeNull()
     expect(page.turn()).toBe(BOHDAN.name)
 
     await page.drawLine([0, 0], [1, 0])
 
-    expect(page.line([1, 0], [0, 0])).toEqual({ color: BLUE })
-    expect(page.line([0, 0], [0, 1])).toEqual({ color: RED })
+    expect(page.line([1, 0], [0, 0])).toEqual({ color: SKY })
+    expect(page.line([0, 0], [0, 1])).toEqual({ color: CORAL })
     expect(page.turn()).toBe(ANNA.name)
   })
 
@@ -178,7 +178,7 @@ describe('game screen: lines and squares (GB-2..4, SQ-1)', () => {
 
     await page.drawLine([1, 0], [1, 1]) // Bohdan draws the 4th edge
 
-    expect(page.square([0, 0])).toEqual({ initial: 'B', color: BLUE })
+    expect(page.square([0, 0])).toEqual({ initial: 'B', color: SKY })
     expect(page.squareCount).toBe(1)
     expect(page.scores()).toEqual({ [ANNA.name]: 0, [BOHDAN.name]: 1 })
     expect(page.turn()).toBe(ANNA.name)
@@ -215,7 +215,7 @@ describe('game screen: stopping (END-2, END-4)', () => {
     expect(page.text()).toContain('The game was stopped.')
     expect(page.scores()).toEqual({ [BOHDAN.name]: 1, [ANNA.name]: 0 })
     expect(page.lineCount).toBe(4)
-    expect(page.square([0, 0])).toEqual({ initial: 'B', color: BLUE })
+    expect(page.square([0, 0])).toEqual({ initial: 'B', color: SKY })
     expect(page.hasButton('Stop')).toBe(false)
   })
 
@@ -239,8 +239,8 @@ describe('game screen: result (END-3..6)', () => {
     expect(page.resultHeadline()).toBe('Draw')
     expect(page.text()).toContain('All squares are filled.')
     expect(page.scores()).toEqual({ [ANNA.name]: 2, [BOHDAN.name]: 2 })
-    expect(page.square([1, 0])).toEqual({ initial: 'A', color: RED })
-    expect(page.square([1, 1])).toEqual({ initial: 'B', color: BLUE })
+    expect(page.square([1, 0])).toEqual({ initial: 'A', color: CORAL })
+    expect(page.square([1, 1])).toEqual({ initial: 'B', color: SKY })
   })
 
   it('Rematch empties the board, keeps players and size, and picks a new first player (END-6)', async () => {
@@ -282,15 +282,15 @@ describe('game screen: reload (PS-1, PS-2)', () => {
     const reloaded = await page.reload()
 
     expect(reloaded.lineCount).toBe(4)
-    expect(reloaded.line([0, 0], [0, 1])).toEqual({ color: RED })
-    expect(reloaded.line([1, 0], [1, 1])).toEqual({ color: BLUE })
-    expect(reloaded.square([0, 0])).toEqual({ initial: 'B', color: BLUE })
+    expect(reloaded.line([0, 0], [0, 1])).toEqual({ color: CORAL })
+    expect(reloaded.line([1, 0], [1, 1])).toEqual({ color: SKY })
+    expect(reloaded.square([0, 0])).toEqual({ initial: 'B', color: SKY })
     expect(reloaded.scores()).toEqual({ [ANNA.name]: 0, [BOHDAN.name]: 1 })
     expect(reloaded.turn()).toBe(ANNA.name)
     expect(reloaded.dotsIn('selected')).toEqual([])
 
     await reloaded.drawLine([1, 1], [1, 2])
-    expect(reloaded.line([1, 1], [1, 2])).toEqual({ color: RED })
+    expect(reloaded.line([1, 1], [1, 2])).toEqual({ color: CORAL })
   })
 
   it('a finished game reloads to the result panel (PS-2)', async () => {
@@ -302,14 +302,14 @@ describe('game screen: reload (PS-1, PS-2)', () => {
 
     expect(reloaded.resultHeadline()).toBe('Bohdan wins')
     expect(reloaded.scores()).toEqual({ [BOHDAN.name]: 1, [ANNA.name]: 0 })
-    expect(reloaded.square([0, 0])).toEqual({ initial: 'B', color: BLUE })
+    expect(reloaded.square([0, 0])).toEqual({ initial: 'B', color: SKY })
   })
 })
 
 describe('game screen: long names (GB-5)', () => {
   // two 15-character names, the most GS-1 allows; the first is one long word
-  const LONG_1 = { name: 'Wolfgangwilhelm', color: '#ff0000' }
-  const LONG_2 = { name: 'Maria-Magdalena', color: '#0000ff' }
+  const LONG_1 = { name: 'Wolfgangwilhelm', color: 'coral' } as const
+  const LONG_2 = { name: 'Maria-Magdalena', color: 'sky' } as const
 
   it('shows the whole name in the turn and the scores, wrapping instead of cutting (GB-5)', async () => {
     const page = await startGame({ player1: LONG_1, player2: LONG_2 })
