@@ -172,6 +172,99 @@ export class GamePage {
     return theme === 'light' || theme === 'dark' ? theme : null
   }
 
+  // ---- rules panel (VR-23..VR-31) ----
+
+  private get rulesButton() {
+    return this.header.get<HTMLButtonElement>('button[data-rules-button]')
+  }
+
+  private get rulesPanel() {
+    return this.wrapper.find<HTMLElement>('[role="dialog"][data-rules-panel]')
+  }
+
+  // what the header's info button tells assistive technology (VR-29)
+  rulesButtonState() {
+    return {
+      label: this.rulesButton.attributes('aria-label'),
+      expanded: this.rulesButton.attributes('aria-expanded'),
+    }
+  }
+
+  async openRules() {
+    await this.rulesButton.trigger('click')
+    await flushPromises()
+  }
+
+  async closeRules(how: 'button' | 'backdrop' | 'escape') {
+    if (how === 'button') await this.rulesPanel.get('button[data-rules-close]').trigger('click')
+    if (how === 'backdrop') await this.wrapper.get('[data-rules-backdrop]').trigger('click')
+    if (how === 'escape') {
+      const target = (document.activeElement ?? document.body) as HTMLElement
+      target.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    }
+    await flushPromises()
+  }
+
+  isRulesOpen() {
+    return this.rulesPanel.exists()
+  }
+
+  // the panel's accessible name: the text of the element it is labelled by
+  rulesPanelName() {
+    const panel = this.rulesPanel.element
+    if (panel.getAttribute('aria-modal') !== 'true') throw new Error('The rules panel is not modal')
+    const id = panel.getAttribute('aria-labelledby')
+    return id ? document.getElementById(id)?.textContent?.trim() : undefined
+  }
+
+  // the rules points, joined, as the open panel shows them
+  rulesText() {
+    return this.rulesPanel.get('ol').text()
+  }
+
+  // each rules point as the open panel shows it, without its number
+  rulesPoints() {
+    return this.rulesPanel.findAll('ol > li > span:last-child').map((point) => point.text())
+  }
+
+  // whether any rules text is shown on the page itself, outside the panel (VR-28)
+  hasInlineRules() {
+    return this.wrapper.findAll('ol').some((ol) => !ol.element.closest('[data-rules-panel]'))
+  }
+
+  // where keyboard focus is
+  focus(): 'rules panel' | 'info button' | 'elsewhere' {
+    const active = document.activeElement
+    if (active && this.rulesPanel.exists() && this.rulesPanel.element.contains(active)) {
+      return 'rules panel'
+    }
+    if (active === this.rulesButton.element) return 'info button'
+    return 'elsewhere'
+  }
+
+  // Presses Tab (or Shift+Tab) the way a browser does: the page may handle the key; if it doesn't,
+  // focus moves to the next (previous) focusable element of the document.
+  async pressTab({ shift = false } = {}) {
+    const active = (document.activeElement ?? document.body) as HTMLElement
+    const event = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      shiftKey: shift,
+      bubbles: true,
+      cancelable: true,
+    })
+    if (active.dispatchEvent(event)) {
+      const focusable = [
+        ...document.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]), select, textarea, a[href], [tabindex]:not([tabindex="-1"])',
+        ),
+      ]
+      const index = focusable.indexOf(active)
+      const next = focusable[(index + (shift ? -1 : 1) + focusable.length) % focusable.length]
+      next?.focus()
+    }
+    await flushPromises()
+  }
+
   // ---- setup screen ----
 
   get isSetupShown() {
@@ -461,7 +554,7 @@ export class GamePage {
   // ---- Stop dialog ----
 
   get dialog() {
-    return this.wrapper.find('[role="dialog"]')
+    return this.wrapper.find('[role="dialog"]:not([data-rules-panel])')
   }
 
   // Stop, then confirm

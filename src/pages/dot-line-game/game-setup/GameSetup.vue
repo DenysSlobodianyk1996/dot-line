@@ -58,8 +58,6 @@
 
       <BaseButton color="primary" type="submit">{{ t('setup.save') }}</BaseButton>
     </Form>
-
-    <RulesToggle default-open class="mt-4" />
   </div>
 </template>
 
@@ -70,7 +68,6 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import PlayerField from './PlayerField.vue'
 import ComputerOpponentField from './ComputerOpponentField.vue'
-import RulesToggle from '../rules/RulesToggle.vue'
 import { createComputerPlayer, type Difficulty, type GameMode, type GameSetupForm } from '@/models'
 
 import BaseLabel from '@/shared/components/BaseLabel.vue'

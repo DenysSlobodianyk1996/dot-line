@@ -13,13 +13,10 @@ export const COMPUTER_DELAY_MS = 1000
  * "Thinking…" from it (CM-14). Call `cancel()` on Stop, Rematch and New game (CM-17); unmounting
  * cancels too. A finished game never schedules a move.
  *
- * While `paused()` is true (the Stop dialog is open) no move is pending; when it turns false again
- * the computer gets its full pause before moving (VC-13).
+ * While `paused()` is true (the Stop dialog or the rules panel is open) no move is pending; when it
+ * turns false again the computer gets its full pause before moving (VC-13, VR-31).
  */
-export function useComputerTurn(
-  game: () => DotLineGame,
-  paused: () => boolean,
-) {
+export function useComputerTurn(game: () => DotLineGame, paused: () => boolean) {
   const isThinking = ref(false)
   let pendingMove: ReturnType<typeof setTimeout> | null = null
 

@@ -116,15 +116,19 @@ describe("my name can't be the computer's (CM-8)", () => {
 })
 
 describe('the rules read the same in both modes (CM-35, RL-5)', () => {
-  const rulesText = (page: Awaited<ReturnType<typeof openGamePage>>) =>
-    page.wrapper.get('section ol').text()
+  const rulesText = async (page: Awaited<ReturnType<typeof openGamePage>>) => {
+    await page.openRules()
+    const text = page.rulesText()
+    await page.closeRules('button')
+    return text
+  }
 
   it('says "take turns" and "the other player", never "two players"', async () => {
     const page = await openGamePage()
-    const computerRules = rulesText(page)
+    const computerRules = await rulesText(page)
     await page.chooseMode('twoPlayers')
 
-    expect(rulesText(page)).toBe(computerRules)
+    expect(await rulesText(page)).toBe(computerRules)
     expect(computerRules).toContain('Take turns')
     expect(computerRules).toContain('the other player')
     expect(computerRules.toLowerCase()).not.toContain('two players')
@@ -132,7 +136,7 @@ describe('the rules read the same in both modes (CM-35, RL-5)', () => {
 
   it('reads neutrally in Ukrainian too', async () => {
     const page = await openGamePage({ storage: { LOCALE: 'uk' } })
-    const rules = rulesText(page)
+    const rules = await rulesText(page)
 
     expect(rules).toContain('Гравці по черзі')
     expect(rules).toContain('іншого гравця')
