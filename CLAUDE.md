@@ -20,6 +20,7 @@ Specs live in `docs/` (layout and workflow in `docs/README.md`). Domain terms ar
 - `npm run lint`: oxlint, then ESLint. **Both run with `--fix` and modify files.**
 - `npm run lint-check`: oxlint, then ESLint, without `--fix` (what CI runs)
 - `npm test`: Vitest run once (jsdom + Vue Test Utils); `npm run test:watch` for watch mode
+- `npm run store:screenshots`: builds, serves the build and regenerates the Play Store images in `docs/store/` with Playwright (fixture games seeded into localStorage); review and commit them. Not part of `npm test` (AR-16, AR-17)
 - `npm run format`: Prettier on `src/` only (no semicolons, single quotes, width 100)
 
 Tests: specs sit in `__tests__/` folders next to the code (`*.spec.ts`) and check external behavior only (spec "Testing Decisions"). Shared helpers live in `src/test/`: `mountGamePage({ storage })` mounts the whole app at `/game` with real router, i18n and localStorage, and calling it again simulates a reload. `src/test/game-page.ts` is the page driver (`startGame`, `startComputerGame`, `clickDot`, `waitForComputer`, …) and the only place that knows the board's DOM; extend it rather than querying the DOM in specs. Computer-turn specs fake only `setTimeout`/`clearTimeout` (faking `setImmediate` hangs `flushPromises`). `src/test/setup.ts` clears localStorage and unmounts after each test. Tests and helpers are type-checked through `tsconfig.vitest.json`.
