@@ -292,7 +292,7 @@ Versus computer changes to these components are described in [Versus computer](#
 
 - **Required marker** [GS-1, GS-2]: `BaseLabel` takes a `required` prop that appends ` *` in an `aria-hidden="true"` `text-danger` span, and the matching `BaseInput` gets `aria-required="true"`. Used on each player's Name and on Size; the color swatches aren't marked. No "* required" legend.
 - **PlayerField.vue**: the name `<input>` has `maxlength="15"`, and the field's rules add `max:15` so a pasted or restored value is still validated, with its own message `validation.maxLength` ("Player 2 name can be at most 15 characters.").
-- **GameSetup.vue**: the size field starts at 4 and its rules are `required|integer|min_value:2|max_value:10` [GS-2]. Under the input sit the `setup.sizeHint` hint (`BaseHint`, the input's `aria-describedby`) and then any validation error, so the hint never disappears.
+- **GameSetup.vue**: the size field starts at 4 and its rules are `required|integer|min_value:2|max_value:10` [GS-2]. Under the input sit the `setup.sizeHint` hint (`BaseHint`) and then any validation error, so the hint never disappears. The input's `aria-describedby` names the hint, plus the error's id while one shows, and `aria-invalid="true"` is set while there is an error.
 - Names are never truncated. Every place that shows a name (GameStatus turn, PlayerScore, GameResult heading) drops `truncate` and uses `min-w-0 break-words`, so a long name wraps; the color swatch stays `shrink-0` and aligned to the first line.
 
 ## Persistence [PS-1..3]

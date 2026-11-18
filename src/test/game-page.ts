@@ -524,10 +524,30 @@ export class GamePage {
       .map((el) => el.textContent!.trim())
   }
 
+  // what assistive technology reads as the size input's description: the text of every element
+  // its aria-describedby points at, in order (GS-2)
+  sizeDescription() {
+    return this.sizeDescribedBy().map((el) => el.textContent!.trim())
+  }
+
+  // whether the size input is announced as invalid (GS-2)
+  isSizeInvalid() {
+    return this.input('size').attributes('aria-invalid') === 'true'
+  }
+
+  private sizeDescribedBy() {
+    const input = this.input('size')
+    const ids = input.exists() ? (input.attributes('aria-describedby') ?? '') : ''
+    return ids
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null)
+  }
+
   private sizeHintElement() {
     const input = this.input('size')
-    const id = input.exists() ? input.attributes('aria-describedby') : undefined
-    const hint = id ? document.getElementById(id) : null
+    const hint = this.sizeDescribedBy()[0] ?? null
     if (!hint) return null
     const followsInput = Boolean(
       input.element.compareDocumentPosition(hint) & Node.DOCUMENT_POSITION_FOLLOWING,

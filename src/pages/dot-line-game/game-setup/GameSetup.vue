@@ -61,11 +61,13 @@
             :title="field.value"
             type="number"
             aria-required="true"
-            :aria-describedby="sizeHintId"
+            :aria-invalid="errorMessage ? 'true' : undefined"
+            :aria-describedby="errorMessage ? `${sizeHintId} ${sizeErrorId}` : sizeHintId"
           />
-          <!-- the hint always shows; a validation error goes below it (GS-2) -->
+          <!-- the hint always shows; a validation error goes below it, and both describe the
+               input (GS-2) -->
           <BaseHint :id="sizeHintId">{{ t('setup.sizeHint') }}</BaseHint>
-          <BaseFieldError :errorMessage />
+          <BaseFieldError :id="sizeErrorId" :errorMessage />
         </div>
       </Field>
 
@@ -101,6 +103,7 @@ defineRule('max_value', max_value)
 
 const { t } = useI18n()
 const sizeHintId = useId()
+const sizeErrorId = useId()
 
 // Setup opens with the game mode and difficulty of the last game started; on a first visit,
 // Versus computer and Normal (CM-2, CM-3, CM-7, CM-29)
