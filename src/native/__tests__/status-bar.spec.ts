@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises } from '@vue/test-utils'
+import { App } from '@capacitor/app'
+import { StatusBar } from '@capacitor/status-bar'
 import { openGamePage, stubSystemTheme } from '@/test/game-page'
 
 // The Capacitor StatusBar plugin, faked at the module boundary: it records the last style and color
@@ -30,6 +32,11 @@ beforeEach(() => {
   document.head.append(tokens)
 })
 afterEach(() => tokens.remove())
+
+// a plugin call that fails, the way a missing or broken plugin rejects on a device
+function failsOnce(call: (...args: never[]) => Promise<unknown>) {
+  vi.mocked(call).mockRejectedValueOnce(new Error('plugin failed'))
+}
 
 async function startNative() {
   const { startNative } = await import('@/native')
@@ -64,5 +71,39 @@ describe('Android status bar (AR-4)', () => {
     await page.toggleTheme()
     await flushPromises()
     expect(statusBar).toEqual({ style: 'LIGHT', color: CREAM })
+  })
+
+  describe('when a plugin call fails', () => {
+    beforeEach(() => {
+      statusBar.style = null
+      statusBar.color = null
+      vi.spyOn(console, 'warn').mockImplementation(() => {})
+    })
+
+    it('still paints the background when the icon style fails', async () => {
+      failsOnce(StatusBar.setStyle)
+      await openGamePage()
+      await startNative()
+
+      expect(statusBar.color).toBe(CREAM)
+    })
+
+    it('keeps the icon style when the background fails', async () => {
+      failsOnce(StatusBar.setBackgroundColor)
+      await openGamePage()
+      await startNative()
+
+      expect(statusBar.style).toBe('LIGHT')
+    })
+
+    it('still follows the theme when the back button listener fails', async () => {
+      failsOnce(App.addListener)
+      const page = await openGamePage()
+      await startNative()
+
+      await page.toggleTheme()
+      await flushPromises()
+      expect(statusBar).toEqual({ style: 'DARK', color: COCOA })
+    })
   })
 })

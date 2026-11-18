@@ -9,14 +9,22 @@ function paperColor() {
   return getComputedStyle(document.documentElement).getPropertyValue('--wc-paper').trim()
 }
 
-async function paint(theme: Theme) {
+// a failed plugin call is reported and skipped, so the other one still runs and the status bar
+// keeps following the theme
+function report(call: string) {
+  return (error: unknown) => console.warn(`StatusBar.${call} failed`, error)
+}
+
+function paint(theme: Theme) {
   // Style.Dark means light icons, for a dark background
-  await StatusBar.setStyle({ style: theme === 'dark' ? Style.Dark : Style.Light })
+  StatusBar.setStyle({ style: theme === 'dark' ? Style.Dark : Style.Light }).catch(
+    report('setStyle'),
+  )
   const color = paperColor()
-  if (color) await StatusBar.setBackgroundColor({ color })
+  if (color) StatusBar.setBackgroundColor({ color }).catch(report('setBackgroundColor'))
 }
 
 export function followThemeInStatusBar() {
   // after the render, when useTheme has already put the new data-theme on <html>
-  watch(useTheme().theme, (theme) => void paint(theme), { immediate: true, flush: 'post' })
+  watch(useTheme().theme, paint, { immediate: true, flush: 'post' })
 }

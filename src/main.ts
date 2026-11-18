@@ -1,5 +1,4 @@
 import { createApp } from 'vue'
-import { Capacitor } from '@capacitor/core'
 import { createPinia } from 'pinia'
 
 import App from './App.vue'
@@ -15,8 +14,15 @@ app.use(i18n)
 
 app.mount('#app')
 
-// back button, status bar (AR-3, AR-4): only inside the Android app, in their own chunk, so the
-// web build never loads them
-if (Capacitor.isNativePlatform()) {
-  void import('./native').then(({ startNative }) => startNative())
+// back button, status bar (AR-3, AR-4): only in the Android app's build, and only on the device.
+// The build folds the mode check to a constant, so the web build drops this branch with Capacitor
+// and the native chunk. A failure is reported and leaves the game playable.
+if (__CAPACITOR_BUILD__) {
+  import('@capacitor/core')
+    .then(async ({ Capacitor }) => {
+      if (!Capacitor.isNativePlatform()) return
+      const { startNative } = await import('./native')
+      await startNative()
+    })
+    .catch((error: unknown) => console.warn('Native setup failed', error))
 }

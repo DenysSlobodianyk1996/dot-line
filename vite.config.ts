@@ -6,10 +6,15 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA, type ManifestOptions } from 'vite-plugin-pwa'
 import { MANIFEST_FILES } from './src/static/manifests'
-import { CAPACITOR_MODE, NOT_THE_APP_PAGES } from './src/static/build'
+import { NOT_THE_APP_PAGES } from './src/static/service-worker'
 import en from './src/i18n/locales/en'
 import uk from './src/i18n/locales/uk'
 
+// The Android app's build (`vite build --mode capacitor`): Capacitor serves the bundled files from
+// the root and they ship inside the app, so there is no service worker and no install manifest
+// (AR-1, AR-2). The app reads it as __CAPACITOR_BUILD__ (defined below), a literal the build
+// folds, so the web build drops the native-only code and Capacitor itself.
+const CAPACITOR_MODE = 'capacitor'
 
 // GitHub Pages serves the app under /<repo>/; the deploy workflow sets BASE_PATH
 const base = process.env.BASE_PATH ?? '/'
@@ -102,6 +107,8 @@ export default defineConfig(({ mode }) => {
       __VUE_I18N_FULL_INSTALL__: true,
       __VUE_I18N_LEGACY_API__: false,
       __INTLIFY_PROD_DEVTOOLS__: false,
+      // true only in the Android app's build (see CAPACITOR_MODE)
+      __CAPACITOR_BUILD__: isCapacitor,
     },
     plugins: [vue(), vueDevTools(), tailwindcss(), ...(isCapacitor ? [] : pwaPlugins())],
     resolve: {

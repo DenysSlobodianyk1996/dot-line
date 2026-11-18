@@ -71,7 +71,7 @@ The developer account is a personal one, so Play requires a closed test with at 
 - `capacitor.config.ts`: `appId: 'app.dotsandboxes.connected'`, `appName: 'Dots and Boxes: Connected'`, `webDir: 'dist'`.
 - The `android/` folder is committed, minus build output and secrets.
 - **Native build mode**: `vite build --mode capacitor`: base `/` (the mode forces it, so no `BASE_PATH` is needed) and the PWA plugin disabled (no service worker, no manifests). Capacitor bundles the files, which covers offline play (AR-2). `npm run android:build` runs the web build, then `cap sync android`, then `gradlew bundleRelease`.
-- **Back button**: one `App.addListener('backButton')` in a small native-only module (`src/native/`), loaded only when `Capacitor.isNativePlatform()`. Order of handling:
+- **Back button**: one `App.addListener('backButton')` in a small native-only module (`src/native/`), loaded only in the capacitor-mode build (a compile-time flag, so the web build has no Capacitor code) and only when `Capacitor.isNativePlatform()`. Order of handling:
   1. close the rules panel (`useRulesPanel().close()`);
   2. otherwise close the Stop dialog (`useStopDialog().close()`, its open state shared like the rules panel's);
   3. otherwise `App.exitApp()`.

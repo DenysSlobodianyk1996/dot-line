@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { NOT_THE_APP_PAGES } from '@/static/build'
+import { NOT_THE_APP_PAGES } from '@/static/service-worker'
 
 // Workbox tests navigateFallbackDenylist against the path plus the query string
 function servedAsApp(pathAndSearch: string) {
