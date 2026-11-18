@@ -10,7 +10,7 @@
       <GameResult
         v-if="dotLineGame.isFinished"
         :dot-line-game="dotLineGame"
-        @new-game="newGame"
+        @new-game-settings="newGameSettings"
         @rematch="rematch"
       />
       <GameStatus
@@ -88,7 +88,7 @@ function rematch() {
   props.dotLineGame.start()
 }
 
-function newGame() {
+function newGameSettings() {
   computerTurn.cancel()
   StorageService.removeItem(CURRENT_GAME)
   props.dotLineGame.reset()

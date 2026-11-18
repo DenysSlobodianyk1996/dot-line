@@ -12,7 +12,7 @@ The artboards use the Warm cream palette of the visual refresh (see [Visual refr
 2. First move: empty board, every dot a valid start [MV-1, MV-4, GB-4]
 3. Mid-game: Богдан to move, Dot1 (1,2) selected, valid Dot2 at (2,2) and (1,3), other valid starts (2,0), (2,1), (0,3), owned squares with fill and initial [MV-2, MV-3, MV-5, GB-2, GB-3]
 4. Stop confirmation [END-2]
-5. Result, winner (Богдан 9, Оля 7): result panel beside the final board, with New game and Rematch [END-3..6]
+5. Result, winner (Богдан 9, Оля 7): result panel beside the final board, with New game settings and Rematch [END-3..6]
 6. Result, draw (8 each) [END-3, END-4]
 
 "Mobile" page (390 px wide phone frames):
@@ -234,7 +234,7 @@ src/pages/dot-line-game/
   game/
     GameBoard.vue     # squares, lines and clickable dots; v-model:selected-dot
     GameStatus.vue    # turn, score, hint, Stop button and the Stop confirmation dialog
-    GameResult.vue    # replaces GameStatus when finished: winner/Draw, score, New game, Rematch
+    GameResult.vue    # replaces GameStatus when finished: winner/Draw, score, New game settings, Rematch
     PlayerScore.vue   # one score row: color swatch, name, score
   rules/
     GameRules.vue     # "How to play" content with the five numbered rules
@@ -261,7 +261,7 @@ All sizes and colors come from the approved canvas.
   - Dot1 selected: "Pick a highlighted neighbor to draw the line. Pick the selected dot again to cancel."
   - otherwise: "Pick a highlighted dot to start a line."
 
-  Stop and Rematch clear the selection. The old "Back" button is gone; Stop, then New game, leads back to setup.
+  Stop and Rematch clear the selection. The old "Back" button is gone; Stop, then New game settings, leads back to setup.
 - **GameBoard.vue** [GB-1..3, MV-4..8]
   - Absolutely positioned elements inside a `rounded-lg border-border bg-surface` box (the lighter "paper" surface, VR-5) of `N·cell + 32` px plus the border. `cell` is the square size: 48 px, or smaller on narrow screens (see Mobile). A dot's center is at `(16 + col·cell, 16 + row·cell)`.
   - Owned squares: `cell` px, owner color mixed at 30% over transparent, bold uppercase initial in the owner color.
@@ -278,8 +278,8 @@ All sizes and colors come from the approved canvas.
     - Otherwise, clicking a valid start selects it (or switches the selection to it).
     - Anything else is ignored.
 - **GameStatus.vue** [GB-4, END-2]: a `w-50` column with Turn (swatch and name), Score (`PlayerScore` rows), the hint and a Stop button (`BaseButton` secondary). Stop opens a dialog: a `fixed inset-0 bg-ink/40` backdrop and a `w-75 p-6 rounded-lg border shadow-lg` card with "Stop the game?", "Whoever owns more squares now wins.", the scores, and Cancel (secondary) and Stop game (primary). Clicking the backdrop cancels; confirming emits `stop`.
-- **GameResult.vue** [END-3..6]: a `w-53` column with "Result", "`<name>` wins" with a swatch or "Draw", "All squares are filled." or "The game was stopped.", the scores with the winner first, and New game (secondary) and Rematch (primary).
-  - New game: `StorageService.removeItem(CURRENT_GAME)` then `game.reset()`.
+- **GameResult.vue** [END-3..6]: a `w-53` column with "Result", "`<name>` wins" with a swatch or "Draw", "All squares are filled." or "The game was stopped.", the scores with the winner first, and New game settings (secondary) and Rematch (primary).
+  - New game settings: `StorageService.removeItem(CURRENT_GAME)` then `game.reset()`.
   - Rematch: `game.start()`.
 - **PlayerScore.vue**: a `text-sm leading-6` row with a 12 px swatch, the full name through `PlayerName` (wrapping, see Player names) and a `tabular-nums` score.
 
@@ -309,7 +309,7 @@ The phone layout is the default, and `sm:` classes (640 px and up) restore the d
   - The board sits in an `overflow-x-auto max-w-full` wrapper for screens where 24 px squares still don't fit.
 - **GameStatus** on phones: Turn and Score in a two-column grid (`grid grid-cols-2 gap-4 sm:flex sm:flex-col`), then the hint, then Stop at full width with `min-h-11` (`w-full sm:w-auto sm:min-h-0`).
 - **Stop dialog** card: `w-full max-w-75`, inside the `p-4` backdrop.
-- **GameResult** on phones: New game and Rematch in `grid grid-cols-2 gap-2`, each `min-h-11`. From `sm` up they return to the wrapping row.
+- **GameResult** on phones: New game settings and Rematch in `grid grid-cols-2 gap-2`, each `min-h-11`; a label that does not fit wraps (no `truncate`/`whitespace-nowrap`) [MB-6]. From `sm` up they return to the wrapping row.
 - **Centering** [MB-9]: horizontal only. The setup root is `mx-auto max-w-130`; the game screen is centered by Game.vue's `sm:justify-center` (on phones it is already full width with the board `self-center`). Nothing is centered vertically (no `items-center`/`min-h-screen` on the page), so content stays top-aligned when its height changes. The board wrapper keeps `max-w-full overflow-x-auto`, a scroll container whose minimum width is 0, so a board that can't shrink scrolls inside itself rather than overflowing the page [MB-1, MB-3].
 - **GameSetup**: the player fieldsets row becomes `flex flex-col gap-2 sm:flex-row`; each fieldset is `min-w-0 flex-1`, so the two share the row equally ("You" and "Opponent" included).
 
@@ -390,7 +390,7 @@ src/shared/components/LanguageToggle.vue
 - `useComputerTurn(() => game, paused)` returns `{ isThinking, cancel }`.
 - It watches `isComputerTurn && !paused() ? lines.length : null` with `immediate: true`, so a restored game resumes on mount. Every change cancels any pending move; when the value isn't `null`, it sets `isThinking` and schedules the move `COMPUTER_DELAY_MS` (1000 ms) later.
 - The move re-checks `isComputerTurn`, asks `chooseComputerLine(game, game.difficulty)` (the model guarantees a computer game has one) and draws the line through the normal `drawLine(line)`, which picks the valid end as the start.
-- `Game.vue` calls `cancel()` in `stop`, `rematch` and `newGame`; unmounting cancels too.
+- `Game.vue` calls `cancel()` in `stop`, `rematch` and `newGameSettings`; unmounting cancels too.
 - `GameStatus` exposes its Stop dialog through `v-model:confirming`; `Game.vue` passes that as `paused`, so the computer waits while the dialog is open and gets a fresh pause after Cancel (VC-13). The board stays locked meanwhile because `isComputerTurn` still holds.
 - `Game.vue` passes `isThinking || isComputerTurn` to `GameBoard` as `locked` (every dot `idle`, clicks ignored) and to `GameStatus` as `thinking`.
 
