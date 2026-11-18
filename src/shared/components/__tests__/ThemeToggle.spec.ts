@@ -78,4 +78,9 @@ describe('header', () => {
     expect(page.headerTitle()).toBe('Dot Line Game')
     expect(page.themeButtonLabel()).toBe('Dark theme')
   })
+  it('shows the logo before the game name, hidden from screen readers (VR-18, VR-19)', async () => {
+    const page = await openGamePage()
+
+    expect(page.headerLogo()).toEqual({ decorative: true, beforeTitle: true })
+  })
 })
