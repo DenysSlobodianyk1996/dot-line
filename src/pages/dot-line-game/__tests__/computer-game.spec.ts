@@ -219,11 +219,11 @@ describe('remembered choices', () => {
     expect(page.selectedDifficulty()).toBe('normal')
   })
 
-  it('New game preselects the last game mode and difficulty (CM-29)', async () => {
+  it('New game settings preselects the last game mode and difficulty (CM-29)', async () => {
     const page = await startComputerGame({ difficulty: 'easy', first: 1 })
     await page.stopGame()
 
-    await page.newGame()
+    await page.newGameSettings()
 
     expect(page.selectedMode()).toBe('computer')
     expect(page.selectedDifficulty()).toBe('easy')
@@ -232,7 +232,7 @@ describe('remembered choices', () => {
   it('the next visit opens in the last game mode, keeping the last difficulty (CM-3, CM-7)', async () => {
     const first = await startComputerGame({ difficulty: 'easy', first: 1 })
     await first.stopGame()
-    await first.newGame()
+    await first.newGameSettings()
     await first.chooseMode('twoPlayers')
     await first.submitSetup({
       mode: 'twoPlayers',
@@ -242,7 +242,7 @@ describe('remembered choices', () => {
       first: 1,
     })
     await first.stopGame()
-    await first.newGame()
+    await first.newGameSettings()
 
     const next = await first.reload()
     expect(next.selectedMode()).toBe('twoPlayers')
@@ -397,11 +397,11 @@ describe('stopping and starting again', () => {
     expect(page.scores()).toEqual({ Anna: 0, [COMPUTER]: 0 })
   })
 
-  it('New game goes to setup and the computer does not move afterwards (CM-29)', async () => {
+  it('New game settings goes to setup and the computer does not move afterwards (CM-29)', async () => {
     const page = await startComputerGame({ first: 2 })
     await page.stopGame()
 
-    await page.newGame()
+    await page.newGameSettings()
     await page.waitForComputer()
 
     expect(page.isSetupShown).toBe(true)

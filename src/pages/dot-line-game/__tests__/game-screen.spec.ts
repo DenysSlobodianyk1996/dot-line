@@ -259,12 +259,27 @@ describe('game screen: result (END-3..6)', () => {
     expect(page.scores()).toEqual({ [ANNA.name]: 0, [BOHDAN.name]: 0 })
   })
 
-  it('New game opens the setup screen and clears the saved game (END-5)', async () => {
+  it('offers New game settings and Rematch, shown in full in both languages (END-5, MB-6)', async () => {
+    const page = await startGame()
+    await page.stopGame()
+
+    expect(page.resultButtons()).toEqual([
+      { label: 'New game settings', shownInFull: true },
+      { label: 'Rematch', shownInFull: true },
+    ])
+    await page.switchLanguage('uk')
+    expect(page.resultButtons()).toEqual([
+      { label: 'Налаштування нової гри', shownInFull: true },
+      { label: 'Реванш', shownInFull: true },
+    ])
+  })
+
+  it('New game settings opens the setup screen and clears the saved game (END-5)', async () => {
     const page = await startGame()
     await page.drawLine([0, 0], [0, 1])
     await page.stopGame()
 
-    await page.newGame()
+    await page.newGameSettings()
 
     expect(page.isSetupShown).toBe(true)
     expect(localStorage.getItem(CURRENT_GAME)).toBeNull()

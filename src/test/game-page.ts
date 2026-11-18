@@ -22,6 +22,13 @@ export const SWATCHES = {
 } as const
 export type SwatchKey = keyof typeof SWATCHES
 
+// a hex color as its swatch key, anything else unchanged
+function paintKeyOf(color: string | null): string {
+  const hex = color?.toLowerCase()
+  const match = Object.entries(SWATCHES).find(([, swatch]) => swatch.hex === hex)
+  return match ? match[0] : (color ?? '')
+}
+
 export interface TestPlayer {
   name: string
   color: SwatchKey
@@ -263,12 +270,71 @@ export class GamePage {
 
   // the rules points, joined, as the open panel shows them
   rulesText() {
-    return this.rulesPanel.get('ol').text()
+    return this.rulesPanel.get('ol[data-rules-steps]').text()
   }
 
   // each rules point as the open panel shows it, without its number
   rulesPoints() {
-    return this.rulesPanel.findAll('ol > li > span:last-child').map((point) => point.text())
+    return this.rulesPanel
+      .findAll('ol[data-rules-steps] > li > span:last-child')
+      .map((point) => point.text())
+  }
+
+  // The "In pictures" storyboard under the rules (RL-7), or null. Each frame lists what its small board
+  // shows: lines and owned squares by position ('row,col-row,col' / 'row,col', 0-based) with their
+  // player color, the picked Dot1 and the highlighted neighbors. Colors are swatch keys.
+  storyboard() {
+    const section = this.rulesPanel.find<HTMLElement>('[data-rules-storyboard]')
+    if (!section.exists()) return null
+    return {
+      heading: section.get('h3').text(),
+      hiddenFromAssistiveTech: section.attributes('aria-hidden') === 'true',
+      frames: section.findAll('[data-storyboard-frame]').map((frame) => {
+        const colorOf = (element: Element, attribute: 'fill' | 'stroke') =>
+          paintKeyOf(element.getAttribute(attribute))
+        const selected = frame.find('[data-dot1]')
+        return {
+          caption: frame.get('[data-caption]').text(),
+          lines: Object.fromEntries(
+            frame
+              .findAll('[data-line]')
+              .map(({ element }) => [
+                element.getAttribute('data-line'),
+                colorOf(element, 'stroke'),
+              ]),
+          ),
+          squares: Object.fromEntries(
+            frame
+              .findAll('[data-square]')
+              .map(({ element }) => [
+                element.getAttribute('data-square'),
+                { letter: element.textContent?.trim(), color: colorOf(element, 'fill') },
+              ]),
+          ),
+          dot1: selected.exists()
+            ? {
+                at: selected.attributes('data-dot1'),
+                color: colorOf(selected.element, 'stroke'),
+              }
+            : null,
+          neighbors: frame.findAll('[data-neighbor]').map((n) => n.attributes('data-neighbor')),
+        }
+      }),
+    }
+  }
+
+  // every paint (fill and stroke) the storyboard boards use, sorted: player colors as swatch keys,
+  // everything else as written (theme tokens are var(--color-…))
+  storyboardPaints() {
+    const section = this.rulesPanel.get('[data-rules-storyboard]')
+    const paints = new Set<string>()
+    for (const element of section.element.querySelectorAll('svg, svg *')) {
+      for (const attribute of ['fill', 'stroke'] as const) {
+        const value = element.getAttribute(attribute)
+        if (value && value !== 'none') paints.add(paintKeyOf(value))
+      }
+    }
+    return [...paints].sort()
   }
 
   // whether any rules text is shown on the page itself, outside the panel (VR-28)
@@ -784,13 +850,24 @@ export class GamePage {
     return this.panelSection('Result').querySelector('h3')!.textContent!.trim()
   }
 
-  // Rematch and New game; first = who moves first after a rematch
+  // the result panel's buttons in order, each with its label and whether the whole label is shown:
+  // nothing around it cuts it off or keeps it on one line, so on a narrow phone it wraps instead
+  // (END-5, MB-6). jsdom has no layout, so this reads the Tailwind classes.
+  resultButtons() {
+    const panel = this.wrapper.get('[data-result-panel]').element
+    return [...panel.querySelectorAll('button')].map((button) => ({
+      label: button.textContent!.trim(),
+      shownInFull: !ancestry(button).some(clips),
+    }))
+  }
+
+  // Rematch and New game settings; first = who moves first after a rematch
   async rematch(first: 1 | 2 = 1) {
     await this.withFirstPlayer(first, () => this.click('Rematch'))
   }
 
-  async newGame() {
-    await this.click('New game')
+  async newGameSettings() {
+    await this.click('New game settings')
   }
 
   // ---- names (GB-5) ----
