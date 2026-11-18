@@ -33,20 +33,33 @@
         <div aria-hidden="true" class="block text-sm font-medium text-ink-soft">
           {{ t('setup.color') }}
         </div>
-        <div role="radiogroup" :aria-label="t('setup.color')" class="grid grid-cols-4 gap-2 p-1">
+        <!-- a radio group: one Tab stop (the picked swatch), arrow keys move and pick (VR-34);
+             each button is a 44 px tap target below sm around a smaller dot (VR-9) -->
+        <div
+          role="radiogroup"
+          :aria-label="t('setup.color')"
+          class="grid grid-cols-4 gap-1 sm:gap-2 sm:p-1"
+          @keydown="onSwatchKeydown($event, value, handleChange)"
+        >
           <button
-            v-for="swatch in SWATCHES"
+            v-for="(swatch, index) in SWATCHES"
             :key="swatch.key"
             type="button"
             role="radio"
             :aria-checked="value === swatch.hex"
             :aria-label="t(`colors.${swatch.key}`)"
             :title="t(`colors.${swatch.key}`)"
-            class="size-8 cursor-pointer justify-self-center rounded-full ring-offset-2 ring-offset-paper transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-            :class="value === swatch.hex ? 'scale-110 ring-3 ring-ink' : ''"
-            :style="{ backgroundColor: swatch.hex }"
+            :tabindex="isTabStop(index, value) ? 0 : -1"
+            class="group flex size-11 cursor-pointer items-center justify-center justify-self-center rounded-full focus-visible:outline-2 focus-visible:outline-accent sm:size-10"
             @click="handleChange(swatch.hex)"
-          ></button>
+          >
+            <span
+              aria-hidden="true"
+              class="size-8 rounded-full ring-offset-2 ring-offset-paper transition-transform group-hover:scale-110"
+              :class="value === swatch.hex ? 'scale-110 ring-3 ring-ink' : ''"
+              :style="{ backgroundColor: swatch.hex }"
+            ></span>
+          </button>
         </div>
         <BaseFieldError :errorMessage />
       </div>
@@ -114,6 +127,33 @@ const nameRules = computed(() => {
   const rules = `required|max:${MAX_NAME_LENGTH}|differentFromAll:${props.otherPlayerNames}`
   return props.rejectComputerName ? `${rules}|notComputerName` : rules
 })
+
+// the picked swatch is the group's Tab stop; with none picked, the first one is (VR-34)
+function isTabStop(index: number, value: unknown) {
+  const picked = SWATCHES.findIndex((swatch) => swatch.hex === value)
+  return index === (picked === -1 ? 0 : picked)
+}
+
+const STEP: Partial<Record<string, 1 | -1>> = {
+  ArrowRight: 1,
+  ArrowDown: 1,
+  ArrowLeft: -1,
+  ArrowUp: -1,
+}
+
+// arrow keys move to the next or previous swatch, wrapping around, and pick it (VR-34)
+function onSwatchKeydown(event: KeyboardEvent, value: unknown, pick: (hex: string) => void) {
+  const step = STEP[event.key]
+  if (!step) return
+  event.preventDefault()
+  const picked = SWATCHES.findIndex((swatch) => swatch.hex === value)
+  const next = (Math.max(picked, 0) + step + SWATCHES.length) % SWATCHES.length
+  const swatch = SWATCHES[next]
+  if (!swatch) return
+  pick(swatch.hex)
+  const group = event.currentTarget as HTMLElement
+  group.querySelectorAll<HTMLElement>('[role="radio"]')[next]?.focus()
+}
 
 const colorRules = computed(() =>
   props.otherPlayerColor ? `differentColor:${props.otherPlayerColor}` : '',

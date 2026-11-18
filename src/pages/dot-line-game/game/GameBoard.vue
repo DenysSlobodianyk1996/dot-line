@@ -63,7 +63,7 @@ const APP_GUTTERS = 16
 // from Tailwind's sm breakpoint the widest side panel (GameResult, w-53) and gap-6 sit beside the board
 const SIDE_PANEL_WITH_GAP = 212 + 24
 const SIDE_BY_SIDE_QUERY = '(min-width: 40rem)'
-const FALLBACK_COLOR = 'var(--wc-ink)' // follows the theme, so it stays readable in dark (VR-17)
+const FALLBACK_COLOR = 'var(--color-ink)' // follows the theme, so it stays readable in dark (VR-17)
 
 const RING_CLASS: Record<DotState, string> = {
   idle: '',

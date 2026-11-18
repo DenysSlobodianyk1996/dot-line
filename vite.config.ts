@@ -6,6 +6,8 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA, type ManifestOptions } from 'vite-plugin-pwa'
 import { MANIFEST_FILES } from './src/static/manifests'
+import en from './src/i18n/locales/en'
+import uk from './src/i18n/locales/uk'
 
 // GitHub Pages serves the app under /<repo>/; the deploy workflow sets BASE_PATH
 const base = process.env.BASE_PATH ?? '/'
@@ -49,7 +51,7 @@ function extraPwaFiles(): Plugin {
       this.emitFile({
         type: 'asset',
         fileName: MANIFEST_FILES.en,
-        source: JSON.stringify(manifestFor('en', 'Dots & Lines')),
+        source: JSON.stringify(manifestFor('en', en.app.title)),
       })
       const page = bundle['index.html']
       if (page?.type === 'asset') {
@@ -77,7 +79,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifestFilename: MANIFEST_FILES.uk,
-      manifest: manifestFor('uk', 'Точки й лінії'),
+      manifest: manifestFor('uk', uk.app.title),
       // the icons are already matched by globPatterns, and the plugin precaches its own manifest
       includeManifestIcons: false,
       workbox: {

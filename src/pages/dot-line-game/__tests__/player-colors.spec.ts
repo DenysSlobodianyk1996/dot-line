@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { flushPromises } from '@vue/test-utils'
 import { CURRENT_GAME } from '@/static'
 import {
   ANNA,
@@ -28,12 +27,12 @@ describe('player colors on setup', () => {
   it('names the swatches in the current language (VR-34)', async () => {
     const page = await openGamePage()
 
-    await page.wrapper.get('button[lang="uk"]').trigger('click')
+    expect(page.swatchGroupLabel(1)).toBe('Color')
 
-    expect(page.wrapper.find('[role="radiogroup"][aria-label="Колір"]').exists()).toBe(true)
-    const names = page.wrapper
-      .findAll('[role="radiogroup"][aria-label="Колір"] [role="radio"]')
-      .map((el) => el.attributes('aria-label'))
+    await page.switchLanguage('uk')
+
+    expect(page.swatchGroupLabel(1)).toBe('Колір')
+    const names = page.swatchNames(1)
     expect(names).toContain('Кораловий')
     expect(names).toContain('Мандариновий')
   })
@@ -46,6 +45,33 @@ describe('player colors on setup', () => {
     expect(page.selectedSwatch(1)).toBe('lavender')
     await page.pickSwatch(1, 'leaf')
     expect(page.selectedSwatch(1)).toBe('leaf')
+  })
+
+  it('Tab stops only on the picked swatch (VR-34)', async () => {
+    const page = await openGamePage()
+    await page.pickSwatch(1, 'lavender')
+
+    expect(page.swatchTabStops(1)).toEqual(['lavender'])
+  })
+
+  it('arrow keys move to the next or previous swatch and pick it, wrapping around (VR-34)', async () => {
+    const page = await openGamePage()
+    await page.pickSwatch(1, 'coral')
+    page.focusSwatch(1, 'coral')
+
+    await page.pressKey('ArrowRight')
+    expect(page.selectedSwatch(1)).toBe('teal')
+    expect(page.focusedSwatch(1)).toBe('teal')
+
+    await page.pressKey('ArrowDown')
+    expect(page.selectedSwatch(1)).toBe('sunflower')
+
+    await page.pressKey('ArrowUp')
+    await page.pressKey('ArrowLeft')
+    await page.pressKey('ArrowLeft')
+    expect(page.selectedSwatch(1)).toBe('tangerine')
+    expect(page.focusedSwatch(1)).toBe('tangerine')
+    expect(page.swatchTabStops(1)).toEqual(['tangerine'])
   })
 
   it('starts the two players on two different swatches (VR-35)', async () => {
@@ -68,8 +94,7 @@ describe('player colors on setup', () => {
     await page.pickSwatch(1, 'berry')
     await page.pickSwatch(2, 'berry')
 
-    await page.wrapper.get('form').trigger('submit')
-    await flushPromises()
+    await page.submitSetupForm()
 
     expect(page.isSetupShown).toBe(true)
     expect(page.setupErrors()).toContain('This color is already taken')
@@ -104,8 +129,7 @@ describe('the computer player color (VR-37)', () => {
 
       await page.waitForComputer()
 
-      const [line] = page.wrapper.findAll<HTMLElement>('.rounded-\\[2px\\]')
-      expect(line?.element.style.backgroundColor).toBe(SWATCHES.tangerine.rgb)
+      expect(page.lineColors()).toEqual([SWATCHES.tangerine.rgb])
     } finally {
       vi.useRealTimers()
     }

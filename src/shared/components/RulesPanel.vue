@@ -9,7 +9,7 @@
     <div
       v-if="isOpen"
       data-rules-backdrop
-      class="fixed inset-0 z-20 bg-black/40"
+      class="fixed inset-0 z-20 bg-ink/40"
       aria-hidden="true"
       @click="close"
     ></div>

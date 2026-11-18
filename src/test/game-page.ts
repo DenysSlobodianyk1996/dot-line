@@ -309,6 +309,13 @@ export class GamePage {
     await flushPromises()
   }
 
+  // presses a key (e.g. 'ArrowRight') on whatever has keyboard focus
+  async pressKey(key: string) {
+    const active = (document.activeElement ?? document.body) as HTMLElement
+    active.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+    await flushPromises()
+  }
+
   // ---- setup screen ----
 
   get isSetupShown() {
@@ -336,10 +343,13 @@ export class GamePage {
       await this.pickSwatch(1, player1.color)
     }
     await this.input('size').setValue(String(size))
-    await this.withFirstPlayer(first, async () => {
-      await this.wrapper.find('form').trigger('submit')
-      await flushPromises()
-    })
+    await this.withFirstPlayer(first, () => this.submitSetupForm())
+  }
+
+  // submits the setup form as it is filled in
+  async submitSetupForm() {
+    await this.wrapper.get('form').trigger('submit')
+    await flushPromises()
   }
 
   input(id: 'player1.name' | 'player2.name' | 'size') {
@@ -392,19 +402,31 @@ export class GamePage {
     return this.wrapper.findAll('fieldset legend').map((legend) => legend.text())
   }
 
-  // a person's fieldset on setup: player 1 is "You" in Versus computer mode
+  // a person's fieldset on setup ("Player 1", or "You" in Versus computer mode), found by its
+  // name field so it works in any language
   private playerFieldset(player: 1 | 2) {
-    const legends = player === 1 ? ['Player 1', 'You'] : ['Player 2']
-    return this.wrapper.findAll('fieldset').find((el) => legends.includes(el.find('legend').text()))
+    return this.wrapper
+      .findAll('fieldset')
+      .find((el) => el.find(`[id="player${player}.name"]`).exists())
   }
 
-  // the color swatches of a person on setup, a radiogroup labelled "Color" (VR-32, VR-34)
+  // a person's color swatches on setup: the fieldset's radiogroup (VR-32, VR-34)
+  private swatchGroup(player: 1 | 2) {
+    const group = this.playerFieldset(player)?.find('[role="radiogroup"]')
+    return group?.exists() ? group : null
+  }
+
   private swatchOptions(player: 1 | 2) {
-    const group = this.playerFieldset(player)?.find('[role="radiogroup"][aria-label="Color"]')
-    return group?.exists() ? group.findAll('[role="radio"]') : []
+    return this.swatchGroup(player)?.findAll('[role="radio"]') ?? []
   }
 
-  // the swatch names a person can pick from, as a screen reader reads them, e.g. ['Coral', …]
+  // the swatch group's accessible name, e.g. 'Color' (VR-34)
+  swatchGroupLabel(player: 1 | 2) {
+    return this.swatchGroup(player)?.attributes('aria-label') ?? null
+  }
+
+  // the swatch names a person can pick from, as a screen reader reads them in the page's
+  // language, e.g. ['Coral', …]
   swatchNames(player: 1 | 2) {
     return this.swatchOptions(player).map((el) => el.attributes('aria-label'))
   }
@@ -418,15 +440,35 @@ export class GamePage {
     await flushPromises()
   }
 
+  // the swatches a person's Tab key stops on (roving tabindex: only the checked one, VR-34)
+  swatchTabStops(player: 1 | 2): SwatchKey[] {
+    return this.swatchOptions(player)
+      .filter((el) => el.attributes('tabindex') !== '-1')
+      .map((el) => swatchKeyOf(el.attributes('aria-label')))
+      .filter((key): key is SwatchKey => key !== null)
+  }
+
+  // puts keyboard focus on a person's swatch, as Tab into the group would
+  focusSwatch(player: 1 | 2, color: SwatchKey) {
+    const swatch = this.swatchOptions(player).find(
+      (el) => el.attributes('aria-label') === SWATCHES[color].name,
+    )
+    if (!swatch) throw new Error(`No ${color} swatch for player ${player}`)
+    ;(swatch.element as HTMLElement).focus()
+  }
+
+  // the swatch of a person that has keyboard focus, or null
+  focusedSwatch(player: 1 | 2): SwatchKey | null {
+    const focused = this.swatchOptions(player).find((el) => el.element === document.activeElement)
+    return focused ? swatchKeyOf(focused.attributes('aria-label')) : null
+  }
+
   // the checked swatch of a person, or null
   selectedSwatch(player: 1 | 2): SwatchKey | null {
     const checked = this.swatchOptions(player).find(
       (el) => el.attributes('aria-checked') === 'true',
     )
-    const entry = Object.entries(SWATCHES).find(
-      ([, { name }]) => name === checked?.attributes('aria-label'),
-    )
-    return (entry?.[0] as SwatchKey) ?? null
+    return swatchKeyOf(checked?.attributes('aria-label'))
   }
 
   // the validation messages the setup form shows
@@ -517,6 +559,11 @@ export class GamePage {
 
   get lineCount() {
     return this.lineElements.length
+  }
+
+  // the colors of every drawn line, as CSS rgb() strings
+  lineColors() {
+    return this.lineElements.map(({ element }) => element.style.backgroundColor)
   }
 
   // the drawn line between two neighboring dots, or null; color is the CSS rgb() string
@@ -700,6 +747,12 @@ export class GamePage {
       random.mockRestore()
     }
   }
+}
+
+// a swatch's key from its English name, or null
+function swatchKeyOf(name: string | undefined): SwatchKey | null {
+  const entry = Object.entries(SWATCHES).find(([, swatch]) => swatch.name === name)
+  return (entry?.[0] as SwatchKey) ?? null
 }
 
 function ancestry(el: Element): Element[] {

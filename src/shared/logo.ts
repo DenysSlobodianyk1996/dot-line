@@ -25,24 +25,21 @@ export interface LogoOptions {
   tileRadius?: number
   // share of the tile the logo is scaled to (only with a tile)
   scale?: number
-  // rendered width and height in px; omitted = sized by CSS
-  size?: number
 }
 
+// sized by CSS, or by whoever rasterizes it
 export function logoSvg({
   dot = LOGO_COLORS.dotLight,
   style,
   tile,
   tileRadius = 22,
   scale = 0.8,
-  size,
 }: LogoOptions = {}): string {
   const offset = (100 - 100 * scale) / 2
-  const sizeAttrs = size === undefined ? '' : ` width="${size}" height="${size}"`
   const dotAt = (cx: number, cy: number) =>
     `<circle class="logo-dot" cx="${cx}" cy="${cy}" r="9" fill="${dot}"/>`
   return [
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"${sizeAttrs} aria-hidden="true">`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">`,
     style ? `<style>${style}</style>` : '',
     tile ? `<rect width="100" height="100" rx="${tileRadius}" fill="${tile}"/>` : '',
     tile ? `<g transform="translate(${offset} ${offset}) scale(${scale})">` : '<g>',

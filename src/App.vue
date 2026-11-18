@@ -7,36 +7,35 @@
         t('app.title')
       }}</span>
       <ThemeToggle />
-      <button
+      <BaseIconButton
         ref="rulesButton"
-        type="button"
         data-rules-button
         :aria-label="t('rules.open')"
         aria-haspopup="dialog"
         :aria-expanded="rulesPanel.isOpen.value"
-        class="flex size-11 cursor-pointer items-center justify-center rounded-full border border-border bg-surface text-ink-soft shadow-sm transition-colors hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-accent sm:size-9"
         @click="rulesPanel.open"
       >
         <InfoIcon :size="20" />
-      </button>
+      </BaseIconButton>
       <LanguageToggle />
     </header>
     <RouterView />
-    <RulesPanel :return-focus-to="rulesButton" />
+    <RulesPanel :return-focus-to="rulesButton?.element ?? null" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import RulesPanel from '@/pages/dot-line-game/rules/RulesPanel.vue'
 import AppLogo from '@/shared/components/AppLogo.vue'
+import BaseIconButton from '@/shared/components/BaseIconButton.vue'
 import LanguageToggle from '@/shared/components/LanguageToggle.vue'
+import RulesPanel from '@/shared/components/RulesPanel.vue'
 import ThemeToggle from '@/shared/components/ThemeToggle.vue'
 import { useRulesPanel } from '@/shared/composables/useRulesPanel'
 import InfoIcon from '@/shared/icons/InfoIcon.vue'
 
 const { t } = useI18n()
 const rulesPanel = useRulesPanel()
-const rulesButton = useTemplateRef<HTMLButtonElement>('rulesButton')
+const rulesButton = useTemplateRef('rulesButton')
 </script>
