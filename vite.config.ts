@@ -9,6 +9,11 @@ import { MANIFEST_FILES } from './src/static/manifests'
 import en from './src/i18n/locales/en'
 import uk from './src/i18n/locales/uk'
 
+// The Android app's build (`vite build --mode capacitor`): Capacitor serves the bundled files from
+// the root and they ship inside the app, so there is no service worker and no install manifest
+// (AR-1, AR-2)
+const CAPACITOR_MODE = 'capacitor'
+
 // GitHub Pages serves the app under /<repo>/; the deploy workflow sets BASE_PATH
 const base = process.env.BASE_PATH ?? '/'
 
@@ -68,21 +73,10 @@ function extraPwaFiles(): Plugin {
   }
 }
 
-// https://vite.dev/config/
-export default defineConfig({
-  base,
-  // vue-i18n esm-bundler feature flags: Composition API only, no devtools in production
-  define: {
-    __VUE_I18N_FULL_INSTALL__: true,
-    __VUE_I18N_LEGACY_API__: false,
-    __INTLIFY_PROD_DEVTOOLS__: false,
-  },
-  plugins: [
-    vue(),
-    vueDevTools(),
-    tailwindcss(),
-    // installable and offline (VR-44..VR-52): updates install silently and apply on the next
-    // launch; the game lives in localStorage, so an update never loses it (VR-48, VR-49)
+// installable and offline (VR-44..VR-52): updates install silently and apply on the next
+// launch; the game lives in localStorage, so an update never loses it (VR-48, VR-49)
+function pwaPlugins() {
+  return [
     VitePWA({
       registerType: 'autoUpdate',
       manifestFilename: MANIFEST_FILES.uk,
@@ -96,13 +90,28 @@ export default defineConfig({
       },
     }),
     extraPwaFiles(),
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+  ]
+}
+
+// https://vite.dev/config/
+export default defineConfig(({ mode }) => {
+  const isCapacitor = mode === CAPACITOR_MODE
+  return {
+    base: isCapacitor ? '/' : base,
+    // vue-i18n esm-bundler feature flags: Composition API only, no devtools in production
+    define: {
+      __VUE_I18N_FULL_INSTALL__: true,
+      __VUE_I18N_LEGACY_API__: false,
+      __INTLIFY_PROD_DEVTOOLS__: false,
     },
-  },
-  server: {
-    port: 4200,
-  },
+    plugins: [vue(), vueDevTools(), tailwindcss(), ...(isCapacitor ? [] : pwaPlugins())],
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+      },
+    },
+    server: {
+      port: 4200,
+    },
+  }
 })

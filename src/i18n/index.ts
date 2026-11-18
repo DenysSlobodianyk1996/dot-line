@@ -24,7 +24,9 @@ export const i18n = createI18n({
 })
 
 // the manifest link decides the installed app's name, so it follows the language (VR-50, VR-51)
+// The Android app's build has no install manifest, so it links none (AR-1)
 function linkManifest(locale: AppLocale) {
+  if (import.meta.env.MODE === 'capacitor') return
   let link = document.head.querySelector<HTMLLinkElement>('link[rel="manifest"]')
   if (!link) {
     link = document.createElement('link')
