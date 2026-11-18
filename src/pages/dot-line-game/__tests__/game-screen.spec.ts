@@ -260,6 +260,21 @@ describe('game screen: result (END-3..6)', () => {
     expect(page.square([1, 1])).toEqual({ initial: 'B', color: SKY })
   })
 
+  it('a win shows the result card with a trophy and the score, winner first (END-4, UP-10)', async () => {
+    const page = await startGame()
+    await page.drawLines(BOHDAN_OWNS_ONE)
+    await page.stopGame()
+
+    expect(page.resultCard()).toEqual({ icon: 'trophy', score: '1 : 0', entrance: 'motion-safe' })
+  })
+
+  it('a draw shows the result card without a trophy (END-4, UP-11)', async () => {
+    const page = await startGame({ first: 1 })
+    await page.drawLines(FULL_GAME_DRAW)
+
+    expect(page.resultCard()).toEqual({ icon: null, score: '2 : 2', entrance: 'motion-safe' })
+  })
+
   it('Rematch empties the board, keeps players and size, and picks a new first player (END-6)', async () => {
     const page = await startGame({ size: 3, first: 1 })
     await page.drawLines(BOHDAN_OWNS_ONE)

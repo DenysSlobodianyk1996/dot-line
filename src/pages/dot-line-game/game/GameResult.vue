@@ -21,20 +21,36 @@
 
     <div class="flex flex-col gap-1">
       <div class="text-sm font-medium text-ink-soft">{{ t('result.title') }}</div>
-      <!-- the whole name, wrapping if needed (GB-5) -->
-      <div v-if="winner" class="flex items-start gap-2">
-        <span
-          class="mt-1.5 size-4 shrink-0 rounded-full"
-          :style="{ backgroundColor: winner.color }"
-        ></span>
-        <!-- the robot sits between the swatch and the heading (CM-13) -->
-        <RobotIcon v-if="isComputerPlayer(winner.name)" :size="24" class="mt-0.5" />
-        <h3 class="min-w-0 text-xl font-bold wrap-break-word text-ink">
-          {{ winnerTitle }}
+      <!-- the result card (UP-10..UP-14): a trophy, or the robot when the computer won (CM-13),
+           none on a draw; one entrance, only when the device allows motion -->
+      <div
+        data-result-card
+        class="flex flex-col items-center gap-2 rounded-2xl bg-accent-soft p-4 text-center motion-safe:animate-result-in"
+      >
+        <template v-if="winner">
+          <RobotIcon v-if="isComputerPlayer(winner.name)" :size="40" class="text-ink" />
+          <TrophyIcon v-else :size="40" class="text-accent" />
+        </template>
+        <!-- the whole name, wrapping if needed (GB-5) -->
+        <h3 class="max-w-full min-w-0 text-xl font-bold wrap-break-word text-ink">
+          {{ winner ? winnerTitle : t('result.draw') }}
         </h3>
+        <!-- winner first; each number sits on its player's swatch chip, so it stays readable on
+             any color in both themes -->
+        <div
+          data-result-score
+          class="flex items-center gap-2 text-4xl font-bold text-ink tabular-nums"
+        >
+          <template v-for="(player, index) in rankedPlayers" :key="player.name">
+            <!-- spaced for screen readers and copy ("5 : 3"); the gap does it on screen -->
+            <span v-if="index > 0">{{ ' : ' }}</span>
+            <span class="min-w-14 rounded-xl border-2 px-2.5" :style="chipStyle(player.color)">
+              {{ dotLineGame.scoreOf(player.name) }}
+            </span>
+          </template>
+        </div>
+        <p class="text-sm text-muted">{{ reason }}</p>
       </div>
-      <h3 v-else class="text-xl font-bold text-ink">{{ t('result.draw') }}</h3>
-      <p class="text-sm text-muted">{{ reason }}</p>
     </div>
 
     <div class="flex flex-col gap-1">
@@ -55,6 +71,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseButton from '@/shared/components/BaseButton.vue'
 import RobotIcon from '@/shared/components/RobotIcon.vue'
+import TrophyIcon from '@/shared/icons/TrophyIcon.vue'
 import PlayerScore from './PlayerScore.vue'
 import { useDisplayName } from '@/shared/composables/useDisplayName'
 
@@ -84,6 +101,14 @@ const winnerTitle = computed(() => {
 const reason = computed(() =>
   props.dotLineGame.finishReason === 'stopped' ? t('result.stopped') : t('result.completed'),
 )
+
+// a tint of the player's color under the ink number, edged in the full color (UP-10, VR-17)
+function chipStyle(color: string) {
+  return {
+    borderColor: color,
+    backgroundColor: `color-mix(in srgb, ${color} 30%, var(--color-surface))`,
+  }
+}
 
 // winner first; a draw keeps player order
 const rankedPlayers = computed(() => {

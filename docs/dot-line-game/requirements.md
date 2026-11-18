@@ -75,7 +75,7 @@ Acceptance:
 - **END-1**: The game ends automatically when all N² squares are owned.
 - **END-2**: A **Stop** button ends the game early, after the player confirms.
 - **END-3**: The winner is the player with more owned squares. Equal scores (including 0–0) are a **Draw**.
-- **END-4**: When the game ends, the final board stays visible and a result panel shows the winner (name and color), or "Draw", plus both scores. Its New game settings and Rematch buttons sit at the top of the panel, exactly where Stop was during the game (UP-6).
+- **END-4**: When the game ends, the final board stays visible and a result panel shows the winner (name and color), or "Draw", plus both scores. Its New game settings and Rematch buttons sit at the top of the panel, exactly where Stop was during the game (UP-6). Below them a **result card** (accent-tinted) shows, top to bottom: a trophy for the winner (the robot when the computer won, nothing on a draw), the heading, the score as `5 : 3` in large type with the winner first and each number on its player's color chip, and why the game ended (all squares filled, or stopped). The Score list with names and colors stays below the card. The card fades and grows in once, and not at all when the device asks for reduced motion (UP-10..UP-14).
 - **END-8**: During the game, Stop sits at the top of the side panel, above the turn, the score and the hint. The text below it keeps its height: the line under the turn ("Thinking…" or the computer's last line) always takes one line even when empty, and the hint area is as tall as the longest hint in the current language and is only hidden, not removed, while the computer thinks. So Stop never moves while you play (UP-4, UP-5).
 - **END-9**: From 640 px wide, the result buttons stack at the panel's full width with Rematch on top, so a label never wraps raggedly (UP-8). Below 640 px see MB-6.
 - **END-5**: **New game settings** in the result panel clears the saved game and opens the setup screen.
@@ -238,7 +238,7 @@ Playing:
 Result and saving:
 
 - **VC-18**: Rematch keeps the game mode, the difficulty, the person's name and color, the computer player and the size, with a new random first player (END-6). If the computer player starts the rematch, it moves on its own (CM-28).
-- **VC-19**: The result heading reads "You won!" or "Computer won" (with the robot), or "Draw", followed by both scores with the winner first. Two players keeps "<name> wins" (CM-27).
+- **VC-19**: The result heading reads "You won!" (under the trophy) or "Computer won" (under the robot, in place of the trophy), or "Draw", followed by both scores with the winner first. Two players keeps "<name> wins" (CM-27, UP-12).
 - **VC-20**: The game mode and difficulty are saved with the game (PS-1) and restored with it (PS-2). A saved Versus computer game without a difficulty loads as Easy (CM-30).
 - **VC-21**: A reload during the computer player's turn restores the game, shows "Thinking…" and lets the computer move after the usual pause. A reload during the person's turn restores "Your turn" with the computer's newest line still highlighted (CM-31, CM-32).
 - **VC-22**: A game saved before game modes existed loads as a Two players game (PS-4, CM-33).

@@ -22,6 +22,7 @@
   --wc-ink: #4a3a2e; /* cocoa text */
   --wc-accent: #e8735a; /* coral: primary actions, start-dot highlight */
   --wc-accent-hover: #dc5f45;
+  --wc-accent-soft: #fdebe4; /* accent tint: the result card */
   --wc-on-accent: #fffdf8; /* text on coral */
   --wc-secondary: #2a9d8f; /* teal */
   --wc-danger: #c2412d; /* validation messages */
@@ -40,6 +41,7 @@
   --wc-ink: #f6ebdc;
   --wc-accent: #f08c73;
   --wc-accent-hover: #f5a48f;
+  --wc-accent-soft: #3d2a22;
   --wc-on-accent: #241c17;
   --wc-secondary: #4db6a8;
   --wc-danger: #ff9b85;
@@ -58,6 +60,7 @@
   --color-ink: var(--wc-ink);
   --color-accent: var(--wc-accent);
   --color-accent-hover: var(--wc-accent-hover);
+  --color-accent-soft: var(--wc-accent-soft);
   --color-on-accent: var(--wc-on-accent);
   --color-secondary: var(--wc-secondary);
   --color-danger: var(--wc-danger);
@@ -67,6 +70,15 @@
 @theme {
   --radius-md: 0.75rem;
   --radius-lg: 1.25rem;
+  /* the result card's single entrance (UP-13); used only as motion-safe:animate-result-in */
+  --animate-result-in: result-in 250ms ease-out;
+
+  @keyframes result-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
 }
 
 html,

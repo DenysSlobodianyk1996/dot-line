@@ -659,6 +659,14 @@ describe('the result speaks to me (CM-27)', () => {
     expect(page.scores()).toEqual({ [COMPUTER]: 2, Anna: 1 })
   })
 
+  it('shows a trophy when I win and the robot when the computer wins, winner first (UP-12)', async () => {
+    const won = await openGamePage({ storage: { [CURRENT_GAME]: finishedGame(2, 1) } })
+    expect(won.resultCard()).toMatchObject({ icon: 'trophy', score: '2 : 1' })
+
+    const lost = await openGamePage({ storage: { [CURRENT_GAME]: finishedGame(1, 2) } })
+    expect(lost.resultCard()).toMatchObject({ icon: 'robot', score: '2 : 1' })
+  })
+
   it('says "Draw" on equal scores', async () => {
     const page = await openGamePage({ storage: { [CURRENT_GAME]: finishedGame(1, 1) } })
 

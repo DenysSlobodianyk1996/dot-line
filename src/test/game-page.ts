@@ -920,6 +920,29 @@ export class GamePage {
     return this.panelSection('Result').querySelector('h3')!.textContent!.trim()
   }
 
+  // the result card (UP-10..UP-13): its icon ('trophy', 'robot' when the computer won, null on a
+  // draw), the score as shown ("5 : 3", winner first), and whether its entrance animation runs only
+  // when the device allows motion ('motion-safe'), always ('always'), or not at all ('none')
+  resultCard() {
+    const card = this.wrapper.find('[data-result-card]')
+    if (!card.exists()) throw new Error('No result card')
+    const el = card.element
+    const icon = el.querySelector('svg[data-icon="trophy"]')
+      ? 'trophy'
+      : el.querySelector(ROBOT)
+        ? 'robot'
+        : null
+    const score = el.querySelector('[data-result-score]')!.textContent!.replace(/\s+/g, ' ').trim()
+    const animations = [...el.classList].filter((c) => /(^|:)animate-/.test(c))
+    const entrance =
+      animations.length === 0
+        ? 'none'
+        : animations.every((c) => c.startsWith('motion-safe:'))
+          ? 'motion-safe'
+          : 'always'
+    return { icon, score, entrance }
+  }
+
   // the result panel's buttons in order, each with its label and whether the whole label is shown:
   // nothing around it cuts it off or keeps it on one line, so on a narrow phone it wraps instead
   // (END-5, MB-6). jsdom has no layout, so this reads the Tailwind classes.

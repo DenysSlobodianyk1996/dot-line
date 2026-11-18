@@ -281,7 +281,12 @@ All sizes and colors come from the approved canvas.
     - Otherwise, clicking a valid start selects it (or switches the selection to it).
     - Anything else is ignored.
 - **GameStatus.vue** [GB-4, END-2]: a `w-53` column (the same width as GameResult, so nothing moves when the result replaces it [MB-9]) with Turn (swatch and name), Score (`PlayerScore` rows), the hint and a Stop button (`BaseButton` secondary). Stop opens a dialog: a `fixed inset-0 bg-ink/40` backdrop and a `w-75 p-6 rounded-lg border shadow-lg` card with "Stop the game?", "Whoever owns more squares now wins.", the scores, and Cancel (secondary) and Stop game (primary). Clicking the backdrop cancels; confirming emits `stop`.
-- **GameResult.vue** [END-3..6]: a `w-53` column with "Result", "`<name>` wins" with a swatch or "Draw", "All squares are filled." or "The game was stopped.", the scores with the winner first, and New game settings (secondary) and Rematch (primary).
+- **GameResult.vue** [END-3..6, UP-10..14]: a `w-53` column with New game settings (secondary) and Rematch (primary), then "Result" over the **result card**, then the Score list (`PlayerScore` rows, winner first). The card (`data-result-card`) is `flex flex-col items-center gap-2 rounded-2xl bg-accent-soft p-4 text-center`, top to bottom:
+  - a 40 px `TrophyIcon` in `text-accent`, or a 40 px `RobotIcon` in `text-ink` when the computer won; nothing on a draw;
+  - the `h3` heading ("`<name>` wins", "You won!", "Computer won" or "Draw"), wrapping (`wrap-break-word`);
+  - the score (`data-result-score`) as `5 : 3` in `text-4xl font-bold tabular-nums`, winner first (player order on a draw). Each number is `text-ink` on a swatch chip, `rounded-xl border-2 px-2.5 min-w-14`, edged in the player's color and filled with `color-mix(in srgb, <color> 30%, var(--color-surface))`, so it stays readable on any saved hex in both themes (VR-17);
+  - "All squares are filled." or "The game was stopped." in `text-sm text-muted`.
+  - Entrance: `motion-safe:animate-result-in` (`result-in` in `styles.css`: fade from 0 and scale from 0.95, 250 ms ease-out), so nothing moves under `prefers-reduced-motion: reduce`.
   - New game settings: `StorageService.removeItem(CURRENT_GAME)` then `game.reset()`.
   - Rematch: `game.start()`.
 - **PlayerScore.vue**: a `text-sm leading-6` row with a 12 px swatch, the full name through `PlayerName` (wrapping, see Player names) and a `tabular-nums` score.
@@ -377,7 +382,7 @@ src/shared/components/LanguageToggle.vue
 
 - `useDisplayName()` returns `displayName(name)`: `t('players.computer')` for the computer player, otherwise the name as typed. It's the only place that turns a stored name into a shown one, and it follows the language toggle.
 - `PlayerName.vue` wraps it, with a `RobotIcon` in front for the computer player (`iconSize`, default 16). It's used in the Turn (20 px) and in `PlayerScore` (score rows, the Stop dialog and the result scores).
-- `GameResult.vue` puts a 24 px `RobotIcon` between the swatch and the heading when the computer wins. `GameBoard.vue` uses `displayName(...)` for the owned-square initial, and `ComputerOpponentField.vue` shows an 18 px robot with `displayName(COMPUTER_NAME)`.
+- `GameResult.vue` puts a 40 px `RobotIcon` above the heading in the result card, in place of the trophy, when the computer wins. `GameBoard.vue` uses `displayName(...)` for the owned-square initial, and `ComputerOpponentField.vue` shows an 18 px robot with `displayName(COMPUTER_NAME)`.
 
 ### Icon
 
@@ -408,7 +413,7 @@ src/shared/components/LanguageToggle.vue
 
 ### Result [VC-19]
 
-- `GameResult.vue`: in a computer game the heading is `result.computerWon` or `result.youWon`; in Two players it's `result.wins` with the displayed name. Draw is unchanged, and the scores are sorted winner first.
+- `GameResult.vue`: in a computer game the heading is `result.computerWon` or `result.youWon`; in Two players it's `result.wins` with the displayed name. Draw is unchanged, and the scores are sorted winner first, in the result card and in the Score list.
 
 ### Setup [VC-1..7, VC-26]
 
@@ -447,6 +452,7 @@ The **Warm cream** palette is a set of semantic CSS custom properties in `src/as
 | `ink` | main text, dots on the board, logo dots, backdrops (`ink/40`) | `#4a3a2e` | `#f6ebdc` |
 | `accent` (coral) | primary button, pressed toggle, selected switch option, start-dot ring, focus | `#e8735a` | `#f08c73` |
 | `accent-hover` | primary hover | `#dc5f45` | `#f5a48f` |
+| `accent-soft` | result card background (UP-10) | `#fdebe4` | `#3d2a22` |
 | `on-accent` | text on `accent` | `#fffdf8` | `#241c17` |
 | `secondary` (teal) | secondary accent | `#2a9d8f` | `#4db6a8` |
 | `danger` | validation messages | `#c2412d` | `#ff9b85` |
@@ -473,7 +479,7 @@ The palette values are the prototype's (spec token table); `on-accent` and `dang
 
 The two icon buttons are `flex size-11 sm:size-9 items-center justify-center rounded-full border border-border bg-surface text-ink-soft shadow-sm hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-accent`, with 20 px icons: 44 px tap targets on phones, 36 px from `sm` up [VR-21].
 
-**Icons** (`src/shared/icons/`): `InfoIcon`, `CloseIcon`, `LightModeIcon`, `DarkModeIcon`, copied from Material Symbols Rounded (Apache-2.0, license note in the folder's README) as inline SVG components: `viewBox="0 -960 960 960"`, `fill="currentColor"`, `aria-hidden="true"`, a `size` prop (default 24). No icon font. `RobotIcon` keeps its place in `src/shared/components/`.
+**Icons** (`src/shared/icons/`): `InfoIcon`, `CloseIcon`, `LightModeIcon`, `DarkModeIcon`, `TrophyIcon` (`emoji_events`, marked `data-icon="trophy"`), copied from Material Symbols Rounded (Apache-2.0, license note in the folder's README) as inline SVG components: `viewBox="0 -960 960 960"`, `fill="currentColor"`, `aria-hidden="true"`, a `size` prop (default 24). No icon font. `RobotIcon` keeps its place in `src/shared/components/`.
 
 ### Swatch picker [VR-32..VR-39]
 
