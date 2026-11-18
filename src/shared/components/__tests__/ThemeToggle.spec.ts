@@ -63,7 +63,7 @@ describe('theme', () => {
 describe('header', () => {
   it('shows the game name and the theme button on the setup and game screens (VR-18, VR-22)', async () => {
     const page = await openGamePage()
-    expect(page.headerTitle()).toBe('Dot Line Game')
+    expect(page.headerTitle()).toBe('Dots & Lines')
     expect(page.themeButtonLabel()).toBe('Dark theme')
 
     await page.submitSetup({
@@ -75,7 +75,7 @@ describe('header', () => {
     })
 
     expect(page.isSetupShown).toBe(false)
-    expect(page.headerTitle()).toBe('Dot Line Game')
+    expect(page.headerTitle()).toBe('Dots & Lines')
     expect(page.themeButtonLabel()).toBe('Dark theme')
   })
   it('shows the logo before the game name, hidden from screen readers (VR-18, VR-19)', async () => {

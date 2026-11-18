@@ -1,7 +1,7 @@
 import { configure } from 'vee-validate'
 import { createI18n } from 'vue-i18n'
 import { StorageService } from '@/services'
-import { LOCALE } from '@/static'
+import { LOCALE, MANIFEST_FILES } from '@/static'
 import en from './locales/en'
 import uk from './locales/uk'
 
@@ -23,9 +23,21 @@ export const i18n = createI18n({
   messages: { uk, en },
 })
 
+// the manifest link decides the installed app's name, so it follows the language (VR-50, VR-51)
+function linkManifest(locale: AppLocale) {
+  let link = document.head.querySelector<HTMLLinkElement>('link[rel="manifest"]')
+  if (!link) {
+    link = document.createElement('link')
+    link.rel = 'manifest'
+    document.head.append(link)
+  }
+  link.setAttribute('href', `${import.meta.env.BASE_URL}${MANIFEST_FILES[locale]}`)
+}
+
 function applyDocumentLocale(locale: AppLocale) {
   document.documentElement.lang = locale
   document.title = i18n.global.t('app.title')
+  linkManifest(locale)
 }
 
 export function setLocale(locale: AppLocale) {

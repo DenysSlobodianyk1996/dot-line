@@ -26,6 +26,8 @@ Tests: specs sit in `__tests__/` folders next to the code (`*.spec.ts`) and chec
 
 CI: `.github/workflows/ci.yml` runs type-check, `lint-check` and tests on every pull request. Deployment: `.github/workflows/deploy.yml` runs the tests, then publishes to GitHub Pages on every push to `master`. It builds with `BASE_PATH=/dot-line/`, which `vite.config.ts` reads as Vite's `base` and the router picks up through `import.meta.env.BASE_URL`, then copies `dist/index.html` to `404.html` so history-mode reloads work. Keep asset and route URLs base-relative (no hard-coded `/…` paths in code).
 
+PWA: `vite-plugin-pwa` in `vite.config.ts` (`autoUpdate`, Workbox precache of all build output, navigation fallback to `index.html`). It emits the Ukrainian manifest; a small plugin there adds the English one and `404.html`. File names live in `src/static/manifests.ts`, and `setLocale()` swaps the `<link rel="manifest">` href with the language. Verify with `BASE_PATH=/dot-line/ npm run build` (both manifests, `sw.js`, icons in `dist/`), not unit tests.
+
 ## Architecture
 
 - **Routing** (`src/router/index.ts`): the only route is `/game`, and every other path redirects there. Page folders expose their root component through an `index.ts` barrel (`export { default } from './Page.vue'`).
