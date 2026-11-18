@@ -1,2 +1,2 @@
-export * from './random-hex-color'
+export * from './swatches'
 export * from './computer-color'

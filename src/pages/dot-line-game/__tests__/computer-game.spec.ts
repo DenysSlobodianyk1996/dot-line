@@ -3,6 +3,8 @@ import { CURRENT_GAME } from '@/static'
 import { COMPUTER_NAME } from '@/models/computer-player.model'
 import {
   ANNA,
+  savedPlayer,
+  SWATCHES,
   BOHDAN,
   COMPUTER,
   COMPUTER_DELAY_MS,
@@ -16,8 +18,8 @@ import {
 } from '@/test/game-page'
 import { flushPromises } from '@vue/test-utils'
 
-// ANNA is #ff0000; the page reports colors as CSS rgb()
-const RED = 'rgb(255, 0, 0)'
+// ANNA plays in coral
+const CORAL = SWATCHES.coral.rgb
 
 beforeEach(() => {
   // only the computer's pause is faked: flushPromises still needs a real setImmediate
@@ -36,7 +38,7 @@ describe('setup in Versus computer mode', () => {
     expect(page.selectedMode()).toBe('computer')
     expect(page.setupFieldsets()).toEqual(['You', 'Opponent'])
     expect(page.input('player1.name').exists()).toBe(true)
-    expect(page.input('player1.color').exists()).toBe(true)
+    expect(page.swatchNames(1)).toHaveLength(8)
     expect(page.input('player2.name').exists()).toBe(false)
     expect(page.input('size').exists()).toBe(true)
   })
@@ -44,12 +46,12 @@ describe('setup in Versus computer mode', () => {
   it('shows the computer as the opponent, with a color far from mine (CM-9, CM-12)', async () => {
     const page = await openGamePage()
 
-    await page.input('player1.color').setValue(ANNA.color)
+    await page.pickSwatch(1, ANNA.color)
 
     const opponent = page.setupOpponent()
     expect(opponent?.name).toBe(COMPUTER)
     expect(opponent?.color).toBeTruthy()
-    expect(opponent?.color).not.toBe(RED)
+    expect(opponent?.color).not.toBe(CORAL)
   })
 
   it('keeps what I typed when I switch the game mode back and forth (CM-10)', async () => {
@@ -109,7 +111,7 @@ describe("my name can't be the computer's (CM-8)", () => {
   })
 
   it('allows the name in Two players mode', async () => {
-    const page = await startGame({ player1: { name: 'Computer', color: '#ff0000' } })
+    const page = await startGame({ player1: { name: 'Computer', color: 'coral' } })
 
     expect(page.isSetupShown).toBe(false)
   })
@@ -280,7 +282,7 @@ describe('playing against the computer', () => {
 
     const [line] = page.wrapper.findAll<HTMLElement>('.rounded-\\[2px\\]')
     expect(line?.element.style.backgroundColor).toBeTruthy()
-    expect(line?.element.style.backgroundColor).not.toBe(RED)
+    expect(line?.element.style.backgroundColor).not.toBe(CORAL)
   })
 
   it('plays to the end: the game finishes when the last square is owned (CM-21, CM-26)', async () => {
@@ -300,7 +302,7 @@ describe('playing against the computer', () => {
   it('draws a line whose valid end comes second, e.g. up from a drawn line (CM-20)', async () => {
     // Anna drew [1,0]-[1,1]; the computer's first legal move is [0,0]-[1,0], which starts at [1,0]
     const saved = {
-      player1: ANNA,
+      player1: savedPlayer(ANNA),
       player2: { name: COMPUTER_NAME, color: '#32a06e' },
       size: 2,
       lines: [{ from: { row: 1, col: 0 }, to: { row: 1, col: 1 }, ownerName: 'Anna' }],
@@ -397,8 +399,8 @@ describe('saving and reloading', () => {
 
   it('loads a game saved before game modes as Two players (CM-33)', async () => {
     const legacy = {
-      player1: ANNA,
-      player2: BOHDAN,
+      player1: savedPlayer(ANNA),
+      player2: savedPlayer(BOHDAN),
       size: 2,
       lines: [],
       dirtySquares: [],
@@ -446,7 +448,7 @@ describe("the computer's turn on screen", () => {
   it('announces when its line claimed a square (CM-37)', async () => {
     // Normal; square 0,0 misses only 0,1-1,1, so the computer claims it
     const saved = {
-      player1: ANNA,
+      player1: savedPlayer(ANNA),
       player2: { name: COMPUTER_NAME, color: '#32a06e' },
       size: 2,
       lines: [
@@ -494,7 +496,7 @@ describe("the computer's turn on screen", () => {
       ownerName: COMPUTER_NAME,
     })
     const finished = {
-      player1: ANNA,
+      player1: savedPlayer(ANNA),
       player2: computer,
       size: 2,
       lines: [
@@ -590,7 +592,7 @@ describe('the result speaks to me (CM-27)', () => {
   function finishedGame(mine: number, its: number) {
     const owners = [...Array(mine).fill(ANNA.name), ...Array(its).fill(COMPUTER_NAME)]
     return {
-      player1: ANNA,
+      player1: savedPlayer(ANNA),
       player2: { name: COMPUTER_NAME, color: '#00ff00' },
       size: 2,
       lines: [],
