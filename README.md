@@ -41,20 +41,20 @@ Recommended editor: [VS Code](https://code.visualstudio.com/) with the [Vue (Off
 
 ## Deployment
 
-Every push to `master` runs the tests, builds the app and publishes it to GitHub Pages through [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). You can also run the workflow manually from the Actions tab. The site is served at https://denysslobodianyk1996.github.io/dot-line/.
+Every push to `master` runs the tests, builds the app and publishes it to GitHub Pages through [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). You can also run the workflow manually from the Actions tab. The site is served at https://denysslobodianyk1996.github.io/dots-and-boxes-connected/.
 
-- The workflow builds with `BASE_PATH=/dot-line/`, which `vite.config.ts` uses as Vite's `base`. Local development keeps `/`.
-- It copies `index.html` to `404.html`, so reloading a route such as `/dot-line/game` still loads the app.
+- The workflow builds with `BASE_PATH=/<repo name>/` (`/dots-and-boxes-connected/`), which `vite.config.ts` uses as Vite's `base`. Local development keeps `/`.
+- It copies `index.html` to `404.html`, so reloading a route such as `/dots-and-boxes-connected/game` still loads the app.
 - One-time setup: in the repository's **Settings → Pages**, set the source to **GitHub Actions**. GitHub Pages requires a public repository unless the account is on a paid plan.
 
 To check a Pages build locally:
 
 ```sh
-BASE_PATH=/dot-line/ npm run build
+BASE_PATH=/dots-and-boxes-connected/ npm run build
 npm run preview
 ```
 
-Then open http://localhost:4173/dot-line/.
+Then open http://localhost:4173/dots-and-boxes-connected/.
 
 ## Tech stack
 

@@ -176,14 +176,14 @@ Acceptance:
 
 ## PWA: Installable app
 
-- **PWA-1**: The game can be installed to the home screen from the published site (under `/dot-line/`) as well as locally. The installed app opens full screen without browser bars (standalone), in portrait or landscape (VR-44, VR-45, VR-52).
+- **PWA-1**: The game can be installed to the home screen from the published site (under `/dots-and-boxes-connected/`) as well as locally. The installed app opens full screen without browser bars (standalone), in portrait or landscape (VR-44, VR-45, VR-52).
 - **PWA-2**: The install icon is the logo on a cream tile: 192 and 512 px icons on a rounded tile, and a 512 px maskable icon and a 180 px Apple touch icon on a full square that the launcher shapes itself, with the logo inside the central 80% safe zone so a circle or squircle mask never cuts it (VR-42, VR-43).
 - **PWA-3**: The splash screen and status bar use the cream background; the status bar turns cocoa when the device is in dark mode (VR-46).
 - **PWA-4**: After the first visit everything works offline: setup, playing, the computer player, the rules, both languages, the font and the icons. Reloading any app address offline opens the game (VR-47).
 - **PWA-5**: A new version installs quietly and takes effect the next time the game is opened, with no update prompt; the saved game is kept (PS-6) (VR-48, VR-49).
 - **PWA-6**: The installed app's name follows the language chosen before installing: "Крапки й квадрати: ланцюжок" by default, "Dots and Boxes: Connected" with English. The short name launchers fall back to is «Крапки й квадрати» / "Dots & Boxes" (VR-50, VR-51, UP-15).
 
-Acceptance (checked on a build with `BASE_PATH=/dot-line/` and by hand, not by unit tests):
+Acceptance (checked on a build with `BASE_PATH=/dots-and-boxes-connected/` and by hand, not by unit tests):
 - Given the build, then it contains the Ukrainian and English manifests, the service worker and every icon the manifests and `index.html` reference.
 - Given I switch the language to English, then the page links the English manifest.
 - Given I visited the game once, when I reload with the network off, then the game opens and plays, computer player included.

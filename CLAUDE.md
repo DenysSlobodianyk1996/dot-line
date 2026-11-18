@@ -24,9 +24,9 @@ Specs live in `docs/` (layout and workflow in `docs/README.md`). Domain terms ar
 
 Tests: specs sit in `__tests__/` folders next to the code (`*.spec.ts`) and check external behavior only (spec "Testing Decisions"). Shared helpers live in `src/test/`: `mountGamePage({ storage })` mounts the whole app at `/game` with real router, i18n and localStorage, and calling it again simulates a reload. `src/test/game-page.ts` is the page driver (`startGame`, `startComputerGame`, `clickDot`, `waitForComputer`, …) and the only place that knows the board's DOM; extend it rather than querying the DOM in specs. Computer-turn specs fake only `setTimeout`/`clearTimeout` (faking `setImmediate` hangs `flushPromises`). `src/test/setup.ts` clears localStorage and unmounts after each test. Tests and helpers are type-checked through `tsconfig.vitest.json`.
 
-CI: `.github/workflows/ci.yml` runs type-check, `lint-check` and tests on every pull request. Deployment: `.github/workflows/deploy.yml` runs the tests, then publishes to GitHub Pages on every push to `master`. It builds with `BASE_PATH=/dot-line/`, which `vite.config.ts` reads as Vite's `base` and the router picks up through `import.meta.env.BASE_URL`, then copies `dist/index.html` to `404.html` so history-mode reloads work. Keep asset and route URLs base-relative (no hard-coded `/…` paths in code).
+CI: `.github/workflows/ci.yml` runs type-check, `lint-check` and tests on every pull request. Deployment: `.github/workflows/deploy.yml` runs the tests, then publishes to GitHub Pages on every push to `master`. It builds with `BASE_PATH=/<repo name>/` (`/dots-and-boxes-connected/`), which `vite.config.ts` reads as Vite's `base` and the router picks up through `import.meta.env.BASE_URL`, then copies `dist/index.html` to `404.html` so history-mode reloads work. Keep asset and route URLs base-relative (no hard-coded `/…` paths in code).
 
-PWA: `vite-plugin-pwa` in `vite.config.ts` (`autoUpdate`, Workbox precache of all build output, navigation fallback to `index.html`). It emits the Ukrainian manifest; a small plugin there adds the English one and `404.html`. File names live in `src/static/manifests.ts`, and `setLocale()` swaps the `<link rel="manifest">` href with the language. Verify with `BASE_PATH=/dot-line/ npm run build` (both manifests, `sw.js`, icons in `dist/`), not unit tests. New static assets must match the precache `globPatterns` to work offline.
+PWA: `vite-plugin-pwa` in `vite.config.ts` (`autoUpdate`, Workbox precache of all build output, navigation fallback to `index.html`). It emits the Ukrainian manifest; a small plugin there adds the English one and `404.html`. File names live in `src/static/manifests.ts`, and `setLocale()` swaps the `<link rel="manifest">` href with the language. Verify with `BASE_PATH=/dots-and-boxes-connected/ npm run build` (both manifests, `sw.js`, icons in `dist/`), not unit tests. New static assets must match the precache `globPatterns` to work offline.
 
 ## Architecture
 
@@ -62,7 +62,7 @@ PWA: `vite-plugin-pwa` in `vite.config.ts` (`autoUpdate`, Workbox precache of al
 
 ### Issue tracker
 
-Issues live in GitHub Issues for `DenysSlobodianyk1996/dot-line`, managed via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+Issues live in GitHub Issues for `DenysSlobodianyk1996/dots-and-boxes-connected`, managed via the `gh` CLI. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
