@@ -20,7 +20,7 @@ const en = {
     name: 'Name',
     color: 'Color',
     size: 'Size',
-    sizeHint: 'From 2 to 10',
+    sizeHint: 'From {min} to {max}',
     save: 'Save',
     mode: 'Game mode',
     modeComputer: 'Versus computer',

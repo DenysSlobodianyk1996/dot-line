@@ -21,7 +21,7 @@ const uk: typeof en = {
     name: 'Ім’я',
     color: 'Колір',
     size: 'Розмір поля',
-    sizeHint: 'Від 2 до 10',
+    sizeHint: 'Від {min} до {max}',
     save: 'Зберегти',
     mode: 'Режим гри',
     modeComputer: 'Проти комп’ютера',

@@ -17,7 +17,7 @@
         v-model="difficulty"
         :label="t('setup.difficulty')"
         :options="difficultyOptions"
-        :hint="t(DIFFICULTY_HINT_KEYS[difficulty])"
+        :hint="difficultyHint"
       />
 
       <div class="flex flex-col gap-2 sm:flex-row">
@@ -50,7 +50,7 @@
       <Field
         name="size"
         :label="t('setup.size')"
-        :rules="`required|integer|min_value:2|max_value:10`"
+        :rules="`required|integer|min_value:${MIN_SIZE}|max_value:${MAX_SIZE}`"
         v-slot="{ field, errorMessage }"
       >
         <div class="flex flex-col gap-2">
@@ -66,7 +66,9 @@
           />
           <!-- the hint always shows; a validation error goes below it, and both describe the
                input (GS-2) -->
-          <BaseHint :id="sizeHintId">{{ t('setup.sizeHint') }}</BaseHint>
+          <BaseHint :id="sizeHintId">{{
+            t('setup.sizeHint', { min: MIN_SIZE, max: MAX_SIZE })
+          }}</BaseHint>
           <BaseFieldError :id="sizeErrorId" :errorMessage />
         </div>
       </Field>
@@ -94,7 +96,7 @@ import BaseHint from '@/shared/components/BaseHint.vue'
 
 import { computerColorFor, randomSwatch } from '@/utils'
 import { StorageService } from '@/services'
-import { DIFFICULTY, GAME_MODE } from '@/static'
+import { DIFFICULTY, GAME_MODE, MAX_SIZE, MIN_SIZE } from '@/static'
 
 defineRule('required', required)
 defineRule('integer', integer)
@@ -112,15 +114,11 @@ const GAME_MODE_OPTIONS: { value: GameMode; labelKey: string }[] = [
   { value: 'computer', labelKey: 'setup.modeComputer' },
   { value: 'twoPlayers', labelKey: 'setup.modeTwoPlayers' },
 ]
-const DIFFICULTY_OPTIONS: { value: Difficulty; labelKey: string }[] = [
-  { value: 'easy', labelKey: 'setup.easy' },
-  { value: 'normal', labelKey: 'setup.normal' },
+// hintKey: the hint under the difficulty switch describes only the selected difficulty (VC-26)
+const DIFFICULTY_OPTIONS: { value: Difficulty; labelKey: string; hintKey: string }[] = [
+  { value: 'easy', labelKey: 'setup.easy', hintKey: 'setup.easyHint' },
+  { value: 'normal', labelKey: 'setup.normal', hintKey: 'setup.normalHint' },
 ]
-// the hint under the difficulty switch describes only the selected difficulty (VC-26)
-const DIFFICULTY_HINT_KEYS: Record<Difficulty, string> = {
-  easy: 'setup.easyHint',
-  normal: 'setup.normalHint',
-}
 const GAME_MODES = GAME_MODE_OPTIONS.map(({ value }) => value)
 const DIFFICULTIES = DIFFICULTY_OPTIONS.map(({ value }) => value)
 
@@ -139,6 +137,10 @@ const modeOptions = computed(() =>
 const difficultyOptions = computed(() =>
   DIFFICULTY_OPTIONS.map(({ value, labelKey }) => ({ value, label: t(labelKey) })),
 )
+const difficultyHint = computed(() => {
+  const option = DIFFICULTY_OPTIONS.find(({ value }) => value === difficulty.value)
+  return option ? t(option.hintKey) : undefined
+})
 
 // what the form fields hold; the game mode and difficulty come from the switches
 type SetupFormValues = Omit<GameSetupForm, 'gameMode' | 'difficulty'>

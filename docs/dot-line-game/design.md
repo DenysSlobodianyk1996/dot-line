@@ -71,7 +71,7 @@ Message keys added to both locales (`src/i18n/locales`):
 | `setup.difficulty` | Difficulty | Складність |
 | `setup.easy` | Easy | Легко |
 | `setup.normal` | Normal | Нормально |
-| `setup.sizeHint` | From 2 to 10 | Від 2 до 10 |
+| `setup.sizeHint` | From {min} to {max} (From 2 to 10) | Від {min} до {max} (Від 2 до 10) |
 | `setup.easyHint` | The computer picks a random line. | Комп’ютер обирає випадкову лінію. |
 | `setup.normalHint` | The computer takes squares whenever it can and tries not to give you any. | Комп’ютер забирає квадрати, коли може, і намагається не віддавати їх вам. |
 | `setup.you` | You | Ви |
@@ -280,7 +280,7 @@ All sizes and colors come from the approved canvas.
     - With a selection, clicking a valid target calls `game.drawLine(selected, dot)` and clears the selection.
     - Otherwise, clicking a valid start selects it (or switches the selection to it).
     - Anything else is ignored.
-- **GameStatus.vue** [GB-4, END-2]: a `w-50` column with Turn (swatch and name), Score (`PlayerScore` rows), the hint and a Stop button (`BaseButton` secondary). Stop opens a dialog: a `fixed inset-0 bg-ink/40` backdrop and a `w-75 p-6 rounded-lg border shadow-lg` card with "Stop the game?", "Whoever owns more squares now wins.", the scores, and Cancel (secondary) and Stop game (primary). Clicking the backdrop cancels; confirming emits `stop`.
+- **GameStatus.vue** [GB-4, END-2]: a `w-53` column (the same width as GameResult, so nothing moves when the result replaces it [MB-9]) with Turn (swatch and name), Score (`PlayerScore` rows), the hint and a Stop button (`BaseButton` secondary). Stop opens a dialog: a `fixed inset-0 bg-ink/40` backdrop and a `w-75 p-6 rounded-lg border shadow-lg` card with "Stop the game?", "Whoever owns more squares now wins.", the scores, and Cancel (secondary) and Stop game (primary). Clicking the backdrop cancels; confirming emits `stop`.
 - **GameResult.vue** [END-3..6]: a `w-53` column with "Result", "`<name>` wins" with a swatch or "Draw", "All squares are filled." or "The game was stopped.", the scores with the winner first, and New game settings (secondary) and Rematch (primary).
   - New game settings: `StorageService.removeItem(CURRENT_GAME)` then `game.reset()`.
   - Rematch: `game.start()`.
@@ -292,7 +292,7 @@ Versus computer changes to these components are described in [Versus computer](#
 
 - **Required marker** [GS-1, GS-2]: `BaseLabel` takes a `required` prop that appends ` *` in an `aria-hidden="true"` `text-danger` span, and the matching `BaseInput` gets `aria-required="true"`. Used on each player's Name and on Size; the color swatches aren't marked. No "* required" legend.
 - **PlayerField.vue**: the name `<input>` has `maxlength="15"`, and the field's rules add `max:15` so a pasted or restored value is still validated, with its own message `validation.maxLength` ("Player 2 name can be at most 15 characters.").
-- **GameSetup.vue**: the size field starts at 4 and its rules are `required|integer|min_value:2|max_value:10` [GS-2]. Under the input sit the `setup.sizeHint` hint (`BaseHint`) and then any validation error, so the hint never disappears. The input's `aria-describedby` names the hint, plus the error's id while one shows, and `aria-invalid="true"` is set while there is an error.
+- **GameSetup.vue**: the size field starts at 4 and its rules are `required|integer|min_value:2|max_value:10`; the bounds are `MIN_SIZE`/`MAX_SIZE` in `src/static/board.ts`, which also fill the hint [GS-2]. Under the input sit the `setup.sizeHint` hint (`BaseHint`) and then any validation error, so the hint never disappears. The input's `aria-describedby` names the hint, plus the error's id while one shows, and `aria-invalid="true"` is set while there is an error.
 - Names are never truncated. Every place that shows a name (GameStatus turn, PlayerScore, GameResult heading) drops `truncate` and uses `min-w-0 break-words`, so a long name wraps; the color swatch stays `shrink-0` and aligned to the first line.
 
 ## Persistence [PS-1..3]
@@ -303,7 +303,7 @@ Versus computer changes to these components are described in [Versus computer](#
 
 The phone layout is the default, and `sm:` classes (640 px and up) restore the desktop layout described above.
 
-- **Game.vue**: `flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-center sm:gap-6`. The board wrapper is centered on phones (`self-center sm:self-start`), and the panel is full width (`w-full`, with `sm:w-50 sm:shrink-0` for GameStatus and `sm:w-53 sm:shrink-0` for GameResult). From `sm` up, `justify-center` centers the board + panel group horizontally [MB-9].
+- **Game.vue**: `flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-center sm:gap-6`. The board wrapper is centered on phones (`self-center sm:self-start`), and the panel is full width (`w-full`, with `sm:w-53 sm:shrink-0` for both GameStatus and GameResult, so the centered group keeps its width when the game ends). From `sm` up, `justify-center` centers the board + panel group horizontally [MB-9].
 - **Board size** (GameBoard): `cell = clamp(floor((viewportWidth − 16 − sidePanel − 34) / N), 24, 48)`.
   - `viewportWidth` is `document.documentElement.clientWidth`, which excludes a desktop scrollbar.
   - The 16 px is the app's `p-2` gutters, and the 34 px is the board's padding plus border.
@@ -455,7 +455,7 @@ The palette values are the prototype's (spec token table); `on-accent` and `dang
 
 - **Font**: Nunito Variable (Latin + Cyrillic) from `@fontsource-variable/nunito`, bundled so it works offline; `--font-sans: 'Nunito Variable', ui-rounded, system-ui, sans-serif` [VR-2].
 - **Shapes**: `--radius-md: 0.75rem` (12 px: buttons, fields, switches, the language toggle) and `--radius-lg: 1.25rem` (20 px: fieldsets, board, dialog). Shadows stay Tailwind's `shadow-sm` / `shadow-lg` [VR-3].
-- **Buttons**: primary `bg-accent text-on-accent hover:bg-accent-hover` with an `accent` focus ring offset on `paper`; secondary `bg-surface-strong text-ink shadow-sm hover:bg-border` [VR-4].
+- **Buttons**: primary `bg-accent text-on-accent hover:bg-accent-hover` with an `accent` focus ring offset on `paper`; secondary `bg-surface-strong text-ink shadow-sm hover:bg-border`; both share `inline-flex items-center justify-center px-4 py-2 text-sm`, so side-by-side buttons are the same size and their labels sit centered [VR-4, MB-6].
 - **Backdrops**: the Stop dialog uses `bg-ink/40`, the rules panel `bg-black/40`.
 - **Player colors** stay as they are in both themes: lines in the owner's color, owned squares at 30% with the initial in the owner's color [VR-7].
 - **useTheme.ts** [VR-11, VR-14, VR-15]: the system preference follows `matchMedia('(prefers-color-scheme: dark)')` live; the override is the saved `THEME` value (`src/static/storage-keys.ts`, through `StorageService`); the effective theme is the override, else the system preference. It sets `document.documentElement.dataset.theme`, and `toggle()` saves the opposite of the current theme as the override.

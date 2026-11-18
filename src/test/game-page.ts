@@ -153,6 +153,14 @@ export function randomFor(first: 1 | 2) {
   return first === 1 ? 0 : 0.99
 }
 
+// an element's text as a screen reader reads it: parts hidden from assistive technology (such as
+// a label's required marker `*`) are left out (GS-1, GS-2)
+export function accessibleText(element: Element) {
+  const copy = element.cloneNode(true) as Element
+  copy.querySelectorAll('[aria-hidden="true"]').forEach((el) => el.remove())
+  return copy.textContent?.trim() ?? ''
+}
+
 export class GamePage {
   constructor(readonly wrapper: VueWrapper) {}
 
@@ -430,9 +438,7 @@ export class GamePage {
   // a setup field's label as a screen reader reads it: parts hidden from assistive technology
   // (such as the required marker) are left out
   fieldAccessibleLabel(id: 'player1.name' | 'player2.name' | 'size') {
-    const label = this.label(id).element.cloneNode(true) as HTMLElement
-    label.querySelectorAll('[aria-hidden="true"]').forEach((el) => el.remove())
-    return label.textContent?.trim() ?? ''
+    return accessibleText(this.label(id).element)
   }
 
   // whether a setup field is announced as required
