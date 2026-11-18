@@ -10,7 +10,7 @@
 4. **Squares**: drawing the fourth side of a square makes it yours. One line can close two squares. Turns alternate after every line.
 5. **End**: the game ends when every square has an owner, or when a player presses **Stop** and confirms. More squares wins, and equal scores are a draw. **Rematch** keeps the players and size; **New game** returns to setup.
 
-The game is saved in the browser's localStorage, so reloading the page continues where you left off. It works on desktop and on phones: on narrow screens the board sits above the panel and its squares shrink to fit. A short "How to play" guide is shown under the setup form, and during a game the **Show rules** button at the bottom brings it back. The interface is in Ukrainian by default; switch to English with the **UA / EN** toggle at the top right, and the app remembers your choice.
+The game is saved in the browser's localStorage, so reloading the page continues where you left off. It works on desktop and on phones: on narrow screens the board sits above the panel and its squares shrink to fit. A short "How to play" guide is shown under the setup form, and during a game the **Show rules** button at the bottom brings it back. On first launch the interface follows your device's language (Ukrainian on a Ukrainian device, English otherwise); switch to English with the **UA / EN** toggle at the top right, and the app remembers your choice.
 
 ## Getting started
 

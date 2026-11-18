@@ -3,8 +3,8 @@ import { mountGamePage } from '@/test/mount-game-page'
 import { GamePage, openGamePage } from '@/test/game-page'
 
 describe('language toggle', () => {
-  it('starts in Ukrainian with UA pressed (I18N-2, I18N-5, UP-15)', async () => {
-    const page = await mountGamePage()
+  it('starts in Ukrainian with UA pressed on a Ukrainian device (I18N-2, I18N-5, UP-15, AR-6)', async () => {
+    const page = await mountGamePage({ deviceLanguage: 'uk-UA' })
 
     expect(page.get('button[lang="uk"]').attributes('aria-pressed')).toBe('true')
     expect(page.get('button[lang="en"]').attributes('aria-pressed')).toBe('false')
@@ -13,7 +13,7 @@ describe('language toggle', () => {
   })
 
   it('switches the text, page language and tab title when EN is pressed (I18N-3, APP-1, UP-15)', async () => {
-    const page = await mountGamePage()
+    const page = await mountGamePage({ deviceLanguage: 'uk-UA' })
 
     await page.get('button[lang="en"]').trigger('click')
 
@@ -25,20 +25,49 @@ describe('language toggle', () => {
   })
 
   it('keeps the chosen language after a reload (I18N-4)', async () => {
-    const page = await mountGamePage()
+    const page = await mountGamePage({ deviceLanguage: 'uk-UA' })
     await page.get('button[lang="en"]').trigger('click')
     page.unmount()
 
-    const reloaded = await mountGamePage()
+    const reloaded = await mountGamePage({ deviceLanguage: 'uk-UA' })
 
     expect(reloaded.text()).toContain('Game Setup')
     expect(document.documentElement.lang).toBe('en')
   })
 })
 
+describe('first launch follows the device language', () => {
+  it('picks Ukrainian on a uk-UA device (I18N-2, AR-6)', async () => {
+    const page = await mountGamePage({ deviceLanguage: 'uk-UA' })
+
+    expect(page.get('button[lang="uk"]').attributes('aria-pressed')).toBe('true')
+    expect(document.documentElement.lang).toBe('uk')
+    expect(document.title).toBe('Крапки й квадрати: ланцюжок')
+    expect(new GamePage(page).manifestHref()).toBe('/manifest.uk.webmanifest')
+  })
+
+  it.each(['en-US', 'de-DE'])('picks English on a %s device (I18N-2, AR-6)', async (language) => {
+    const page = await mountGamePage({ deviceLanguage: language })
+
+    expect(page.text()).toContain('Game Setup')
+    expect(page.get('button[lang="en"]').attributes('aria-pressed')).toBe('true')
+    expect(document.documentElement.lang).toBe('en')
+    expect(document.title).toBe('Dots and Boxes: Connected')
+    expect(new GamePage(page).manifestHref()).toBe('/manifest.en.webmanifest')
+  })
+
+  it('keeps a saved language over the device language (I18N-4, AR-7)', async () => {
+    const page = await mountGamePage({ deviceLanguage: 'en-US', storage: { LOCALE: 'uk' } })
+
+    expect(page.get('button[lang="uk"]').attributes('aria-pressed')).toBe('true')
+    expect(document.documentElement.lang).toBe('uk')
+    expect(document.title).toBe('Крапки й квадрати: ланцюжок')
+  })
+})
+
 describe('install manifest', () => {
-  it('links the Ukrainian manifest on the first visit (VR-50)', async () => {
-    const page = new GamePage(await mountGamePage())
+  it('links the Ukrainian manifest on the first visit from a Ukrainian device (VR-50)', async () => {
+    const page = new GamePage(await mountGamePage({ deviceLanguage: 'uk-UA' }))
 
     expect(page.manifestHref()).toBe('/manifest.uk.webmanifest')
   })

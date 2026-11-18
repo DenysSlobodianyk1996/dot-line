@@ -6,12 +6,18 @@ export interface MountGamePageOptions {
   // localStorage entries to seed before the app loads, e.g. { LOCALE: 'en', CURRENT_GAME: {...} };
   // objects are JSON-serialized, strings are stored as they are (like StorageService)
   storage?: Record<string, object | string>
+  // the device language (`navigator.language`); jsdom's own is 'en-US'
+  deviceLanguage?: string
 }
 
 // Mounts the whole app at /game with the real router, i18n and localStorage, the way main.ts does.
 // Modules are re-imported on every call, so i18n reads the seeded locale and a second call
 // in the same test simulates a page reload from whatever is saved in localStorage.
-export async function mountGamePage({ storage = {} }: MountGamePageOptions = {}) {
+export async function mountGamePage({ storage = {}, deviceLanguage }: MountGamePageOptions = {}) {
+  if (deviceLanguage) {
+    // undone by vi.restoreAllMocks() in src/test/setup.ts
+    vi.spyOn(navigator, 'language', 'get').mockReturnValue(deviceLanguage)
+  }
   for (const [key, value] of Object.entries(storage)) {
     localStorage.setItem(key, typeof value === 'object' ? JSON.stringify(value) : value)
   }

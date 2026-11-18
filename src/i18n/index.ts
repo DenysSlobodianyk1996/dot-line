@@ -7,24 +7,30 @@ import uk from './locales/uk'
 
 export const SUPPORTED_LOCALES = ['uk', 'en'] as const
 export type AppLocale = (typeof SUPPORTED_LOCALES)[number]
-export const DEFAULT_LOCALE: AppLocale = 'uk'
 
 function isAppLocale(value: unknown): value is AppLocale {
   return SUPPORTED_LOCALES.includes(value as AppLocale)
 }
 
-// a saved choice wins; Ukrainian only on the first visit (I18N-2, I18N-4)
+// the first launch follows the device: Ukrainian on a Ukrainian device, English otherwise (I18N-2, AR-6)
+function deviceLocale(): AppLocale {
+  return navigator.language.toLowerCase().startsWith('uk') ? 'uk' : 'en'
+}
+
+// a saved choice always wins (I18N-4, AR-7)
 const savedLocale = StorageService.getItem(LOCALE)
 
 export const i18n = createI18n({
   legacy: false,
-  locale: isAppLocale(savedLocale) ? savedLocale : DEFAULT_LOCALE,
+  locale: isAppLocale(savedLocale) ? savedLocale : deviceLocale(),
   fallbackLocale: 'en',
   messages: { uk, en },
 })
 
 // the manifest link decides the installed app's name, so it follows the language (VR-50, VR-51)
+// The Android app's build has no install manifest, so it links none (AR-1)
 function linkManifest(locale: AppLocale) {
+  if (import.meta.env.MODE === 'capacitor') return
   let link = document.head.querySelector<HTMLLinkElement>('link[rel="manifest"]')
   if (!link) {
     link = document.createElement('link')
