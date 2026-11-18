@@ -10,6 +10,10 @@ const uk: typeof en = {
     uk: 'Українська',
     en: 'English',
   },
+  theme: {
+    light: 'Світла тема',
+    dark: 'Темна тема',
+  },
   setup: {
     title: 'Налаштування гри',
     player: 'Гравець {number}',

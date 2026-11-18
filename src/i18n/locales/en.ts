@@ -8,6 +8,11 @@ const en = {
     uk: 'Українська',
     en: 'English',
   },
+  // the theme button names the theme it switches to (VR-16)
+  theme: {
+    light: 'Light theme',
+    dark: 'Dark theme',
+  },
   setup: {
     title: 'Game Setup',
     player: 'Player {number}',

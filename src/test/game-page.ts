@@ -84,6 +84,44 @@ export async function startComputerGame(options: Omit<StartGameOptions, 'mode' |
   return startGame({ ...options, mode: 'computer' })
 }
 
+export type TestTheme = 'light' | 'dark'
+
+// Stubs the device's light/dark setting (prefers-color-scheme) before the page opens; set() changes
+// it live, like switching the phone to dark mode while the game is open (VR-11, VR-15).
+// Other media queries (the board's layout) keep answering "no match".
+export function stubSystemTheme(initial: TestTheme) {
+  let dark = initial === 'dark'
+  const listeners = new Set<(event: MediaQueryListEvent) => void>()
+  const isDarkQuery = (query: string) => query.includes('prefers-color-scheme: dark')
+  vi.spyOn(window, 'matchMedia').mockImplementation(
+    (query: string) =>
+      ({
+        get matches() {
+          return isDarkQuery(query) && dark
+        },
+        media: query,
+        onchange: null,
+        addListener: () => {},
+        removeListener: () => {},
+        addEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => {
+          if (isDarkQuery(query)) listeners.add(listener)
+        },
+        removeEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => {
+          listeners.delete(listener)
+        },
+        dispatchEvent: () => false,
+      }) as unknown as MediaQueryList,
+  )
+  return {
+    async set(theme: TestTheme) {
+      dark = theme === 'dark'
+      const event = { matches: dark, media: '(prefers-color-scheme: dark)' } as MediaQueryListEvent
+      listeners.forEach((listener) => listener(event))
+      await flushPromises()
+    },
+  }
+}
+
 // Value for Math.random that makes start() pick the given player out of two.
 export function randomFor(first: 1 | 2) {
   return first === 1 ? 0 : 0.99
@@ -101,6 +139,37 @@ export class GamePage {
 
   text() {
     return this.wrapper.text()
+  }
+
+  // ---- header ----
+
+  private get header() {
+    return this.wrapper.get('header')
+  }
+
+  // the game name at the start of the header (VR-18, VR-22)
+  headerTitle() {
+    return this.header.get('[data-app-title]').text()
+  }
+
+  private get themeButton() {
+    return this.header.get('button[data-theme-toggle]')
+  }
+
+  // what the theme button says it switches to, e.g. 'Dark theme' (VR-16)
+  themeButtonLabel() {
+    return this.themeButton.attributes('aria-label')
+  }
+
+  async toggleTheme() {
+    await this.themeButton.trigger('click')
+    await flushPromises()
+  }
+
+  // the theme the page is drawn in: the root element's data-theme
+  theme(): TestTheme | null {
+    const theme = document.documentElement.dataset.theme
+    return theme === 'light' || theme === 'dark' ? theme : null
   }
 
   // ---- setup screen ----
