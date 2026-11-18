@@ -4,7 +4,9 @@ import { useTheme, type Theme } from '@/shared/composables/useTheme'
 
 // The status bar takes the page background (--wc-paper) and icons that read on it, and follows
 // the theme live: the device's setting and the theme button (AR-4). The color comes from the
-// tokens in styles.css, so there is no second copy of the palette.
+// tokens in styles.css, so there is no second copy of the palette. From Android 15 the app is
+// edge-to-edge and the background call does nothing: the page itself runs under the status bar
+// (viewport-fit=cover, safe-area padding in styles.css), so its --wc-paper shows there instead.
 function paperColor() {
   return getComputedStyle(document.documentElement).getPropertyValue('--wc-paper').trim()
 }

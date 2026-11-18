@@ -28,7 +28,7 @@
       aria-modal="true"
       :aria-labelledby="titleId"
       tabindex="-1"
-      class="fixed inset-y-0 right-0 z-30 flex w-full flex-col gap-4 overflow-y-auto bg-surface p-5 shadow-2xl outline-none sm:w-96 sm:rounded-l-3xl"
+      class="fixed inset-y-0 right-0 z-30 flex w-full flex-col gap-4 overflow-y-auto bg-surface p-safe-5 shadow-2xl outline-none sm:w-96 sm:rounded-l-3xl"
       @keydown.esc="close"
       @keydown.tab="trapFocus"
     >
