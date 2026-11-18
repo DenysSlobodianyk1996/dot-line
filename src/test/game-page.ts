@@ -711,13 +711,24 @@ export class GamePage {
     return this.panelSection('Result').querySelector('h3')!.textContent!.trim()
   }
 
-  // Rematch and New game; first = who moves first after a rematch
+  // the result panel's buttons in order, each with its label and whether the whole label is shown:
+  // nothing around it cuts it off or keeps it on one line, so on a narrow phone it wraps instead
+  // (END-5, MB-6). jsdom has no layout, so this reads the Tailwind classes.
+  resultButtons() {
+    const panel = this.wrapper.get('[data-result-panel]').element
+    return [...panel.querySelectorAll('button')].map((button) => ({
+      label: button.textContent!.trim(),
+      shownInFull: !ancestry(button).some(clips),
+    }))
+  }
+
+  // Rematch and New game settings; first = who moves first after a rematch
   async rematch(first: 1 | 2 = 1) {
     await this.withFirstPlayer(first, () => this.click('Rematch'))
   }
 
-  async newGame() {
-    await this.click('New game')
+  async newGameSettings() {
+    await this.click('New game settings')
   }
 
   // ---- names (GB-5) ----

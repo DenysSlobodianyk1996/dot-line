@@ -76,7 +76,7 @@ Acceptance:
 - **END-2**: A **Stop** button ends the game early, after the player confirms.
 - **END-3**: The winner is the player with more owned squares. Equal scores (including 0–0) are a **Draw**.
 - **END-4**: When the game ends, the final board stays visible and a result panel shows the winner (name and color), or "Draw", plus both scores.
-- **END-5**: **New game** in the result panel clears the saved game and opens the setup screen.
+- **END-5**: **New game settings** in the result panel clears the saved game and opens the setup screen.
 - **END-6**: **Rematch** in the result panel keeps both players, the size, the game mode and the difficulty, clears all lines and owned squares, and picks a new random first player (VC-18).
 - **END-7**: No moves are possible after the game ends.
 
@@ -105,7 +105,7 @@ Acceptance:
 - **MB-3**: Squares are 48 px when the board fits the screen. On narrower screens they shrink so the board fits the available width, down to 24 px.
 - **MB-4**: Each dot's tap area is a square the size of one board square (at most 44 px), centered on the dot, so neighboring dots never share a tap area.
 - **MB-5**: The Stop confirmation dialog fits the screen with at least 16 px on each side.
-- **MB-6**: Below 640 px wide, the result panel sits below the board at full width, with New game and Rematch side by side at equal width.
+- **MB-6**: Below 640 px wide, the result panel sits below the board at full width, with New game settings and Rematch side by side at equal width. A label that does not fit wraps onto more lines; it is never cut off.
 - **MB-7**: Below 640 px wide, the setup form shows Player 1 above Player 2.
 - **MB-8**: Below 640 px wide, buttons on the game screen are at least 44 px tall.
 
@@ -207,7 +207,7 @@ One person plays against the **computer player**. Stories CM-1..40 and the decis
 Setup:
 
 - **VC-1**: The setup screen starts with a **Game mode** switch: **Versus computer** or **Two players**. Two players works exactly as before computer mode existed (CM-1, CM-34).
-- **VC-2**: On a first visit setup opens with Versus computer and Normal selected. Afterwards it opens with the game mode and difficulty of the last game started, including after New game. These choices are saved only when a game starts, not when the switches are pressed, and the difficulty is saved even when a Two players game starts, for the next Versus computer game (CM-2, CM-3, CM-7, CM-29).
+- **VC-2**: On a first visit setup opens with Versus computer and Normal selected. Afterwards it opens with the game mode and difficulty of the last game started, including after New game settings. These choices are saved only when a game starts, not when the switches are pressed, and the difficulty is saved even when a Two players game starts, for the next Versus computer game (CM-2, CM-3, CM-7, CM-29).
 - **VC-3**: In Versus computer mode the form asks only for the person's name and color (a "You" fieldset) and the size. A read-only "Opponent" fieldset shows the robot icon, "Computer" and the computer player's color (CM-4).
 - **VC-4**: A **Difficulty** switch (**Easy** / **Normal**) sits right under the game mode switch and is shown only in Versus computer mode (CM-5, CM-6).
 - **VC-5**: In Versus computer mode the person's name is rejected with "This name belongs to the computer" when it matches the computer player's name in any supported language ("Комп’ютер", "Computer"), ignoring case, surrounding spaces and the apostrophe variant (', ’ or ʼ). Two players mode has no such check (CM-8).
@@ -221,7 +221,7 @@ Playing:
 - **VC-10**: On the computer player's turn, the turn shows its swatch, robot and name with a pulsing "Thinking…" below, announced politely to assistive technology, and the hint is hidden. After about one second the computer draws its line. In the same place a short message then says what it did, also announced politely: "Computer drew a line", or "Computer drew a line and claimed a square" ("…two squares"), until the person draws (CM-14, CM-15, CM-37).
 - **VC-11**: The computer player follows the same rules as a person: only lines allowed by MV-1..3, one line per turn, the turn always passes (TR-1), the squares it closes become its owned squares and count toward its score (SQ-1..3), and the game ends as soon as the last square is owned (END-1) (CM-20, CM-21, CM-26).
 - **VC-12**: During the computer player's turn the board is locked: no dot is highlighted and clicks on dots do nothing (CM-16).
-- **VC-13**: Stop works during the computer player's turn, and stopping cancels its pending move. While the Stop dialog is open the computer player waits; Cancel gives it its usual pause again. Rematch, New game and leaving the game screen cancel it too (CM-17).
+- **VC-13**: Stop works during the computer player's turn, and stopping cancels its pending move. While the Stop dialog is open the computer player waits; Cancel gives it its usual pause again. Rematch, New game settings and leaving the game screen cancel it too (CM-17).
 - **VC-14**: The computer player's newest line has a halo in its color until the person draws the next line. A finished game shows no halo (CM-18).
 - **VC-15**: On the person's turn, the turn reads "Your turn" (with the person's swatch) instead of the person's name (CM-19).
 - **VC-16**: **Easy** draws a random line among all the lines allowed right now (CM-22).

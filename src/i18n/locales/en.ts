@@ -82,7 +82,7 @@ const en = {
     completed: 'All squares are filled.',
     stopped: 'The game was stopped.',
     score: 'Score',
-    newGame: 'New game',
+    newGameSettings: 'New game settings',
     rematch: 'Rematch',
   },
   rules: {
