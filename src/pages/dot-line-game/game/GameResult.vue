@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-full flex-col gap-4 sm:w-53 sm:shrink-0">
+  <div data-result-panel class="flex w-full flex-col gap-4 sm:w-53 sm:shrink-0">
     <div class="flex flex-col gap-1">
       <div class="text-sm font-medium text-ink-soft">{{ t('result.title') }}</div>
       <!-- the whole name, wrapping if needed (GB-5) -->
@@ -30,8 +30,8 @@
 
     <!-- phones: equal-width 44 px buttons (MB-6, MB-8) -->
     <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-      <BaseButton color="secondary" class="min-h-11 sm:min-h-0" @click="emit('newGame')">
-        {{ t('result.newGame') }}
+      <BaseButton color="secondary" class="min-h-11 sm:min-h-0" @click="emit('newGameSettings')">
+        {{ t('result.newGameSettings') }}
       </BaseButton>
       <BaseButton color="primary" class="min-h-11 sm:min-h-0" @click="emit('rematch')">
         {{ t('result.rematch') }}
@@ -54,7 +54,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  newGame: []
+  newGameSettings: []
   rematch: []
 }>()
 

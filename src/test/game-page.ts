@@ -22,6 +22,13 @@ export const SWATCHES = {
 } as const
 export type SwatchKey = keyof typeof SWATCHES
 
+// a hex color as its swatch key, anything else unchanged
+function paintKeyOf(color: string | null): string {
+  const hex = color?.toLowerCase()
+  const match = Object.entries(SWATCHES).find(([, swatch]) => swatch.hex === hex)
+  return match ? match[0] : (color ?? '')
+}
+
 export interface TestPlayer {
   name: string
   color: SwatchKey
@@ -146,6 +153,14 @@ export function randomFor(first: 1 | 2) {
   return first === 1 ? 0 : 0.99
 }
 
+// an element's text as a screen reader reads it: parts hidden from assistive technology (such as
+// a label's required marker `*`) are left out (GS-1, GS-2)
+export function accessibleText(element: Element) {
+  const copy = element.cloneNode(true) as Element
+  copy.querySelectorAll('[aria-hidden="true"]').forEach((el) => el.remove())
+  return copy.textContent?.trim() ?? ''
+}
+
 export class GamePage {
   constructor(readonly wrapper: VueWrapper) {}
 
@@ -263,12 +278,71 @@ export class GamePage {
 
   // the rules points, joined, as the open panel shows them
   rulesText() {
-    return this.rulesPanel.get('ol').text()
+    return this.rulesPanel.get('ol[data-rules-steps]').text()
   }
 
   // each rules point as the open panel shows it, without its number
   rulesPoints() {
-    return this.rulesPanel.findAll('ol > li > span:last-child').map((point) => point.text())
+    return this.rulesPanel
+      .findAll('ol[data-rules-steps] > li > span:last-child')
+      .map((point) => point.text())
+  }
+
+  // The "In pictures" storyboard under the rules (RL-7), or null. Each frame lists what its small board
+  // shows: lines and owned squares by position ('row,col-row,col' / 'row,col', 0-based) with their
+  // player color, the picked Dot1 and the highlighted neighbors. Colors are swatch keys.
+  storyboard() {
+    const section = this.rulesPanel.find<HTMLElement>('[data-rules-storyboard]')
+    if (!section.exists()) return null
+    return {
+      heading: section.get('h3').text(),
+      hiddenFromAssistiveTech: section.attributes('aria-hidden') === 'true',
+      frames: section.findAll('[data-storyboard-frame]').map((frame) => {
+        const colorOf = (element: Element, attribute: 'fill' | 'stroke') =>
+          paintKeyOf(element.getAttribute(attribute))
+        const selected = frame.find('[data-dot1]')
+        return {
+          caption: frame.get('[data-caption]').text(),
+          lines: Object.fromEntries(
+            frame
+              .findAll('[data-line]')
+              .map(({ element }) => [
+                element.getAttribute('data-line'),
+                colorOf(element, 'stroke'),
+              ]),
+          ),
+          squares: Object.fromEntries(
+            frame
+              .findAll('[data-square]')
+              .map(({ element }) => [
+                element.getAttribute('data-square'),
+                { letter: element.textContent?.trim(), color: colorOf(element, 'fill') },
+              ]),
+          ),
+          dot1: selected.exists()
+            ? {
+                at: selected.attributes('data-dot1'),
+                color: colorOf(selected.element, 'stroke'),
+              }
+            : null,
+          neighbors: frame.findAll('[data-neighbor]').map((n) => n.attributes('data-neighbor')),
+        }
+      }),
+    }
+  }
+
+  // every paint (fill and stroke) the storyboard boards use, sorted: player colors as swatch keys,
+  // everything else as written (theme tokens are var(--color-…))
+  storyboardPaints() {
+    const section = this.rulesPanel.get('[data-rules-storyboard]')
+    const paints = new Set<string>()
+    for (const element of section.element.querySelectorAll('svg, svg *')) {
+      for (const attribute of ['fill', 'stroke'] as const) {
+        const value = element.getAttribute(attribute)
+        if (value && value !== 'none') paints.add(paintKeyOf(value))
+      }
+    }
+    return [...paints].sort()
   }
 
   // whether any rules text is shown on the page itself, outside the panel (VR-28)
@@ -356,6 +430,29 @@ export class GamePage {
     return this.wrapper.find<HTMLInputElement>(`[id="${id}"]`)
   }
 
+  // a setup field's label as it is shown, with its required marker, e.g. 'Name *'
+  fieldLabel(id: 'player1.name' | 'player2.name' | 'size') {
+    return this.label(id).text().trim()
+  }
+
+  // a setup field's label as a screen reader reads it: parts hidden from assistive technology
+  // (such as the required marker) are left out
+  fieldAccessibleLabel(id: 'player1.name' | 'player2.name' | 'size') {
+    return accessibleText(this.label(id).element)
+  }
+
+  // whether a setup field is announced as required
+  isRequired(id: 'player1.name' | 'player2.name' | 'size') {
+    const input = this.input(id)
+    return (
+      input.attributes('aria-required') === 'true' || input.attributes('required') !== undefined
+    )
+  }
+
+  private label(id: 'player1.name' | 'player2.name' | 'size') {
+    return this.wrapper.get(`label[for="${id}"]`)
+  }
+
   // the options of a labelled switch (radiogroup), e.g. 'Game mode'
   private switchOptions(label: string) {
     const group = this.wrapper.find(`[role="radiogroup"][aria-label="${label}"]`)
@@ -395,6 +492,74 @@ export class GamePage {
   // the checked difficulty, or null when the switch isn't shown
   selectedDifficulty(): TestDifficulty | null {
     return this.selectedOption('Difficulty', DIFFICULTY_LABELS)
+  }
+
+  // the hint that describes the difficulty switch for assistive technology (aria-describedby), as
+  // shown below the switch, or null when there is none (VC-26)
+  difficultyHint() {
+    const group = this.wrapper.find('[role="radiogroup"][aria-label="Difficulty"]')
+    const id = group.exists() ? group.attributes('aria-describedby') : undefined
+    if (!id) return null
+    const hint = document.getElementById(id)
+    if (!hint) return null
+    const followsSwitch = Boolean(
+      group.element.compareDocumentPosition(hint) & Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+    if (!followsSwitch) throw new Error('The difficulty hint must sit below the switch')
+    return hint.textContent!.trim()
+  }
+
+  // the hint that describes the size input for assistive technology (aria-describedby), as shown
+  // below the input, or null when there is none (GS-2)
+  sizeHint() {
+    const hint = this.sizeHintElement()
+    return hint ? hint.textContent!.trim() : null
+  }
+
+  // the messages shown under the size input, top to bottom: its hint, then any validation
+  // error (GS-2)
+  sizeMessages() {
+    const hint = this.sizeHintElement()
+    if (!hint) return []
+    const errors = this.wrapper
+      .findAll('form [data-field-error]')
+      .map((el) => el.element)
+      .filter((el) => el.parentElement === hint.parentElement)
+    return [hint, ...errors]
+      .sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1))
+      .map((el) => el.textContent!.trim())
+  }
+
+  // what assistive technology reads as the size input's description: the text of every element
+  // its aria-describedby points at, in order (GS-2)
+  sizeDescription() {
+    return this.sizeDescribedBy().map((el) => el.textContent!.trim())
+  }
+
+  // whether the size input is announced as invalid (GS-2)
+  isSizeInvalid() {
+    return this.input('size').attributes('aria-invalid') === 'true'
+  }
+
+  private sizeDescribedBy() {
+    const input = this.input('size')
+    const ids = input.exists() ? (input.attributes('aria-describedby') ?? '') : ''
+    return ids
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null)
+  }
+
+  private sizeHintElement() {
+    const input = this.input('size')
+    const hint = this.sizeDescribedBy()[0] ?? null
+    if (!hint) return null
+    const followsInput = Boolean(
+      input.element.compareDocumentPosition(hint) & Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+    if (!followsInput) throw new Error('The size hint must sit below the input')
+    return hint
   }
 
   // the fieldsets of the setup form by legend, e.g. ['You', 'Opponent'] or ['Player 1', 'Player 2']
@@ -711,13 +876,24 @@ export class GamePage {
     return this.panelSection('Result').querySelector('h3')!.textContent!.trim()
   }
 
-  // Rematch and New game; first = who moves first after a rematch
+  // the result panel's buttons in order, each with its label and whether the whole label is shown:
+  // nothing around it cuts it off or keeps it on one line, so on a narrow phone it wraps instead
+  // (END-5, MB-6). jsdom has no layout, so this reads the Tailwind classes.
+  resultButtons() {
+    const panel = this.wrapper.get('[data-result-panel]').element
+    return [...panel.querySelectorAll('button')].map((button) => ({
+      label: button.textContent!.trim(),
+      shownInFull: !ancestry(button).some(clips),
+    }))
+  }
+
+  // Rematch and New game settings; first = who moves first after a rematch
   async rematch(first: 1 | 2 = 1) {
     await this.withFirstPlayer(first, () => this.click('Rematch'))
   }
 
-  async newGame() {
-    await this.click('New game')
+  async newGameSettings() {
+    await this.click('New game settings')
   }
 
   // ---- names (GB-5) ----

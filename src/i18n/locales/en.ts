@@ -20,6 +20,7 @@ const en = {
     name: 'Name',
     color: 'Color',
     size: 'Size',
+    sizeHint: 'From {min} to {max}',
     save: 'Save',
     mode: 'Game mode',
     modeComputer: 'Versus computer',
@@ -29,6 +30,8 @@ const en = {
     difficulty: 'Difficulty',
     easy: 'Easy',
     normal: 'Normal',
+    easyHint: 'The computer picks a random line.',
+    normalHint: 'The computer takes squares whenever it can and tries not to give you any.',
   },
   colors: {
     coral: 'Coral',
@@ -82,7 +85,7 @@ const en = {
     completed: 'All squares are filled.',
     stopped: 'The game was stopped.',
     score: 'Score',
-    newGame: 'New game',
+    newGameSettings: 'New game settings',
     rematch: 'Rematch',
   },
   rules: {
@@ -95,6 +98,14 @@ const en = {
     step4: 'After every line, the turn passes to the other player.',
     step5:
       'The game ends when all squares are claimed or someone presses Stop. Most squares wins; equal scores are a draw.',
+    // the still storyboard under the steps (RL-7); captions must stay true to the rules (RL-5)
+    storyboard: {
+      title: 'In pictures',
+      frame1: 'The first line goes anywhere.',
+      frame2: 'Next lines start from a drawn one: pick a dot, then a neighbor.',
+      frame3: 'Draw the fourth side and the square is yours.',
+      frame4: 'One line can close two squares.',
+    },
   },
 }
 

@@ -12,7 +12,7 @@ The artboards use the Warm cream palette of the visual refresh (see [Visual refr
 2. First move: empty board, every dot a valid start [MV-1, MV-4, GB-4]
 3. Mid-game: Богдан to move, Dot1 (1,2) selected, valid Dot2 at (2,2) and (1,3), other valid starts (2,0), (2,1), (0,3), owned squares with fill and initial [MV-2, MV-3, MV-5, GB-2, GB-3]
 4. Stop confirmation [END-2]
-5. Result, winner (Богдан 9, Оля 7): result panel beside the final board, with New game and Rematch [END-3..6]
+5. Result, winner (Богдан 9, Оля 7): result panel beside the final board, with New game settings and Rematch [END-3..6]
 6. Result, draw (8 each) [END-3, END-4]
 
 "Mobile" page (390 px wide phone frames):
@@ -36,7 +36,7 @@ Spec: [computer-opponent/spec.md](../computer-opponent/spec.md) (stories CM-n), 
 
 Desktop page (second row):
 
-16. Setup, Versus computer: game mode switch (Versus computer selected), difficulty switch (Normal selected), "Ви" fieldset with name and color, and a read-only "Суперник" fieldset with the robot, "Комп’ютер" and its automatic color [CM-1, CM-2, CM-4..7, CM-9]
+16. Setup, Versus computer: game mode switch (Versus computer selected), difficulty switch (Normal selected) with the muted Normal hint below it (VC-26, added after approval, not drawn on the artboard), "Ви" fieldset with name and color, and a read-only "Суперник" fieldset with the robot, "Комп’ютер" and its automatic color [CM-1, CM-2, CM-4..7, CM-9]
 17. Setup, Versus computer, English [CM-36, I18N-1]
 18. Computer thinking: Turn shows the color swatch, robot and "Комп’ютер", with a pulsing "Думає…" (polite live region) under the name, and the hint hidden. Every dot is idle, so the board is locked, and Stop is still available [CM-13, CM-14, CM-16, CM-17, CM-37]
 19. Computer line highlighted, "Ваш хід": the computer's last line (a safe line, CM-24) has a 4 px halo in its color, valid starts are highlighted again, and Turn says "Ваш хід" [CM-18, CM-19]
@@ -55,6 +55,7 @@ Mobile page (second row, 390 px):
 Visual rules used on these screens:
 
 - **Mode and difficulty switches**: a labelled `role="radiogroup"` styled like the language toggle (`rounded-md border border-border bg-surface p-0.5 shadow-sm`), stretched to full width with equal-width options. The selected option is `bg-accent text-on-accent`. Options are `min-h-8` from `sm` up and `min-h-11` on phones. Difficulty sits right under the mode switch and is shown only in Versus computer mode [CM-6].
+- **Hint under a control**: one line of muted text (`text-sm text-muted`) right below the control it explains, tied to it with `aria-describedby`. The difficulty switch has one describing only the selected difficulty [VC-26], and the size input has "From 2 to 10" above its validation error [GS-2]; `BaseHint.vue` draws both.
 - **Robot icon**: Material Symbols `smart_toy` (outlined, `viewBox="0 -960 960 960"`) as inline SVG with `fill: currentColor` and `aria-hidden="true"`. It is 20 px in Turn, 16 px in score rows, 24 px in the result heading and 18 px in the setup Opponent field. It always sits between the color swatch and the written name, which stays the accessible text [CM-13, CM-37].
 - **Thinking**: `text-sm text-muted animate-pulse` in an `aria-live="polite"` element under the name in Turn (as on mobile artboard 24, on both layouts). The hint is hidden while the computer's move is pending.
 - **Last computer line**: the normal line plus `box-shadow: 0 0 0 4px` in the computer's color at 40%. It is shown only while the game is playing and the newest line is the computer's.
@@ -70,6 +71,9 @@ Message keys added to both locales (`src/i18n/locales`):
 | `setup.difficulty` | Difficulty | Складність |
 | `setup.easy` | Easy | Легко |
 | `setup.normal` | Normal | Нормально |
+| `setup.sizeHint` | From {min} to {max} (From 2 to 10) | Від {min} до {max} (Від 2 до 10) |
+| `setup.easyHint` | The computer picks a random line. | Комп’ютер обирає випадкову лінію. |
+| `setup.normalHint` | The computer takes squares whenever it can and tries not to give you any. | Комп’ютер забирає квадрати, коли може, і намагається не віддавати їх вам. |
 | `setup.you` | You | Ви |
 | `setup.opponent` | Opponent | Суперник |
 | `players.computer` | Computer | Комп’ютер |
@@ -231,19 +235,22 @@ src/pages/dot-line-game/
   game/
     GameBoard.vue     # squares, lines and clickable dots; v-model:selected-dot
     GameStatus.vue    # turn, score, hint, Stop button and the Stop confirmation dialog
-    GameResult.vue    # replaces GameStatus when finished: winner/Draw, score, New game, Rematch
+    GameResult.vue    # replaces GameStatus when finished: winner/Draw, score, New game settings, Rematch
     PlayerScore.vue   # one score row: color swatch, name, score
   rules/
     GameRules.vue     # "How to play" content with the five numbered rules
     RulesPanel.vue    # modal rules panel (side panel / full screen), rendered once in App.vue
 src/shared/
   components/AppLogo.vue              # the logo SVG (dot color, optional animation)
-  components/BaseSegmentedControl.vue # labelled radiogroup switch (game mode, difficulty)
+  components/BaseSegmentedControl.vue # labelled radiogroup switch (game mode, difficulty), optional hint
+  components/BaseHint.vue             # muted hint text under a control (aria-describedby target)
   components/LanguageToggle.vue       # UA / EN buttons in the header
   components/PlayerName.vue           # displayed name, with the robot for the computer player
   components/RobotIcon.vue            # inline-SVG smart_toy icon
   composables/useDisplayName.ts       # stored name → displayed name
+  components/RulesStoryboard.vue      # the rules panel's "In pictures" storyboard (RL-7)
   composables/useRulesPanel.ts        # shared open state of the rules panel
+  rules-storyboard.ts                 # the storyboard's scripted 3×3 game and its four frames
   composables/useTheme.ts             # system preference, saved override, effective theme
   icons/                              # Material Symbols Rounded as inline-SVG components
 src/utils/swatches.ts                 # SWATCHES (8 keys + hex), randomSwatch()
@@ -257,7 +264,7 @@ All sizes and colors come from the approved canvas.
   - Dot1 selected: "Pick a highlighted neighbor to draw the line. Pick the selected dot again to cancel."
   - otherwise: "Pick a highlighted dot to start a line."
 
-  Stop and Rematch clear the selection. The old "Back" button is gone; Stop, then New game, leads back to setup.
+  Stop and Rematch clear the selection. The old "Back" button is gone; Stop, then New game settings, leads back to setup.
 - **GameBoard.vue** [GB-1..3, MV-4..8]
   - Absolutely positioned elements inside a `rounded-lg border-border bg-surface` box (the lighter "paper" surface, VR-5) of `N·cell + 32` px plus the border. `cell` is the square size: 48 px, or smaller on narrow screens (see Mobile). A dot's center is at `(16 + col·cell, 16 + row·cell)`.
   - Owned squares: `cell` px, owner color mixed at 30% over transparent, bold uppercase initial in the owner color.
@@ -273,9 +280,9 @@ All sizes and colors come from the approved canvas.
     - With a selection, clicking a valid target calls `game.drawLine(selected, dot)` and clears the selection.
     - Otherwise, clicking a valid start selects it (or switches the selection to it).
     - Anything else is ignored.
-- **GameStatus.vue** [GB-4, END-2]: a `w-50` column with Turn (swatch and name), Score (`PlayerScore` rows), the hint and a Stop button (`BaseButton` secondary). Stop opens a dialog: a `fixed inset-0 bg-ink/40` backdrop and a `w-75 p-6 rounded-lg border shadow-lg` card with "Stop the game?", "Whoever owns more squares now wins.", the scores, and Cancel (secondary) and Stop game (primary). Clicking the backdrop cancels; confirming emits `stop`.
-- **GameResult.vue** [END-3..6]: a `w-53` column with "Result", "`<name>` wins" with a swatch or "Draw", "All squares are filled." or "The game was stopped.", the scores with the winner first, and New game (secondary) and Rematch (primary).
-  - New game: `StorageService.removeItem(CURRENT_GAME)` then `game.reset()`.
+- **GameStatus.vue** [GB-4, END-2]: a `w-53` column (the same width as GameResult, so nothing moves when the result replaces it [MB-9]) with Turn (swatch and name), Score (`PlayerScore` rows), the hint and a Stop button (`BaseButton` secondary). Stop opens a dialog: a `fixed inset-0 bg-ink/40` backdrop and a `w-75 p-6 rounded-lg border shadow-lg` card with "Stop the game?", "Whoever owns more squares now wins.", the scores, and Cancel (secondary) and Stop game (primary). Clicking the backdrop cancels; confirming emits `stop`.
+- **GameResult.vue** [END-3..6]: a `w-53` column with "Result", "`<name>` wins" with a swatch or "Draw", "All squares are filled." or "The game was stopped.", the scores with the winner first, and New game settings (secondary) and Rematch (primary).
+  - New game settings: `StorageService.removeItem(CURRENT_GAME)` then `game.reset()`.
   - Rematch: `game.start()`.
 - **PlayerScore.vue**: a `text-sm leading-6` row with a 12 px swatch, the full name through `PlayerName` (wrapping, see Player names) and a `tabular-nums` score.
 
@@ -283,19 +290,20 @@ Versus computer changes to these components are described in [Versus computer](#
 
 ## Player names [GS-1, GB-5]
 
+- **Required marker** [GS-1, GS-2]: `BaseLabel` takes a `required` prop that appends ` *` in an `aria-hidden="true"` `text-danger` span, and the matching `BaseInput` gets `aria-required="true"`. Used on each player's Name and on Size; the color swatches aren't marked. No "* required" legend.
 - **PlayerField.vue**: the name `<input>` has `maxlength="15"`, and the field's rules add `max:15` so a pasted or restored value is still validated, with its own message `validation.maxLength` ("Player 2 name can be at most 15 characters.").
-- **GameSetup.vue**: the size field's rules are `required|integer|min_value:2|max_value:10` [GS-2].
+- **GameSetup.vue**: the size field starts at 4 and its rules are `required|integer|min_value:2|max_value:10`; the bounds are `MIN_SIZE`/`MAX_SIZE` in `src/static/board.ts`, which also fill the hint [GS-2]. Under the input sit the `setup.sizeHint` hint (`BaseHint`) and then any validation error, so the hint never disappears. The input's `aria-describedby` names the hint, plus the error's id while one shows, and `aria-invalid="true"` is set while there is an error.
 - Names are never truncated. Every place that shows a name (GameStatus turn, PlayerScore, GameResult heading) drops `truncate` and uses `min-w-0 break-words`, so a long name wraps; the color swatch stays `shrink-0` and aligned to the first line.
 
 ## Persistence [PS-1..3]
 
 `Game.vue`'s `watchEffect` saves the whole reactive game (including `gameMode` and `difficulty`) with `StorageService.setItem(CURRENT_GAME, game)`. `Page.vue` restores it with `StorageService.getItem(CURRENT_GAME, { applyParse: true })` and `dotLineGame.reset(savedGame)`, and the constructors rebuild the `Line`, `Dot` and `Square` instances. A started, unfinished save without `currentPlayerName` (saved before gameplay existed) gets `start()` [PS-3]. `status` decides whether Game shows GameStatus or GameResult. The dot selection isn't saved.
 
-## Mobile [MB-1..8]
+## Mobile [MB-1..9]
 
 The phone layout is the default, and `sm:` classes (640 px and up) restore the desktop layout described above.
 
-- **Game.vue**: `flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6`. The board wrapper is centered on phones (`self-center sm:self-start`), and the panel is full width (`w-full`, with `sm:w-50 sm:shrink-0` for GameStatus and `sm:w-53 sm:shrink-0` for GameResult).
+- **Game.vue**: `flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-center sm:gap-6`. The board wrapper is centered on phones (`self-center sm:self-start`), and the panel is full width (`w-full`, with `sm:w-53 sm:shrink-0` for both GameStatus and GameResult, so the centered group keeps its width when the game ends). From `sm` up, `justify-center` centers the board + panel group horizontally [MB-9].
 - **Board size** (GameBoard): `cell = clamp(floor((viewportWidth − 16 − sidePanel − 34) / N), 24, 48)`.
   - `viewportWidth` is `document.documentElement.clientWidth`, which excludes a desktop scrollbar.
   - The 16 px is the app's `p-2` gutters, and the 34 px is the board's padding plus border.
@@ -304,10 +312,11 @@ The phone layout is the default, and `sm:` classes (640 px and up) restore the d
   - The board sits in an `overflow-x-auto max-w-full` wrapper for screens where 24 px squares still don't fit.
 - **GameStatus** on phones: Turn and Score in a two-column grid (`grid grid-cols-2 gap-4 sm:flex sm:flex-col`), then the hint, then Stop at full width with `min-h-11` (`w-full sm:w-auto sm:min-h-0`).
 - **Stop dialog** card: `w-full max-w-75`, inside the `p-4` backdrop.
-- **GameResult** on phones: New game and Rematch in `grid grid-cols-2 gap-2`, each `min-h-11`. From `sm` up they return to the wrapping row.
+- **GameResult** on phones: New game settings and Rematch in `grid grid-cols-2 gap-2`, each `min-h-11`; a label that does not fit wraps (no `truncate`/`whitespace-nowrap`) [MB-6]. From `sm` up they return to the wrapping row.
+- **Centering** [MB-9]: horizontal only. The setup root is `mx-auto max-w-130`; the game screen is centered by Game.vue's `sm:justify-center` (on phones it is already full width with the board `self-center`). Nothing is centered vertically (no `items-center`/`min-h-screen` on the page), so content stays top-aligned when its height changes. The board wrapper keeps `max-w-full overflow-x-auto`, a scroll container whose minimum width is 0, so a board that can't shrink scrolls inside itself rather than overflowing the page [MB-1, MB-3].
 - **GameSetup**: the player fieldsets row becomes `flex flex-col gap-2 sm:flex-row`; each fieldset is `min-w-0 flex-1`, so the two share the row equally ("You" and "Opponent" included).
 
-## Rules [RL-1, RL-5, VR-23..VR-31, APP-1]
+## Rules [RL-1, RL-5, RL-7, VR-23..VR-31, APP-1]
 
 - **GameRules.vue** [RL-1, RL-5]: a `section` (gap 12 px) labelled by its "How to play" heading (`text-sm font-semibold text-ink`). Below it, an ordered list of five rules (`text-sm text-ink-soft`, gap 8 px), each with a 20 px round `bg-surface-strong` number. It has no card styling of its own any more: it sits directly on the rules panel. The rules text comes from `rules.step1`–`step5` in `src/i18n/locales` (see Languages). The English wording is:
   1. Take turns drawing a line between two neighboring dots: left, right, up or down.
@@ -315,6 +324,10 @@ The phone layout is the default, and `sm:` classes (640 px and up) restore the d
   3. Draw the fourth side of a square to claim it. One line can claim two squares.
   4. After every line, the turn passes to the other player.
   5. The game ends when all squares are claimed or someone presses Stop. Most squares wins; equal scores are a draw.
+- **RulesStoryboard.vue** [RL-7]: rendered by `GameRules` below the steps. A `section` with `aria-hidden="true"` (`pt-2`, gap 8 px), an `h3` "In pictures" (`rules.storyboard.title`, `text-sm font-semibold text-ink-soft`), then an `ol` `grid grid-cols-2 gap-3` of four frames. Each frame is an inline `<svg>` (`w-full h-auto`, viewBox 176×176: the board's 48 px squares and 16 px padding, scaled to the column width, so it fits the 320 px full-screen panel) above a centered `text-xs text-ink-soft` caption (`rules.storyboard.frame1`–`frame4`).
+  - Drawn like GameBoard, with SVG paints set to theme variables so the frames follow the theme live: board `var(--color-surface)` with a `var(--color-border)` outline (8 px radius), idle dots 8 px `var(--color-dot)`, owned squares in the owner color at 30% with its bold initial, 4 px round-capped lines in the owner color, Dot1 as a 24 px ring in the current player's color (12% fill) around a 10 px dot in that color with a `surface` stroke, neighbors as 20 px dashed rings (12% fill) around 8 px `var(--color-ink)` dots.
+  - The frames come from `storyFrames()` in `src/shared/rules-storyboard.ts`, which plays a fixed 10-line script on a real `DotLineGame` (players named `coral` and `teal`, the swatch keys, colored from `SWATCHES`), so every frame obeys the game rules: after line 1, before line 2 with Dot1 (1,1) picked, after line 5 (Coral owns square 0,0), after line 10 (Teal's line 1,1–2,1 closes squares 1,0 and 1,1).
+  - Owner letters are `t('colors.coral' | 'colors.teal')`'s first letter, uppercased: C/T in English, К/Б in Ukrainian.
 - **RulesPanel.vue** replaces `RulesToggle.vue` (the Show/Hide rules button and the inline rules on setup and game are gone) [VR-24..VR-29]. It is rendered once in `App.vue`, after `RouterView`:
   - Backdrop: `fixed inset-0 z-20 bg-black/40`, fading in and out over 200 ms. A click on it closes the panel.
   - Panel: an `aside` with `role="dialog"`, `aria-modal="true"`, labelled by the "How to play" heading. `fixed inset-y-0 right-0 z-30 flex w-full flex-col gap-4 overflow-y-auto bg-surface p-5 shadow-2xl`, and from `sm` up `sm:w-96 sm:rounded-l-3xl` (384 px, 24 px radius on the left edge). It slides in from the right (`translate-x-full` → 0, 250 ms ease-out; out in 200 ms ease-in). On phones it covers the whole screen.
@@ -343,7 +356,7 @@ src/shared/components/LanguageToggle.vue
   - The initial locale is the saved `LOCALE` value from localStorage (through `StorageService`), if it's supported, otherwise `uk` [I18N-4]. `fallbackLocale` is `en`.
   - `setLocale(locale)` sets `i18n.global.locale.value`, saves `LOCALE`, then sets `document.documentElement.lang` and `document.title = t('app.title')` [I18N-3, APP-1]. The same document update runs once at startup.
   - `configure({ generateMessage })` from vee-validate: the `differentFromAll` rule gets `validation.differentNames`, `notComputerName` gets `validation.computerName`, `max` gets `validation.maxLength` with `{ field, length }`, and every other rule gets `validation.invalid` with `{ field }`. `field` is the `<Field>`'s translated `label` [GS-1, I18N-1]. The custom rule returns `false`, not a hard-coded string. Messages are generated when validation runs, so a message already on screen updates on the next validation [I18N-6].
-- **Message keys**: `rules.step1`–`step5` for the rules, `game.hintFirstLine` / `hintSelected` / `hintStart` for hints, `game.dotLabel` with `{row}`/`{col}`, `result.wins` with `{name}`, `players.computer` for the computer player's name, `setup.player` / `setup.playerName` with `{number}`. Player names are passed in as parameters and never translated.
+- **Message keys**: `rules.step1`–`step5` for the rules, `rules.storyboard.title` and `frame1`–`frame4` for the storyboard, `game.hintFirstLine` / `hintSelected` / `hintStart` for hints, `game.dotLabel` with `{row}`/`{col}`, `result.wins` with `{name}`, `players.computer` for the computer player's name, `setup.player` / `setup.playerName` with `{number}`. Player names are passed in as parameters and never translated.
 - **Components** call `const { t } = useI18n()`. `PlayerField` takes `number` (1 or 2) instead of a `label` string.
 - **LanguageToggle.vue** [I18N-3, I18N-5]:
   - A `role="group"` element labelled `t('language.label')`: `inline-flex rounded-md border border-border bg-surface p-0.5 shadow-sm`.
@@ -353,7 +366,7 @@ src/shared/components/LanguageToggle.vue
 - **vite.config.ts**: `define` sets the vue-i18n esm-bundler flags: `__VUE_I18N_FULL_INSTALL__: true`, `__VUE_I18N_LEGACY_API__: false`, `__INTLIFY_PROD_DEVTOOLS__: false`.
 - **StorageService.setItem** accepts a `string` as well as an `object`, and strings are stored as they are.
 
-## Versus computer [VC-1..25]
+## Versus computer [VC-1..26]
 
 ### Computer player identity
 
@@ -384,7 +397,7 @@ src/shared/components/LanguageToggle.vue
 - `useComputerTurn(() => game, paused)` returns `{ isThinking, cancel }`.
 - It watches `isComputerTurn && !paused() ? lines.length : null` with `immediate: true`, so a restored game resumes on mount. Every change cancels any pending move; when the value isn't `null`, it sets `isThinking` and schedules the move `COMPUTER_DELAY_MS` (1000 ms) later.
 - The move re-checks `isComputerTurn`, asks `chooseComputerLine(game, game.difficulty)` (the model guarantees a computer game has one) and draws the line through the normal `drawLine(line)`, which picks the valid end as the start.
-- `Game.vue` calls `cancel()` in `stop`, `rematch` and `newGame`; unmounting cancels too.
+- `Game.vue` calls `cancel()` in `stop`, `rematch` and `newGameSettings`; unmounting cancels too.
 - `GameStatus` exposes its Stop dialog through `v-model:confirming`; `Game.vue` passes that as `paused`, so the computer waits while the dialog is open and gets a fresh pause after Cancel (VC-13). The board stays locked meanwhile because `isComputerTurn` still holds.
 - `Game.vue` passes `isThinking || isComputerTurn` to `GameBoard` as `locked` (every dot `idle`, clicks ignored) and to `GameStatus` as `thinking`.
 
@@ -397,13 +410,14 @@ src/shared/components/LanguageToggle.vue
 
 - `GameResult.vue`: in a computer game the heading is `result.computerWon` or `result.youWon`; in Two players it's `result.wins` with the displayed name. Draw is unchanged, and the scores are sorted winner first.
 
-### Setup [VC-1..7]
+### Setup [VC-1..7, VC-26]
 
-- `GameSetup.vue` has a `BaseSegmentedControl` for the game mode, and a second one for the difficulty only when the mode is `'computer'`. The vee-validate `<Form>` has `keep-values`, so values typed in either mode survive a switch [VC-7].
+- `GameSetup.vue` has a `BaseSegmentedControl` for the game mode, and a second one for the difficulty only when the mode is `'computer'`, with `hint` set to `setup.easyHint` or `setup.normalHint` for the selected difficulty [VC-26]. The vee-validate `<Form>` has `keep-values`, so values typed in either mode survive a switch [VC-7].
   - Versus computer: a `PlayerField` with `legend="You"` (field label `setup.name`, so messages read "Name is not valid."), `reject-computer-name` and no other names to differ from, then `ComputerOpponentField` with `computerColorFor(values.player1.color)`.
   - Two players: the two `PlayerField`s as before.
   - `submit()` emits a `GameSetupForm`. In computer mode `player2 = createComputerPlayer(player1.color)`, and a second person typed earlier is ignored. `Page.vue` applies it with `setGameMode(...).setPlayer1(...).setPlayer2(...).setSize(...).start()`.
-- `BaseSegmentedControl.vue` (generic over the value type): a visible label (`aria-hidden`) plus a `role="radiogroup"` with the same `aria-label`. Each option is a `role="radio"` button with `aria-checked`, `flex-1` and `min-h-11 sm:min-h-8`; the selected one is `bg-accent text-on-accent`.
+- `BaseSegmentedControl.vue` (generic over the value type): a visible label (`aria-hidden`) plus a `role="radiogroup"` with the same `aria-label`. Each option is a `role="radio"` button with `aria-checked`, `flex-1` and `min-h-11 sm:min-h-8`; the selected one is `bg-accent text-on-accent`. An optional `hint` prop renders a `BaseHint` below the group, and the group's `aria-describedby` points at it (id from `useId()`) [VC-26].
+- `BaseHint.vue` (`src/shared/components/`): the muted hint under a control, a `<p>` with `text-sm text-muted` and the `id` the control's `aria-describedby` names. Any setup field can use it.
 - `PlayerField.vue` registers `notComputerName`: the name, trimmed, with `'`, `’` and `ʼ` unified and lower-cased, must not equal `players.computer` of any locale in `SUPPORTED_LOCALES`, normalized the same way [VC-5].
 
 ### Preferences [VC-2]
@@ -441,7 +455,7 @@ The palette values are the prototype's (spec token table); `on-accent` and `dang
 
 - **Font**: Nunito Variable (Latin + Cyrillic) from `@fontsource-variable/nunito`, bundled so it works offline; `--font-sans: 'Nunito Variable', ui-rounded, system-ui, sans-serif` [VR-2].
 - **Shapes**: `--radius-md: 0.75rem` (12 px: buttons, fields, switches, the language toggle) and `--radius-lg: 1.25rem` (20 px: fieldsets, board, dialog). Shadows stay Tailwind's `shadow-sm` / `shadow-lg` [VR-3].
-- **Buttons**: primary `bg-accent text-on-accent hover:bg-accent-hover` with an `accent` focus ring offset on `paper`; secondary `bg-surface-strong text-ink shadow-sm hover:bg-border` [VR-4].
+- **Buttons**: primary `bg-accent text-on-accent hover:bg-accent-hover` with an `accent` focus ring offset on `paper`; secondary `bg-surface-strong text-ink shadow-sm hover:bg-border`; both share `inline-flex items-center justify-center px-4 py-2 text-sm`, so side-by-side buttons are the same size and their labels sit centered [VR-4, MB-6].
 - **Backdrops**: the Stop dialog uses `bg-ink/40`, the rules panel `bg-black/40`.
 - **Player colors** stay as they are in both themes: lines in the owner's color, owned squares at 30% with the initial in the owner's color [VR-7].
 - **useTheme.ts** [VR-11, VR-14, VR-15]: the system preference follows `matchMedia('(prefers-color-scheme: dark)')` live; the override is the saved `THEME` value (`src/static/storage-keys.ts`, through `StorageService`); the effective theme is the override, else the system preference. It sets `document.documentElement.dataset.theme`, and `toggle()` saves the opposite of the current theme as the override.

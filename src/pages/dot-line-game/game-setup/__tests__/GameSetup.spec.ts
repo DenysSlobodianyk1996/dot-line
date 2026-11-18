@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { flushPromises, type VueWrapper } from '@vue/test-utils'
 import { mountGamePage, type MountGamePageOptions } from '@/test/mount-game-page'
+import { accessibleText } from '@/test/game-page'
 
 const TWO_PLAYERS = ['Двоє гравців', 'Two players']
 
@@ -14,12 +15,12 @@ async function openTwoPlayersSetup(storage: MountGamePageOptions['storage'] = {}
   return page
 }
 
-// finds an input through its visible label, the way a player would (label `for` → input `id`)
+// finds an input through its label, the way a player would (label `for` → input `id`)
 function inputLabelled(page: VueWrapper, fieldset: string | null, label: string) {
   const scope = fieldset
     ? page.findAll('fieldset').find((f) => f.find('legend').text() === fieldset)
     : page.find('form')
-  const labelEl = scope?.findAll('label').find((l) => l.text() === label)
+  const labelEl = scope?.findAll('label').find((l) => accessibleText(l.element) === label)
   const id = labelEl?.attributes('for')
   if (!id) throw new Error(`No label "${label}" in ${fieldset ?? 'form'}`)
   return page.get<HTMLInputElement>(`[id="${id}"]`)

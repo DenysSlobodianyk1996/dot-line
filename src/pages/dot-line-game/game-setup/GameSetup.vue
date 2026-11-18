@@ -1,5 +1,6 @@
 <template>
-  <div class="max-w-130">
+  <!-- centered horizontally, top-aligned (MB-9) -->
+  <div class="mx-auto max-w-130">
     <h3 class="w-full text-center font-bold text-xl mb-4">{{ t('setup.title') }}</h3>
     <!-- keep-values: what's typed survives a game mode switch (CM-10) -->
     <Form
@@ -16,6 +17,7 @@
         v-model="difficulty"
         :label="t('setup.difficulty')"
         :options="difficultyOptions"
+        :hint="difficultyHint"
       />
 
       <div class="flex flex-col gap-2 sm:flex-row">
@@ -48,13 +50,26 @@
       <Field
         name="size"
         :label="t('setup.size')"
-        :rules="`required|integer|min_value:2|max_value:10`"
+        :rules="`required|integer|min_value:${MIN_SIZE}|max_value:${MAX_SIZE}`"
         v-slot="{ field, errorMessage }"
       >
         <div class="flex flex-col gap-2">
-          <BaseLabel :for="field.name">{{ t('setup.size') }}</BaseLabel>
-          <BaseInput v-bind="field" :id="field.name" :title="field.value" type="number" />
-          <BaseFieldError :errorMessage />
+          <BaseLabel :for="field.name" required>{{ t('setup.size') }}</BaseLabel>
+          <BaseInput
+            v-bind="field"
+            :id="field.name"
+            :title="field.value"
+            type="number"
+            aria-required="true"
+            :aria-invalid="errorMessage ? 'true' : undefined"
+            :aria-describedby="errorMessage ? `${sizeHintId} ${sizeErrorId}` : sizeHintId"
+          />
+          <!-- the hint always shows; a validation error goes below it, and both describe the
+               input (GS-2) -->
+          <BaseHint :id="sizeHintId">{{
+            t('setup.sizeHint', { min: MIN_SIZE, max: MAX_SIZE })
+          }}</BaseHint>
+          <BaseFieldError :id="sizeErrorId" :errorMessage />
         </div>
       </Field>
 
@@ -66,7 +81,7 @@
 <script setup lang="ts">
 import { Form, Field, defineRule } from 'vee-validate'
 import { required, integer, min_value, max_value } from '@vee-validate/rules'
-import { computed, ref } from 'vue'
+import { computed, ref, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 import PlayerField from './PlayerField.vue'
 import ComputerOpponentField from './ComputerOpponentField.vue'
@@ -77,10 +92,11 @@ import BaseInput from '@/shared/components/BaseInput.vue'
 import BaseFieldError from '@/shared/components/BaseFieldError.vue'
 import BaseButton from '@/shared/components/BaseButton.vue'
 import BaseSegmentedControl from '@/shared/components/BaseSegmentedControl.vue'
+import BaseHint from '@/shared/components/BaseHint.vue'
 
 import { computerColorFor, randomSwatch } from '@/utils'
 import { StorageService } from '@/services'
-import { DIFFICULTY, GAME_MODE } from '@/static'
+import { DIFFICULTY, GAME_MODE, MAX_SIZE, MIN_SIZE } from '@/static'
 
 defineRule('required', required)
 defineRule('integer', integer)
@@ -88,6 +104,8 @@ defineRule('min_value', min_value)
 defineRule('max_value', max_value)
 
 const { t } = useI18n()
+const sizeHintId = useId()
+const sizeErrorId = useId()
 
 // Setup opens with the game mode and difficulty of the last game started; on a first visit,
 // Versus computer and Normal (CM-2, CM-3, CM-7, CM-29)
@@ -96,9 +114,10 @@ const GAME_MODE_OPTIONS: { value: GameMode; labelKey: string }[] = [
   { value: 'computer', labelKey: 'setup.modeComputer' },
   { value: 'twoPlayers', labelKey: 'setup.modeTwoPlayers' },
 ]
-const DIFFICULTY_OPTIONS: { value: Difficulty; labelKey: string }[] = [
-  { value: 'easy', labelKey: 'setup.easy' },
-  { value: 'normal', labelKey: 'setup.normal' },
+// hintKey: the hint under the difficulty switch describes only the selected difficulty (VC-26)
+const DIFFICULTY_OPTIONS: { value: Difficulty; labelKey: string; hintKey: string }[] = [
+  { value: 'easy', labelKey: 'setup.easy', hintKey: 'setup.easyHint' },
+  { value: 'normal', labelKey: 'setup.normal', hintKey: 'setup.normalHint' },
 ]
 const GAME_MODES = GAME_MODE_OPTIONS.map(({ value }) => value)
 const DIFFICULTIES = DIFFICULTY_OPTIONS.map(({ value }) => value)
@@ -118,6 +137,10 @@ const modeOptions = computed(() =>
 const difficultyOptions = computed(() =>
   DIFFICULTY_OPTIONS.map(({ value, labelKey }) => ({ value, label: t(labelKey) })),
 )
+const difficultyHint = computed(() => {
+  const option = DIFFICULTY_OPTIONS.find(({ value }) => value === difficulty.value)
+  return option ? t(option.hintKey) : undefined
+})
 
 // what the form fields hold; the game mode and difficulty come from the switches
 type SetupFormValues = Omit<GameSetupForm, 'gameMode' | 'difficulty'>
@@ -127,7 +150,8 @@ const player1Color = randomSwatch()
 const formInitialValues: SetupFormValues = {
   player1: { name: '', color: player1Color },
   player2: { name: '', color: randomSwatch(player1Color) },
-  size: 2,
+  // 4 by default (GS-2)
+  size: 4,
 }
 
 const emit = defineEmits<{

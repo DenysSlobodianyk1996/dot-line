@@ -6,8 +6,8 @@ Domain terms (Dot, Line, Square, Owned square, Dot1/Dot2, Turn, Swatch, Rules pa
 
 ## GS: Game setup (existing screen)
 
-- **GS-1**: Each player enters a name and picks a color from the swatches (GS-4). Names are required, at most 15 characters, and must differ case-insensitively. The field doesn't accept more than 15 characters, and a longer value that gets in anyway (pasted or restored) fails validation with "<field> can be at most 15 characters." The color is used for that player's lines and owned squares, and in Two players mode the two players' colors must differ (GS-5). Validation messages use readable, translated field names ("Ім’я гравця 1" / "Player 1 name", "Розмір поля" / "Size"), never internal names like `player1.name` (I18N-1). In Versus computer mode only the person's name and color are entered (VC-3), and the name must not be the computer's (VC-5).
-- **GS-2**: Size N is required, a whole number, 2 ≤ N ≤ 10. A fractional size such as 2.5 is rejected.
+- **GS-1**: Each player enters a name and picks a color from the swatches (GS-4). Names are required, at most 15 characters, and must differ case-insensitively. Each required name field shows `*` after its "Ім’я" / "Name" label (both players in Two players mode, the person in Versus computer mode); the `*` is hidden from screen readers, which announce the input as required instead. There is no "* required" legend, and the color isn't marked because a swatch is always picked. The field doesn't accept more than 15 characters, and a longer value that gets in anyway (pasted or restored) fails validation with "<field> can be at most 15 characters." The color is used for that player's lines and owned squares, and in Two players mode the two players' colors must differ (GS-5). Validation messages use readable, translated field names ("Ім’я гравця 1" / "Player 1 name", "Розмір поля" / "Size"), never internal names like `player1.name` (I18N-1). In Versus computer mode only the person's name and color are entered (VC-3), and the name must not be the computer's (VC-5).
+- **GS-2**: Size N is required, a whole number, 2 ≤ N ≤ 10. Its "Розмір поля" / "Size" label ends with the same `*` marker as the names (GS-1), and the input is announced as required. A fractional size such as 2.5 is rejected. Setup opens with size 4. A muted hint "Від 2 до 10" / "From 2 to 10" always shows under the input and describes it for assistive technology; a validation error appears below the hint instead of replacing it, also describes the input, and the input is announced as invalid while it shows.
 - **GS-3**: Submitting a valid form starts the game in the chosen game mode (VC-1). The first player is chosen at random (see TR-2).
 - **GS-4**: A player's color is one of 8 round **swatches**: coral, teal, sunflower, sky, lavender, leaf, berry and tangerine, the same in the light and the dark theme. They form a radio group labelled "Колір" / "Color", and each swatch is announced by its name in the current language ("Кораловий" / "Coral", …). The picked swatch has a ring and is slightly larger (VR-32..VR-34, VR-38).
 - **GS-5**: Setup opens with two different random swatches for Player 1 and Player 2. In Two players mode a player can't keep the other player's swatch: the form shows "Цей колір уже зайнятий" / "This color is already taken" and the game doesn't start. In Versus computer mode the computer player's color follows VC-6 (VR-35..VR-37).
@@ -76,7 +76,7 @@ Acceptance:
 - **END-2**: A **Stop** button ends the game early, after the player confirms.
 - **END-3**: The winner is the player with more owned squares. Equal scores (including 0–0) are a **Draw**.
 - **END-4**: When the game ends, the final board stays visible and a result panel shows the winner (name and color), or "Draw", plus both scores.
-- **END-5**: **New game** in the result panel clears the saved game and opens the setup screen.
+- **END-5**: **New game settings** in the result panel clears the saved game and opens the setup screen.
 - **END-6**: **Rematch** in the result panel keeps both players, the size, the game mode and the difficulty, clears all lines and owned squares, and picks a new random first player (VC-18).
 - **END-7**: No moves are possible after the game ends.
 
@@ -105,9 +105,10 @@ Acceptance:
 - **MB-3**: Squares are 48 px when the board fits the screen. On narrower screens they shrink so the board fits the available width, down to 24 px.
 - **MB-4**: Each dot's tap area is a square the size of one board square (at most 44 px), centered on the dot, so neighboring dots never share a tap area.
 - **MB-5**: The Stop confirmation dialog fits the screen with at least 16 px on each side.
-- **MB-6**: Below 640 px wide, the result panel sits below the board at full width, with New game and Rematch side by side at equal width.
+- **MB-6**: Below 640 px wide, the result panel sits below the board at full width, with New game settings and Rematch side by side at equal width. A label that does not fit wraps onto more lines; it is never cut off.
 - **MB-7**: Below 640 px wide, the setup form shows Player 1 above Player 2.
 - **MB-8**: Below 640 px wide, buttons on the game screen are at least 44 px tall.
+- **MB-9**: On every screen width, the setup form and the game screen (the board with its panel, in progress or finished, side by side or stacked) are centered horizontally below the header, which keeps its full width. They stay top-aligned: nothing is centered vertically, so validation messages, the mode switch or the result replacing the status never move the content up or down.
 
 Acceptance:
 - Given a 390 px wide phone and N=4, then squares are 48 px and the board is centered above the panel.
@@ -121,8 +122,9 @@ Acceptance:
 - **RL-2**: The rules live only in the **rules panel**, opened by the info button ("Правила" / "Rules") in the header of every screen (HD-1), mid-game included. The setup and game screens show no rules inline and have no Show/Hide rules button (VR-23, VR-28).
 - **RL-3**: From 640 px wide the panel slides in from the right, 384 px wide, over a dimmed backdrop; below 640 px it covers the whole screen. It closes with its ✕ button ("Закрити правила" / "Close rules"), a tap on the backdrop or Esc. It is closed whenever the app loads, on both screens, and its open state isn't saved (VR-24..VR-27).
 - **RL-4**: The panel is a modal dialog labelled by its "How to play" heading. When it opens, focus moves to ✕; Tab and Shift+Tab stay inside it; when it closes, focus returns to the info button. The info button reports the panel with `aria-haspopup="dialog"` and `aria-expanded` (VR-29).
-- **RL-5**: The rules text matches the game rules (MV-1..3, SQ-1..2, TR-1, END-1..3). When a rule changes, its text changes with it. The computer player follows the same rules (VC-11), so computer mode adds no rules text.
+- **RL-5**: The rules text matches the game rules (MV-1..3, SQ-1..2, TR-1, END-1..3). When a rule changes, its text changes with it. The computer player follows the same rules (VC-11), so computer mode adds no rules text. The same goes for the storyboard captions (RL-7): "The first line goes anywhere." (MV-1), "Next lines start from a drawn one: pick a dot, then a neighbor." (MV-2, MV-3), "Draw the fourth side and the square is yours." (SQ-1) and "One line can close two squares." (SQ-2).
 - **RL-6**: While the rules panel is open during the computer player's turn, the computer waits; once the panel closes it gets its usual pause before moving, as with the Stop dialog (VC-13, VR-31).
+- **RL-7**: Below the five rules, the panel shows a still **storyboard** headed "In pictures" / «У картинках»: four small 3×3 boards in a 2×2 grid, each with a caption in the current language. The frames come from one scripted, legal game between a coral and a teal player (it ends Coral 1, Teal 2): (1) the first line on an empty board, "The first line goes anywhere." / «Першу лінію можна провести будь-де.»; (2) Teal has picked Dot1 at the end of that line and its free neighbors are highlighted, "Next lines start from a drawn one: pick a dot, then a neighbor." / «Наступні лінії починаються від уже проведеної: оберіть точку, потім сусідню.»; (3) Coral has drawn a fourth side and owns the square, "Draw the fourth side and the square is yours." / «Проведіть четверту сторону, і квадрат ваш.»; (4) Teal's single line has closed two squares, "One line can close two squares." / «Одна лінія може закрити два квадрати.». The boards are drawn in the app with the board's look and theme tokens, so they follow the light and dark theme live; the players' lines and squares use the coral and teal swatches (GS-4), and the owner letters are the initials of the color names in the current language (C/T, К/Б). Frames fill the panel's width, also on the full-screen phone panel, with no horizontal scroll. The storyboard is static, needs no image files (PWA-4) and is hidden from assistive technology, since the rules text says the same; the panel's labelling and focus trap are unchanged (RL-4).
 
 Acceptance:
 - Given I open the setup screen, then no rules are shown and the info button in the header reports the panel as closed.
@@ -131,6 +133,9 @@ Acceptance:
 - Given the panel is open, when I press Tab or Shift+Tab, then focus stays inside it.
 - Given it's the computer player's turn and the panel is open, then the computer doesn't move however long I wait; when I close the panel, it moves after about one second.
 - Given a 390 px wide phone, then the open panel covers the screen.
+- Given I open the panel, then below the rules it shows "In pictures" and four captioned 3×3 boards in a 2×2 grid: one line on an empty board; Dot1 with highlighted neighbors; one owned square; two squares owned through one line.
+- Given the panel is open, when I switch the language or the theme, then the heading, captions, owner letters and board colors follow at once.
+- Given a 320 px wide phone, then the four boards fit the panel without horizontal scroll.
 
 ## TH: Look and theme
 
@@ -207,9 +212,10 @@ One person plays against the **computer player**. Stories CM-1..40 and the decis
 Setup:
 
 - **VC-1**: The setup screen starts with a **Game mode** switch: **Versus computer** or **Two players**. Two players works exactly as before computer mode existed (CM-1, CM-34).
-- **VC-2**: On a first visit setup opens with Versus computer and Normal selected. Afterwards it opens with the game mode and difficulty of the last game started, including after New game. These choices are saved only when a game starts, not when the switches are pressed, and the difficulty is saved even when a Two players game starts, for the next Versus computer game (CM-2, CM-3, CM-7, CM-29).
+- **VC-2**: On a first visit setup opens with Versus computer and Normal selected. Afterwards it opens with the game mode and difficulty of the last game started, including after New game settings. These choices are saved only when a game starts, not when the switches are pressed, and the difficulty is saved even when a Two players game starts, for the next Versus computer game (CM-2, CM-3, CM-7, CM-29).
 - **VC-3**: In Versus computer mode the form asks only for the person's name and color (a "You" fieldset) and the size. A read-only "Opponent" fieldset shows the robot icon, "Computer" and the computer player's color (CM-4).
 - **VC-4**: A **Difficulty** switch (**Easy** / **Normal**) sits right under the game mode switch and is shown only in Versus computer mode (CM-5, CM-6).
+- **VC-26**: One muted line of hint text sits below the Difficulty switch and describes only the selected difficulty; it changes when the person switches difficulty and follows the language toggle. Easy: "The computer picks a random line." / "Комп’ютер обирає випадкову лінію." (VC-16). Normal: "The computer takes squares whenever it can and tries not to give you any." / "Комп’ютер забирає квадрати, коли може, і намагається не віддавати їх вам." (VC-17). The switch is described by the hint for assistive technology (`aria-describedby`). Two players mode has no difficulty switch, so no hint (#36).
 - **VC-5**: In Versus computer mode the person's name is rejected with "This name belongs to the computer" when it matches the computer player's name in any supported language ("Комп’ютер", "Computer"), ignoring case, surrounding spaces and the apostrophe variant (', ’ or ʼ). Two players mode has no such check (CM-8).
 - **VC-6**: The computer player's color is chosen automatically from the same swatches as the person's (GS-4): the swatch that looks most different from the person's color. It follows the person's color while it's being picked and can't be edited (CM-9, VR-37).
 - **VC-7**: Switching the game mode keeps everything already typed: names, colors and size (CM-10).
@@ -221,7 +227,7 @@ Playing:
 - **VC-10**: On the computer player's turn, the turn shows its swatch, robot and name with a pulsing "Thinking…" below, announced politely to assistive technology, and the hint is hidden. After about one second the computer draws its line. In the same place a short message then says what it did, also announced politely: "Computer drew a line", or "Computer drew a line and claimed a square" ("…two squares"), until the person draws (CM-14, CM-15, CM-37).
 - **VC-11**: The computer player follows the same rules as a person: only lines allowed by MV-1..3, one line per turn, the turn always passes (TR-1), the squares it closes become its owned squares and count toward its score (SQ-1..3), and the game ends as soon as the last square is owned (END-1) (CM-20, CM-21, CM-26).
 - **VC-12**: During the computer player's turn the board is locked: no dot is highlighted and clicks on dots do nothing (CM-16).
-- **VC-13**: Stop works during the computer player's turn, and stopping cancels its pending move. While the Stop dialog is open the computer player waits; Cancel gives it its usual pause again. Rematch, New game and leaving the game screen cancel it too (CM-17).
+- **VC-13**: Stop works during the computer player's turn, and stopping cancels its pending move. While the Stop dialog is open the computer player waits; Cancel gives it its usual pause again. Rematch, New game settings and leaving the game screen cancel it too (CM-17).
 - **VC-14**: The computer player's newest line has a halo in its color until the person draws the next line. A finished game shows no halo (CM-18).
 - **VC-15**: On the person's turn, the turn reads "Your turn" (with the person's swatch) instead of the person's name (CM-19).
 - **VC-16**: **Easy** draws a random line among all the lines allowed right now (CM-22).
