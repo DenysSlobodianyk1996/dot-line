@@ -97,7 +97,7 @@ describe('setup in Versus computer mode', () => {
 
     await page.switchLanguage('uk')
 
-    expect(page.text()).toContain("Комп’ютер обирає випадкову лінію.")
+    expect(page.text()).toContain('Комп’ютер обирає випадкову лінію.')
     await page.switchLanguage('en')
     expect(page.difficultyHint()).toBe('The computer picks a random line.')
   })
