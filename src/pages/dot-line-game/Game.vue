@@ -21,8 +21,6 @@
         @stop="stop"
       />
     </div>
-
-    <RulesToggle class="w-full sm:max-w-130" />
   </div>
 </template>
 
@@ -35,7 +33,7 @@ import { useI18n } from 'vue-i18n'
 import GameBoard from './game/GameBoard.vue'
 import GameResult from './game/GameResult.vue'
 import GameStatus from './game/GameStatus.vue'
-import RulesToggle from './rules/RulesToggle.vue'
+import { useRulesPanel } from '@/shared/composables/useRulesPanel'
 import { useComputerTurn } from './useComputerTurn'
 
 const props = defineProps<{
@@ -56,13 +54,15 @@ const hint = computed(() => {
   return t('game.hintStart')
 })
 
-// the Stop dialog is open: the computer waits for the answer (VC-13)
+// the Stop dialog is open: the computer waits for the answer (VC-13); it waits while the rules
+// panel is open too (VR-31)
+const rulesPanel = useRulesPanel()
 const isStopConfirmOpen = ref(false)
 
 // the computer player's turns: ~1 s pause, then its line (CM-11, CM-15, CM-31)
 const computerTurn = useComputerTurn(
   () => props.dotLineGame,
-  () => isStopConfirmOpen.value,
+  () => isStopConfirmOpen.value || rulesPanel.isOpen.value,
 )
 
 // on the computer's turn nothing can be picked and clicks are ignored (CM-16)

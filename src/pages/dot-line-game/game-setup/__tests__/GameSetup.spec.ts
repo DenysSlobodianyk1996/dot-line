@@ -40,7 +40,7 @@ async function submit(page: VueWrapper) {
 }
 
 function errors(page: VueWrapper) {
-  return page.findAll('form .text-red-600').map((e) => e.text())
+  return page.findAll('form [data-field-error]').map((e) => e.text())
 }
 
 describe('game setup', () => {

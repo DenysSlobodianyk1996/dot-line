@@ -1,12 +1,17 @@
 // Source of message keys; uk.ts must have exactly the same shape (I18N-1)
 const en = {
   app: {
-    title: 'Dot Line Game',
+    title: 'Dots & Lines',
   },
   language: {
     label: 'Language',
     uk: 'Українська',
     en: 'English',
+  },
+  // the theme button names the theme it switches to (VR-16)
+  theme: {
+    light: 'Light theme',
+    dark: 'Dark theme',
   },
   setup: {
     title: 'Game Setup',
@@ -24,6 +29,18 @@ const en = {
     difficulty: 'Difficulty',
     easy: 'Easy',
     normal: 'Normal',
+  },
+  colors: {
+    coral: 'Coral',
+    teal: 'Teal',
+    sunflower: 'Sunflower',
+    sky: 'Sky',
+    lavender: 'Lavender',
+    leaf: 'Leaf',
+    berry: 'Berry',
+    tangerine: 'Tangerine',
+    // validation: the other player already has this swatch (VR-36)
+    taken: 'This color is already taken',
   },
   players: {
     computer: 'Computer',
@@ -70,8 +87,8 @@ const en = {
   },
   rules: {
     title: 'How to play',
-    show: 'Show rules',
-    hide: 'Hide rules',
+    open: 'Rules',
+    close: 'Close rules',
     step1: 'Take turns drawing a line between two neighboring dots: left, right, up or down.',
     step2: 'The first line can go anywhere. After that, start from a dot that already has a line.',
     step3: 'Draw the fourth side of a square to claim it. One line can claim two squares.',

@@ -1,12 +1,4 @@
-// Colors the computer player can get; all readable on white and as a 30% square fill
-export const COMPUTER_PALETTE = [
-  '#32a06e', // green
-  '#2f6fd6', // blue
-  '#cd3f5a', // red
-  '#e08a1e', // orange
-  '#8a4fd1', // purple
-  '#1f9bb0', // teal
-] as const
+import { SWATCHES } from './swatches'
 
 type Rgb = [number, number, number]
 
@@ -27,13 +19,13 @@ function distance([r1, g1, b1]: Rgb, [r2, g2, b2]: Rgb): number {
   )
 }
 
-/** The palette color that looks most different from the person's color (CM-9). */
+/** The swatch that looks most different from the person's color (CM-9, VR-37). */
 export function computerColorFor(personColor: string | null | undefined): string {
   const person = toRgb(personColor ?? '')
-  let best: string = COMPUTER_PALETTE[0]
+  let best: string = SWATCHES[0].hex
   if (!person) return best
   let bestDistance = -1
-  for (const color of COMPUTER_PALETTE) {
+  for (const { hex: color } of SWATCHES) {
     const d = distance(person, toRgb(color)!)
     if (d > bestDistance) {
       best = color

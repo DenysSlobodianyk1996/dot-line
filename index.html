@@ -2,9 +2,27 @@
 <html lang="uk">
   <head>
     <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
+    <!-- logo favicon: SVG that follows the tab bar's color scheme, .ico for older browsers (VR-40, VR-41).
+         Vite prefixes these public paths with the base (/dot-line/ on Pages) at build time. -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- status bar color per system color scheme: cream paper, cocoa in dark (VR-46).
+         The build injects the Ukrainian install manifest link; setLocale() swaps it (VR-50, VR-51). -->
+    <meta name="theme-color" content="#fbf5ec" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#241c17" media="(prefers-color-scheme: dark)">
     <title>Точки й лінії</title>
+    <script>
+      // pick the theme before the app loads so a dark device doesn't flash cream (same rule as useTheme)
+      try {
+        var saved = localStorage.getItem('THEME')
+        document.documentElement.dataset.theme =
+          saved === 'light' || saved === 'dark'
+            ? saved
+            : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="app"></div>

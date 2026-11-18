@@ -1,7 +1,7 @@
 <template>
   <div class="flex w-full flex-col gap-4 sm:w-53 sm:shrink-0">
     <div class="flex flex-col gap-1">
-      <div class="text-sm font-medium text-gray-700">{{ t('result.title') }}</div>
+      <div class="text-sm font-medium text-ink-soft">{{ t('result.title') }}</div>
       <!-- the whole name, wrapping if needed (GB-5) -->
       <div v-if="winner" class="flex items-start gap-2">
         <span
@@ -10,16 +10,16 @@
         ></span>
         <!-- the robot sits between the swatch and the heading (CM-13) -->
         <RobotIcon v-if="isComputerPlayer(winner.name)" :size="24" class="mt-0.5" />
-        <h3 class="min-w-0 text-xl font-bold wrap-break-word text-gray-900">
+        <h3 class="min-w-0 text-xl font-bold wrap-break-word text-ink">
           {{ winnerTitle }}
         </h3>
       </div>
-      <h3 v-else class="text-xl font-bold text-gray-900">{{ t('result.draw') }}</h3>
-      <p class="text-sm text-gray-500">{{ reason }}</p>
+      <h3 v-else class="text-xl font-bold text-ink">{{ t('result.draw') }}</h3>
+      <p class="text-sm text-muted">{{ reason }}</p>
     </div>
 
     <div class="flex flex-col gap-1">
-      <div class="text-sm font-medium text-gray-700">{{ t('result.score') }}</div>
+      <div class="text-sm font-medium text-ink-soft">{{ t('result.score') }}</div>
       <PlayerScore
         v-for="player in rankedPlayers"
         :key="player.name"
