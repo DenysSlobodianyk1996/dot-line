@@ -29,6 +29,8 @@ const en = {
     difficulty: 'Difficulty',
     easy: 'Easy',
     normal: 'Normal',
+    easyHint: 'The computer picks a random line.',
+    normalHint: 'The computer takes squares whenever it can and tries not to give you any.',
   },
   colors: {
     coral: 'Coral',

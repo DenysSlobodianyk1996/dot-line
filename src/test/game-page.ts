@@ -422,6 +422,21 @@ export class GamePage {
     return this.selectedOption('Difficulty', DIFFICULTY_LABELS)
   }
 
+  // the hint that describes the difficulty switch for assistive technology (aria-describedby), as
+  // shown below the switch, or null when there is none (VC-26)
+  difficultyHint() {
+    const group = this.wrapper.find('[role="radiogroup"][aria-label="Difficulty"]')
+    const id = group.exists() ? group.attributes('aria-describedby') : undefined
+    if (!id) return null
+    const hint = document.getElementById(id)
+    if (!hint) return null
+    const followsSwitch = Boolean(
+      group.element.compareDocumentPosition(hint) & Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+    if (!followsSwitch) throw new Error('The difficulty hint must sit below the switch')
+    return hint.textContent!.trim()
+  }
+
   // the fieldsets of the setup form by legend, e.g. ['You', 'Opponent'] or ['Player 1', 'Player 2']
   setupFieldsets() {
     return this.wrapper.findAll('fieldset legend').map((legend) => legend.text())

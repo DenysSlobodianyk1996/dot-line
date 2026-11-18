@@ -17,6 +17,7 @@
         v-model="difficulty"
         :label="t('setup.difficulty')"
         :options="difficultyOptions"
+        :hint="t(DIFFICULTY_HINT_KEYS[difficulty])"
       />
 
       <div class="flex flex-col gap-2 sm:flex-row">
@@ -107,6 +108,11 @@ const DIFFICULTY_OPTIONS: { value: Difficulty; labelKey: string }[] = [
   { value: 'easy', labelKey: 'setup.easy' },
   { value: 'normal', labelKey: 'setup.normal' },
 ]
+// the hint under the difficulty switch describes only the selected difficulty (VC-26)
+const DIFFICULTY_HINT_KEYS: Record<Difficulty, string> = {
+  easy: 'setup.easyHint',
+  normal: 'setup.normalHint',
+}
 const GAME_MODES = GAME_MODE_OPTIONS.map(({ value }) => value)
 const DIFFICULTIES = DIFFICULTY_OPTIONS.map(({ value }) => value)
 
