@@ -91,7 +91,7 @@ Leaving the current game for the setup screen, where everything can be chosen ag
 ## App
 
 **Swatch**:
-One of the fixed, named player colors a player picks from on the setup screen (coral, teal, sunflower, sky, lavender, leaf, berry, tangerine).
+One of the 8 fixed, named player colors (coral, teal, sunflower, sky, lavender, leaf, berry, tangerine). A person picks one on the setup screen; the computer player gets the one that looks most different from the person's.
 _Avoid_: color picker, palette color
 
 **Rules panel**:
@@ -99,5 +99,5 @@ The panel with the "How to play" rules, opened from the info button in the heade
 _Avoid_: rules drawer, rules modal, rules toggle
 
 **Theme**:
-The light or dark version of the app's look; follows the device until the player switches it.
+The light or dark version of the app's Warm cream look; follows the device until the player switches it with the theme button in the header.
 _Avoid_: mode (that word belongs to game mode), skin

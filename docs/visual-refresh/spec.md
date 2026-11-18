@@ -2,7 +2,7 @@
 
 Terms follow [GLOSSARY.md](../../GLOSSARY.md). Related decisions: [ADR-0001](../adr/0001-players-identified-by-name.md) (players identified by name). User stories carry IDs **VR-n** for commits.
 
-**Status**: specified, not started. Issue: [#22](https://github.com/DenysSlobodianyk1996/dot-line/issues/22). Prototype (primary source): branch `prototype/visual-refresh` (game layouts on `/game?variant=A|B|C`, icon comparison on `/prototype-icons`; verdict in its last commit). This spec changes shipped requirements RL-2..RL-4, GS-1 (color part), CM-9 and I18N-3; when it ships, `docs/dot-line-game/requirements.md` is updated to match.
+**Status**: implemented on `feat/visual-refresh` (#23–#30), not yet on `master` (browser QA pending); shipped behavior is in [requirements](../dot-line-game/requirements.md) (GS-4, GS-5, PS-5, PS-6, RL-2..RL-6, TH, HD, APP-1, PWA, VC-6). Issue: [#22](https://github.com/DenysSlobodianyk1996/dot-line/issues/22). Prototype (primary source): branch `prototype/visual-refresh` (game layouts on `/game?variant=A|B|C`, icon comparison on `/prototype-icons`; verdict in its last commit). This spec changed shipped requirements RL-2..RL-4, GS-1 (color part), CM-9 (VC-6) and I18N-3; `docs/dot-line-game/requirements.md` now describes the result.
 
 ## Problem Statement
 

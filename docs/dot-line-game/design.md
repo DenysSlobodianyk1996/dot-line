@@ -315,14 +315,14 @@ The phone layout is the default, and `sm:` classes (640 px and up) restore the d
   3. Draw the fourth side of a square to claim it. One line can claim two squares.
   4. After every line, the turn passes to the other player.
   5. The game ends when all squares are claimed or someone presses Stop. Most squares wins; equal scores are a draw.
-- **RulesPanel.vue** replaces `RulesToggle.vue` (the Show/Hide rules button and the inline rules on setup and game are gone) [VR-24..VR-29]. It is rendered once in `App.vue` and teleported to `body`:
-  - Backdrop: `fixed inset-0 z-20 bg-ink/30` (a little lighter than the Stop dialog's), fading in and out over 200 ms. A click on it closes the panel.
-  - Panel: an `aside` with `role="dialog"`, `aria-modal="true"`, labelled by the "How to play" heading. `fixed inset-y-0 right-0 z-30 flex w-full flex-col gap-4 overflow-y-auto bg-paper p-5 shadow-2xl`, and from `sm` up `sm:w-96 sm:rounded-l-3xl` (384 px, 24 px radius on the left edge). It slides in from the right (`translate-x-full` → 0, 250 ms ease-out; out in 200 ms ease-in). On phones it covers the whole screen.
-  - Top row: the 40 px logo (animated, like the header) on the left and a 44 px round close button (`CloseIcon`, `text-ink-soft hover:bg-surface-muted`, `aria-label` `rules.hide`) on the right. Then `GameRules`.
-  - Focus: moves into the panel on open, is trapped while it is open, and returns to the info button on close. ✕, a backdrop click and Esc all close it [VR-26, VR-29].
+- **RulesPanel.vue** replaces `RulesToggle.vue` (the Show/Hide rules button and the inline rules on setup and game are gone) [VR-24..VR-29]. It is rendered once in `App.vue`, after `RouterView`:
+  - Backdrop: `fixed inset-0 z-20 bg-black/40`, fading in and out over 200 ms. A click on it closes the panel.
+  - Panel: an `aside` with `role="dialog"`, `aria-modal="true"`, labelled by the "How to play" heading. `fixed inset-y-0 right-0 z-30 flex w-full flex-col gap-4 overflow-y-auto bg-surface p-5 shadow-2xl`, and from `sm` up `sm:w-96 sm:rounded-l-3xl` (384 px, 24 px radius on the left edge). It slides in from the right (`translate-x-full` → 0, 250 ms ease-out; out in 200 ms ease-in). On phones it covers the whole screen.
+  - Top row: a 44 px round close button on the right (`CloseIcon`, `text-ink-soft hover:bg-surface-muted`, `aria-label` `rules.close`). Then `GameRules`. Under `prefers-reduced-motion` the slide and fade are off.
+  - Focus: moves to the close button on open, is trapped while it is open, and returns to the info button on close. ✕, a backdrop click and Esc all close it [VR-26, VR-29].
   - Closed by default on every screen, and the open state isn't saved [VR-27].
 - **useRulesPanel.ts**: a module-level `isOpen` ref with `open()` and `close()`, shared by the header's info button, the panel and `Game.vue`.
-- **Computer turn** [VR-31]: `Game.vue` passes `confirming || isRulesOpen` as `useComputerTurn`'s `paused`, so the computer waits while the panel is open, as with the Stop dialog.
+- **Computer turn** [VR-31, RL-6]: `Game.vue` passes `isStopConfirmOpen || rulesPanel.isOpen` as `useComputerTurn`'s `paused`, so the computer waits while the panel is open, as with the Stop dialog.
 - **index.html** [APP-1]: `<html lang="uk">` with `<title>Точки й лінії</title>`, the default before the app starts. At runtime the title and `lang` follow the language (see Languages). The deploy workflow's `404.html` copy inherits the same defaults.
 
 ## Languages [I18N-1..6, APP-1]
@@ -422,8 +422,8 @@ The **Warm cream** palette is a set of semantic CSS custom properties in `src/as
 
 | Token | Used for | Light | Dark |
 | --- | --- | --- | --- |
-| `paper` | app background, rules panel, swatch ring gap | `#fbf5ec` | `#241c17` |
-| `surface` | fields, board, rules card, header buttons, dialog | `#fffdf8` | `#30261f` |
+| `paper` | app background, swatch ring gap | `#fbf5ec` | `#241c17` |
+| `surface` | fields, board, rules panel, header buttons, dialog | `#fffdf8` | `#30261f` |
 | `surface-muted` | hover background, read-only fields | `#f3e8d9` | `#3a2e26` |
 | `surface-strong` | secondary button, rule numbers | `#ecdfcc` | `#45372d` |
 | `border` | borders, secondary hover | `#e2d3bd` | `#574638` |
@@ -442,7 +442,7 @@ The palette values are the prototype's (spec token table); `on-accent` and `dang
 - **Font**: Nunito Variable (Latin + Cyrillic) from `@fontsource-variable/nunito`, bundled so it works offline; `--font-sans: 'Nunito Variable', ui-rounded, system-ui, sans-serif` [VR-2].
 - **Shapes**: `--radius-md: 0.75rem` (12 px: buttons, fields, switches, the language toggle) and `--radius-lg: 1.25rem` (20 px: fieldsets, board, dialog). Shadows stay Tailwind's `shadow-sm` / `shadow-lg` [VR-3].
 - **Buttons**: primary `bg-accent text-on-accent hover:bg-accent-hover` with an `accent` focus ring offset on `paper`; secondary `bg-surface-strong text-ink shadow-sm hover:bg-border` [VR-4].
-- **Backdrops**: the Stop dialog uses `bg-ink/40`, the rules panel `bg-ink/30`, as in the prototype.
+- **Backdrops**: the Stop dialog uses `bg-ink/40`, the rules panel `bg-black/40`.
 - **Player colors** stay as they are in both themes: lines in the owner's color, owned squares at 30% with the initial in the owner's color [VR-7].
 - **useTheme.ts** [VR-11, VR-14, VR-15]: the system preference follows `matchMedia('(prefers-color-scheme: dark)')` live; the override is the saved `THEME` value (`src/static/storage-keys.ts`, through `StorageService`); the effective theme is the override, else the system preference. It sets `document.documentElement.dataset.theme`, and `toggle()` saves the opposite of the current theme as the override.
 - `index.html` sets `data-theme` from the saved `THEME` (or the media query) in a small inline script before the app loads, so a reload doesn't flash the light theme.
@@ -451,10 +451,10 @@ The palette values are the prototype's (spec token table); `on-accent` and `dang
 
 `App.vue`: `<header class="mb-4 flex items-center gap-2">` above `RouterView`, inside the existing `p-2` wrapper:
 
-1. `AppLogo` at 36 px, animated, dot color `ink` of the current theme.
-2. The game name, `t('app.title')`, `mr-auto min-w-0 text-lg font-extrabold text-ink` (18 px, 800). It wraps on very narrow phones (320 px); the buttons never shrink [VR-22].
+1. `AppLogo` at 32 px (`size-8`), animated, dots in `currentColor` = `ink` of the current theme.
+2. The game name, `t('app.title')`, `mr-auto text-lg font-extrabold text-ink` (18 px, 800). It wraps on very narrow phones (320 px); the buttons never shrink [VR-22].
 3. Theme button (`ThemeToggle.vue`): shows `DarkModeIcon` (moon) in light and `LightModeIcon` (sun) in dark; `aria-label` says what it switches to, `theme.dark` / `theme.light` [VR-13, VR-16].
-4. Info button: `InfoIcon`, `aria-label` `rules.show`, `aria-expanded` bound to the rules panel, `aria-haspopup="dialog"`; opens the rules panel [VR-23].
+4. Info button: `InfoIcon`, `aria-label` `rules.open`, `aria-expanded` bound to the rules panel, `aria-haspopup="dialog"`; opens the rules panel [VR-23].
 5. `LanguageToggle` (unchanged behavior).
 
 The two icon buttons are `flex size-11 sm:size-9 items-center justify-center rounded-full border border-border bg-surface text-ink-soft shadow-sm hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-accent`, with 20 px icons: 44 px tap targets on phones, 36 px from `sm` up [VR-21].
@@ -485,16 +485,16 @@ The two icon buttons are `flex size-11 sm:size-9 items-center justify-center rou
 
 ### Logo and app icons [VR-19, VR-20, VR-40..VR-43]
 
-- **AppLogo.vue**: one SVG (`viewBox="0 0 100 100"`, `aria-hidden`): lines `(22,22)–(78,22)` coral `#e8735a` and `(22,22)–(22,78)` teal `#2a9d8f`, both `stroke-width` 11 with round caps; the "waiting" line `(78,22)–(78,78)` sunflower `#e2a93b`, `stroke-width` 9, `stroke-dasharray="0.1 16"`, round caps (so it reads as dots); four dots of radius 9 in the `dot` prop color, and a sunflower halo of radius 14 at 25% opacity behind the top-right dot. Props: `size`, `dot`, `animated`, and `tile` (a background color; the logo then sits on a `rx=22` rect, scaled to 80% around the center, inside the maskable safe zone).
-- **Animation**: with `animated`, the waiting line runs `logo-wait` (`stroke-dashoffset` 0 → −24, 1.2 s, linear, infinite). Under `prefers-reduced-motion: reduce` it doesn't run [VR-20].
+- **AppLogo.vue**: one SVG (`viewBox="0 0 100 100"`, `aria-hidden`): lines `(22,22)–(78,22)` coral `#e8735a` and `(22,22)–(22,78)` teal `#2a9d8f`, both `stroke-width` 11 with round caps; the "waiting" line `(78,22)–(78,78)` sunflower `#e2a93b`, `stroke-width` 9, `stroke-dasharray="0.1 16"`, round caps (so it reads as dots); four dots of radius 9 in the `dot` prop color, and a sunflower halo of radius 14 at 25% opacity behind the top-right dot. The SVG is built by `logoSvg(options)` in `src/shared/logo.ts`, the one source for the header, the favicon and the install icons: `dot` (a color or `currentColor`), `style`, `tile` (a background color; the logo then sits on a `rx=tileRadius` rect, default 22, scaled by `scale`, default 80%, around the center) and `size`. `AppLogo.vue` has no props: it renders `logoSvg({ dot: 'currentColor' })` with `v-html` in a `size-8` span.
+- **Animation**: in `AppLogo`, the waiting line runs `logo-wait` (`stroke-dashoffset` 0 → −16.1, one dash period, 1.2 s, linear, infinite) only under `prefers-reduced-motion: no-preference` [VR-20].
 - **Favicon** `public/favicon.svg`: the transparent logo with a `<style>` that makes the dots `#4a3a2e`, and `#f6ebdc` under `@media (prefers-color-scheme: dark)`, so the dots stay visible on dark tab bars [VR-41]. `favicon.ico` (16, 32, 48 px, light version) is the fallback.
-- **Install icons**: the logo on a full-bleed cream `#fbf5ec` square with cocoa dots, logo inside the central 80%: `pwa-192x192.png`, `pwa-512x512.png`, `maskable-icon-512x512.png` (purpose `maskable`) and `apple-touch-icon-180x180.png`. Generated once from the SVG source by a script (dev dependency) and committed under `public/` [VR-42, VR-43].
+- **Install icons**: the logo with cocoa dots on cream `#fbf5ec`: `pwa-192x192.png` and `pwa-512x512.png` on a rounded tile (`rx` 22, logo at 80%), `maskable-icon-512x512.png` (purpose `maskable`) and `apple-touch-icon-180x180.png` on a full-bleed square with the logo at 74%, so even the halo stays inside the safe-zone circle. `npm run generate-icons` (`scripts/generate-icons.ts`, with `sharp` and `png-to-ico` as dev dependencies) writes them and the favicons once; they are committed under `public/` [VR-42, VR-43].
 
 ### Installable app (PWA) [VR-44..VR-52]
 
 - `vite-plugin-pwa` with `registerType: 'autoUpdate'`: a new service worker installs quietly and takes over the next time the game opens; nothing interrupts a game, and the saved game in localStorage is untouched [VR-48, VR-49].
 - Workbox precaches every built asset (JS, CSS, the Nunito font files, icons, `index.html`, `404.html`) and falls back to `index.html` for navigations, so `/game` works offline after the first visit [VR-47].
-- Manifests, without `short_name`: `manifest.webmanifest` (Ukrainian, `name` "Точки й лінії", linked from `index.html`) and `manifest.en.webmanifest` (`name` "Dots & Lines"). Both: `display: standalone`, `orientation: any`, `start_url` and `scope` from Vite's `base` (`/dot-line/` on Pages), `background_color` and `theme_color` `#fbf5ec`, and the icons above [VR-45, VR-46, VR-50..VR-52].
+- Manifests, without `short_name`: `manifest.uk.webmanifest` (Ukrainian, `name` "Точки й лінії", linked from `index.html` by the build) and `manifest.en.webmanifest` (`name` "Dots & Lines"). Both: `display: standalone`, `orientation: any`, `start_url` and `scope` from Vite's `base` (`/dot-line/` on Pages), `background_color` and `theme_color` `#fbf5ec`, and the icons above [VR-45, VR-46, VR-50..VR-52].
 - `index.html` has `<meta name="theme-color" content="#fbf5ec" media="(prefers-color-scheme: light)">` and `content="#241c17"` for dark [VR-46].
 - `setLocale()` also swaps the `<link rel="manifest">` `href` to the locale's manifest, along with `lang` and the title [VR-50, VR-51]. The English `app.title` becomes "Dots & Lines".
 
@@ -509,7 +509,7 @@ Added to both locales:
 | `colors.<key>` | see [Swatch picker](#swatch-picker-vr-32vr-39) | |
 | `colors.taken` | This color is already taken | Цей колір уже зайнятий |
 
-Changed: `app.title` in English, "Dots & Lines". `rules.show` and `rules.hide` stay and label the info and close buttons.
+Changed: `app.title` in English, "Dots & Lines". `rules.show` and `rules.hide` are replaced by `rules.open` ("Rules" / "Правила", the info button) and `rules.close` ("Close rules" / "Закрити правила", the close button).
 
 ## Tests
 
