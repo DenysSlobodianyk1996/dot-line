@@ -503,6 +503,39 @@ export class GamePage {
     return hint.textContent!.trim()
   }
 
+  // the hint that describes the size input for assistive technology (aria-describedby), as shown
+  // below the input, or null when there is none (GS-2)
+  sizeHint() {
+    const hint = this.sizeHintElement()
+    return hint ? hint.textContent!.trim() : null
+  }
+
+  // the messages shown under the size input, top to bottom: its hint, then any validation
+  // error (GS-2)
+  sizeMessages() {
+    const hint = this.sizeHintElement()
+    if (!hint) return []
+    const errors = this.wrapper
+      .findAll('form [data-field-error]')
+      .map((el) => el.element)
+      .filter((el) => el.parentElement === hint.parentElement)
+    return [hint, ...errors]
+      .sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1))
+      .map((el) => el.textContent!.trim())
+  }
+
+  private sizeHintElement() {
+    const input = this.input('size')
+    const id = input.exists() ? input.attributes('aria-describedby') : undefined
+    const hint = id ? document.getElementById(id) : null
+    if (!hint) return null
+    const followsInput = Boolean(
+      input.element.compareDocumentPosition(hint) & Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+    if (!followsInput) throw new Error('The size hint must sit below the input')
+    return hint
+  }
+
   // the fieldsets of the setup form by legend, e.g. ['You', 'Opponent'] or ['Player 1', 'Player 2']
   setupFieldsets() {
     return this.wrapper.findAll('fieldset legend').map((legend) => legend.text())
