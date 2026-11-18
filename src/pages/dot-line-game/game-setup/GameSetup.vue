@@ -1,5 +1,6 @@
 <template>
-  <div class="max-w-130">
+  <!-- centered horizontally, top-aligned (MB-9) -->
+  <div class="mx-auto max-w-130">
     <h3 class="w-full text-center font-bold text-xl mb-4">{{ t('setup.title') }}</h3>
     <!-- keep-values: what's typed survives a game mode switch (CM-10) -->
     <Form
@@ -16,6 +17,7 @@
         v-model="difficulty"
         :label="t('setup.difficulty')"
         :options="difficultyOptions"
+        :hint="t(DIFFICULTY_HINT_KEYS[difficulty])"
       />
 
       <div class="flex flex-col gap-2 sm:flex-row">
@@ -52,8 +54,14 @@
         v-slot="{ field, errorMessage }"
       >
         <div class="flex flex-col gap-2">
-          <BaseLabel :for="field.name">{{ t('setup.size') }}</BaseLabel>
-          <BaseInput v-bind="field" :id="field.name" :title="field.value" type="number" />
+          <BaseLabel :for="field.name" required>{{ t('setup.size') }}</BaseLabel>
+          <BaseInput
+            v-bind="field"
+            :id="field.name"
+            :title="field.value"
+            type="number"
+            aria-required="true"
+          />
           <BaseFieldError :errorMessage />
         </div>
       </Field>
@@ -100,6 +108,11 @@ const DIFFICULTY_OPTIONS: { value: Difficulty; labelKey: string }[] = [
   { value: 'easy', labelKey: 'setup.easy' },
   { value: 'normal', labelKey: 'setup.normal' },
 ]
+// the hint under the difficulty switch describes only the selected difficulty (VC-26)
+const DIFFICULTY_HINT_KEYS: Record<Difficulty, string> = {
+  easy: 'setup.easyHint',
+  normal: 'setup.normalHint',
+}
 const GAME_MODES = GAME_MODE_OPTIONS.map(({ value }) => value)
 const DIFFICULTIES = DIFFICULTY_OPTIONS.map(({ value }) => value)
 

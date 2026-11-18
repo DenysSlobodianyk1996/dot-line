@@ -29,6 +29,8 @@ const en = {
     difficulty: 'Difficulty',
     easy: 'Easy',
     normal: 'Normal',
+    easyHint: 'The computer picks a random line.',
+    normalHint: 'The computer takes squares whenever it can and tries not to give you any.',
   },
   colors: {
     coral: 'Coral',
@@ -82,7 +84,7 @@ const en = {
     completed: 'All squares are filled.',
     stopped: 'The game was stopped.',
     score: 'Score',
-    newGame: 'New game',
+    newGameSettings: 'New game settings',
     rematch: 'Rematch',
   },
   rules: {

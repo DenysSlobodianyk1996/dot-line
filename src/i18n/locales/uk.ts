@@ -30,6 +30,8 @@ const uk: typeof en = {
     difficulty: 'Складність',
     easy: 'Легко',
     normal: 'Нормально',
+    easyHint: 'Комп’ютер обирає випадкову лінію.',
+    normalHint: 'Комп’ютер забирає квадрати, коли може, і намагається не віддавати їх вам.',
   },
   colors: {
     coral: 'Кораловий',
@@ -81,7 +83,7 @@ const uk: typeof en = {
     completed: 'Усі квадрати заповнено.',
     stopped: 'Гру зупинено.',
     score: 'Рахунок',
-    newGame: 'Нова гра',
+    newGameSettings: 'Налаштування нової гри',
     rematch: 'Реванш',
   },
   rules: {

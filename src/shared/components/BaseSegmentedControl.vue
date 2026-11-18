@@ -5,6 +5,7 @@
     <div
       role="radiogroup"
       :aria-label="label"
+      :aria-describedby="hint ? hintId : undefined"
       class="flex gap-0.5 rounded-md border border-border bg-surface p-0.5 shadow-sm"
     >
       <button
@@ -24,16 +25,23 @@
         {{ option.label }}
       </button>
     </div>
+    <BaseHint v-if="hint" :id="hintId">{{ hint }}</BaseHint>
   </div>
 </template>
 
 <script setup lang="ts" generic="T extends string">
 // A labelled full-width switch between a few options, styled like the language toggle
-// (design: game mode and difficulty switches; CM-1, CM-5, CM-38)
+// (design: game mode and difficulty switches; CM-1, CM-5, CM-38), with an optional muted hint
+// below it that describes the group (VC-26)
+import { useId } from 'vue'
+import BaseHint from './BaseHint.vue'
+
 defineProps<{
   label: string
   options: { value: T; label: string }[]
+  hint?: string
 }>()
 
 const model = defineModel<T>({ required: true })
+const hintId = useId()
 </script>

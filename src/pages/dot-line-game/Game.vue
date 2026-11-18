@@ -1,6 +1,7 @@
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+    <!-- board + panel centered horizontally, top-aligned (MB-9) -->
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-center sm:gap-6">
       <GameBoard
         v-model:selected-dot="selectedDot"
         :dot-line-game="dotLineGame"
@@ -9,7 +10,7 @@
       <GameResult
         v-if="dotLineGame.isFinished"
         :dot-line-game="dotLineGame"
-        @new-game="newGame"
+        @new-game-settings="newGameSettings"
         @rematch="rematch"
       />
       <GameStatus
@@ -87,7 +88,7 @@ function rematch() {
   props.dotLineGame.start()
 }
 
-function newGame() {
+function newGameSettings() {
   computerTurn.cancel()
   StorageService.removeItem(CURRENT_GAME)
   props.dotLineGame.reset()
