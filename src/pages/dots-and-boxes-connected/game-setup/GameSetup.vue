@@ -5,11 +5,12 @@
     <div class="mb-4 flex items-center justify-center gap-2">
       <h3 class="text-center font-bold text-xl">{{ t('setup.title') }}</h3>
       <BaseIconButton
+        ref="rulesButton"
         data-setup-rules-button
         :aria-label="t('rules.open')"
         aria-haspopup="dialog"
-        :aria-expanded="rulesPanel.isOpen.value"
-        @click="rulesPanel.open"
+        :aria-expanded="rulesPanel.isOpenedBy(rulesButton?.element)"
+        @click="rulesPanel.open($event.currentTarget)"
       >
         <InfoIcon :size="20" />
       </BaseIconButton>
@@ -93,7 +94,7 @@
 <script setup lang="ts">
 import { Form, Field, defineRule } from 'vee-validate'
 import { required, integer, min_value, max_value } from '@vee-validate/rules'
-import { computed, ref, useId } from 'vue'
+import { computed, ref, useId, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import PlayerField from './PlayerField.vue'
 import ComputerOpponentField from './ComputerOpponentField.vue'
@@ -120,6 +121,7 @@ defineRule('max_value', max_value)
 
 const { t } = useI18n()
 const rulesPanel = useRulesPanel()
+const rulesButton = useTemplateRef('rulesButton')
 const sizeHintId = useId()
 const sizeErrorId = useId()
 

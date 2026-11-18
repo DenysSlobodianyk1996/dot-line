@@ -266,10 +266,10 @@ export class GamePage {
   }
 
   // Opens the panel with the header's info button or the one next to the setup title (UP-1).
-  // Focuses the button first, as a click does in the browser.
+  // The button doesn't get focus first: Safari and touch screens don't focus a clicked button (UP-2).
   async openRules({ from = 'header' }: { from?: 'header' | 'setup' } = {}) {
     const button = from === 'setup' ? this.setupRulesButton : this.rulesButton
-    ;(button.element as HTMLElement).focus()
+    ;(document.activeElement as HTMLElement | null)?.blur()
     await button.trigger('click')
     await flushPromises()
   }

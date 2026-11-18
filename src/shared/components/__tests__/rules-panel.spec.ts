@@ -145,6 +145,19 @@ describe('info button next to the setup title (UP-1, UP-2)', () => {
     expect(page.setupRulesButtonState()?.expanded).toBe('true')
   })
 
+  it('reports open only on the info button that opened the panel', async () => {
+    const page = await openGamePage()
+
+    await page.openRules({ from: 'setup' })
+    expect(page.setupRulesButtonState()?.expanded).toBe('true')
+    expect(page.rulesButtonState().expanded).toBe('false')
+    await page.closeRules('escape')
+
+    await page.openRules({ from: 'header' })
+    expect(page.rulesButtonState().expanded).toBe('true')
+    expect(page.setupRulesButtonState()?.expanded).toBe('false')
+  })
+
   it.each(['button', 'backdrop', 'escape'] as const)(
     'returns focus to the setup info button after closing with %s',
     async (how) => {

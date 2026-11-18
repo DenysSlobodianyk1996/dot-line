@@ -60,7 +60,7 @@ import GameRules from './GameRules.vue'
 const props = defineProps<{ returnFocusTo: HTMLElement | null }>()
 
 const { t } = useI18n()
-const { isOpen, opener, close } = useRulesPanel()
+const { isOpen, close, returnFocus } = useRulesPanel()
 const titleId = useId()
 const panel = useTemplateRef<HTMLElement>('panel')
 const closeButton = useTemplateRef<HTMLButtonElement>('closeButton')
@@ -70,8 +70,7 @@ const closeButton = useTemplateRef<HTMLButtonElement>('closeButton')
 watch(isOpen, async (open) => {
   await nextTick()
   if (open) return closeButton.value?.focus()
-  const target = opener.value?.isConnected ? opener.value : props.returnFocusTo
-  target?.focus()
+  returnFocus(props.returnFocusTo)
 })
 
 const FOCUSABLE =
