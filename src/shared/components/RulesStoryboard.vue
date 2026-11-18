@@ -102,16 +102,17 @@
   </section>
 </template>
 
-<script setup lang="ts">
-import { useI18n } from 'vue-i18n'
+<script lang="ts">
 import { Dot } from '@/models'
 import { STORY_COLORS, STORY_SIZE, storyFrames, type StoryPlayer } from '@/shared/rules-storyboard'
+import { BOARD_MAX_CELL, BOARD_PADDING } from '@/static'
 
-// the game board's proportions: 48 px squares inside 16 px padding, scaled to the frame's width
-const CELL = 48
-const PAD = 16
+// the game board's proportions (its largest squares and padding), scaled to the frame's width
+const CELL = BOARD_MAX_CELL
+const PAD = BOARD_PADDING
 const BOX = STORY_SIZE * CELL + PAD * 2
 
+// the scripted game never changes, so it is played once, not each time the panel opens
 const FRAMES = storyFrames()
 const DOTS = Array.from(
   { length: (STORY_SIZE + 1) ** 2 },
@@ -119,10 +120,15 @@ const DOTS = Array.from(
     new Dot({ row: Math.floor(index / (STORY_SIZE + 1)), col: index % (STORY_SIZE + 1) }),
 )
 
-const { t } = useI18n()
-
 const at = (index: number) => PAD + index * CELL
 const colorOf = (owner: string | null) => STORY_COLORS[owner as StoryPlayer]
+</script>
+
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 // the owner's initial from the color's name in the current language: C/T, К/Б
 const letterOf = (owner: string | null) => t(`colors.${owner}`).charAt(0).toUpperCase()
 </script>

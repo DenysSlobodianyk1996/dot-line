@@ -49,4 +49,20 @@ describe('Setup size', () => {
       expect(messages[1]).not.toBe('')
     },
   )
+
+  it('describes an invalid size by its hint and its error, and marks it invalid (GS-2)', async () => {
+    const page = await openGamePage()
+    await page.input('player1.name').setValue('Anna')
+
+    expect(page.isSizeInvalid()).toBe(false)
+    expect(page.sizeDescription()).toEqual(['From 2 to 10'])
+
+    await page.input('size').setValue('11')
+    await page.submitSetupForm()
+
+    expect(page.isSizeInvalid()).toBe(true)
+    const [hint, error] = page.sizeDescription()
+    expect(hint).toBe('From 2 to 10')
+    expect(error).toBe(page.sizeMessages()[1])
+  })
 })

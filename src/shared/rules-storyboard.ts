@@ -49,8 +49,11 @@ function snapshot(game: DotLineGame, dot1: Dot | null = null): StoryFrame {
   }
 }
 
-/** The four frames: first line, Dot1 with its neighbors, one owned square, two squares from one line. */
-export function storyFrames(): StoryFrame[] {
+/**
+ * The four frames: first line, Dot1 with its neighbors, one owned square, two squares from one line.
+ * Throws if a scripted line breaks the rules, so a bad script can't silently drop a move.
+ */
+export function storyFrames(moves: [Dot, Dot][] = MOVES): StoryFrame[] {
   const game = new DotLineGame({
     player1: { name: 'coral', color: STORY_COLORS.coral },
     player2: { name: 'teal', color: STORY_COLORS.teal },
@@ -58,10 +61,13 @@ export function storyFrames(): StoryFrame[] {
     currentPlayerName: 'coral',
   })
   const frames: StoryFrame[] = []
-  MOVES.forEach(([from, to], index) => {
+  moves.forEach(([from, to], index) => {
     if (index === 1) frames.push(snapshot(game, from))
+    if (!game.canDraw(from, to)) {
+      throw new Error(`Storyboard move ${index + 1} (${from.key}-${to.key}) is not a legal line`)
+    }
     game.drawLine(from, to)
-    if (index === 0 || index === 4 || index === MOVES.length - 1) frames.push(snapshot(game))
+    if (index === 0 || index === 4 || index === moves.length - 1) frames.push(snapshot(game))
   })
   return frames
 }

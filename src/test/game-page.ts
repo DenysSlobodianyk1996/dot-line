@@ -153,6 +153,14 @@ export function randomFor(first: 1 | 2) {
   return first === 1 ? 0 : 0.99
 }
 
+// an element's text as a screen reader reads it: parts hidden from assistive technology (such as
+// a label's required marker `*`) are left out (GS-1, GS-2)
+export function accessibleText(element: Element) {
+  const copy = element.cloneNode(true) as Element
+  copy.querySelectorAll('[aria-hidden="true"]').forEach((el) => el.remove())
+  return copy.textContent?.trim() ?? ''
+}
+
 export class GamePage {
   constructor(readonly wrapper: VueWrapper) {}
 
@@ -430,9 +438,7 @@ export class GamePage {
   // a setup field's label as a screen reader reads it: parts hidden from assistive technology
   // (such as the required marker) are left out
   fieldAccessibleLabel(id: 'player1.name' | 'player2.name' | 'size') {
-    const label = this.label(id).element.cloneNode(true) as HTMLElement
-    label.querySelectorAll('[aria-hidden="true"]').forEach((el) => el.remove())
-    return label.textContent?.trim() ?? ''
+    return accessibleText(this.label(id).element)
   }
 
   // whether a setup field is announced as required
@@ -524,10 +530,30 @@ export class GamePage {
       .map((el) => el.textContent!.trim())
   }
 
+  // what assistive technology reads as the size input's description: the text of every element
+  // its aria-describedby points at, in order (GS-2)
+  sizeDescription() {
+    return this.sizeDescribedBy().map((el) => el.textContent!.trim())
+  }
+
+  // whether the size input is announced as invalid (GS-2)
+  isSizeInvalid() {
+    return this.input('size').attributes('aria-invalid') === 'true'
+  }
+
+  private sizeDescribedBy() {
+    const input = this.input('size')
+    const ids = input.exists() ? (input.attributes('aria-describedby') ?? '') : ''
+    return ids
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null)
+  }
+
   private sizeHintElement() {
     const input = this.input('size')
-    const id = input.exists() ? input.attributes('aria-describedby') : undefined
-    const hint = id ? document.getElementById(id) : null
+    const hint = this.sizeDescribedBy()[0] ?? null
     if (!hint) return null
     const followsInput = Boolean(
       input.element.compareDocumentPosition(hint) & Node.DOCUMENT_POSITION_FOLLOWING,

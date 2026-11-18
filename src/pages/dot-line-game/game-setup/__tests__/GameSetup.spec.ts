@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { flushPromises, type VueWrapper } from '@vue/test-utils'
 import { mountGamePage, type MountGamePageOptions } from '@/test/mount-game-page'
+import { accessibleText } from '@/test/game-page'
 
 const TWO_PLAYERS = ['Двоє гравців', 'Two players']
 
@@ -12,13 +13,6 @@ async function openTwoPlayersSetup(storage: MountGamePageOptions['storage'] = {}
   await option.trigger('click')
   await flushPromises()
   return page
-}
-
-// a label's text as a screen reader reads it: the required marker `*` is hidden (GS-1, GS-2)
-function accessibleText(label: Element) {
-  const copy = label.cloneNode(true) as Element
-  copy.querySelectorAll('[aria-hidden="true"]').forEach((el) => el.remove())
-  return copy.textContent?.trim() ?? ''
 }
 
 // finds an input through its label, the way a player would (label `for` → input `id`)

@@ -48,19 +48,20 @@ import { Dot, isComputerPlayer, type DotLineGame, type Line, type Square } from 
 import { computed, onBeforeUnmount, onMounted, ref, type CSSProperties } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDisplayName } from '@/shared/composables/useDisplayName'
+import { BOARD_MAX_CELL, BOARD_PADDING } from '@/static'
 
 type DotState = 'idle' | 'start' | 'selected' | 'target'
 
-const MAX_CELL = 48
+const MAX_CELL = BOARD_MAX_CELL
 const MIN_CELL = 24
-const PADDING = 16
+const PADDING = BOARD_PADDING
 const BORDER = 1
 const LINE_WIDTH = 4
 const HALO_WIDTH = 4
 const MAX_TAP_AREA = 44
 // horizontal space taken by the app's p-2 gutters
 const APP_GUTTERS = 16
-// from Tailwind's sm breakpoint the widest side panel (GameResult, w-53) and gap-6 sit beside the board
+// from Tailwind's sm breakpoint the side panel (GameStatus or GameResult, both w-53) and gap-6 sit beside the board
 const SIDE_PANEL_WITH_GAP = 212 + 24
 const SIDE_BY_SIDE_QUERY = '(min-width: 40rem)'
 const FALLBACK_COLOR = 'var(--color-ink)' // follows the theme, so it stays readable in dark (VR-17)
