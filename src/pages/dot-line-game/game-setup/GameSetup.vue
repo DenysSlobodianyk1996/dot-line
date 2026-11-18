@@ -18,7 +18,7 @@
     <Form
       :initial-values="formInitialValues"
       keep-values
-      class="flex flex-col gap-2"
+      class="flex flex-col gap-4"
       @submit="submit"
       v-slot="{ values }"
     >
@@ -32,7 +32,7 @@
         :hint="difficultyHint"
       />
 
-      <div class="flex flex-col gap-2 sm:flex-row">
+      <div class="flex flex-col gap-4 sm:flex-row">
         <template v-if="isComputerMode">
           <PlayerField
             :number="1"
