@@ -1,8 +1,17 @@
 <template>
   <div data-side-panel data-result-panel class="flex w-full flex-col gap-4 sm:w-53 sm:shrink-0">
-    <!-- where Stop was (UP-6). Phones: two equal 44 px columns (MB-6, MB-8, UP-7); sm+: a full-width
-         stack with Rematch on top, so nothing wraps raggedly (UP-8) -->
+    <!-- where Stop was (UP-6). sm+: a full-width stack with Rematch on top, so nothing wraps
+         raggedly (UP-8); DOM (and Tab) order follows that stack. Phones: two equal 44 px columns
+         with New game settings on the left, by `order` (MB-6, MB-8, UP-7) -->
     <div data-panel-actions class="grid grid-cols-2 gap-2 sm:flex sm:flex-col">
+      <BaseButton
+        color="primary"
+        class="order-last min-h-11 w-full gap-2 sm:order-none sm:min-h-0"
+        @click="emit('rematch')"
+      >
+        <RefreshIcon :size="20" class="shrink-0" />
+        {{ t('result.rematch') }}
+      </BaseButton>
       <BaseButton
         color="secondary"
         class="min-h-11 w-full gap-2 sm:min-h-0"
@@ -10,14 +19,6 @@
       >
         <SettingsIcon :size="20" class="shrink-0" />
         {{ t('result.newGameSettings') }}
-      </BaseButton>
-      <BaseButton
-        color="primary"
-        class="min-h-11 w-full gap-2 sm:order-first sm:min-h-0"
-        @click="emit('rematch')"
-      >
-        <RefreshIcon :size="20" class="shrink-0" />
-        {{ t('result.rematch') }}
       </BaseButton>
     </div>
 

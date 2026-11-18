@@ -198,7 +198,8 @@ describe('game screen: side panel layout (UP-4..UP-6)', () => {
 
     await page.stopGame()
 
-    expect(page.sidePanelActions()).toEqual(['New game settings', 'Rematch'])
+    // DOM (and Tab) order matches the stack from 640 px up: Rematch on top (UP-8)
+    expect(page.sidePanelActions()).toEqual(['Rematch', 'New game settings'])
   })
 })
 
@@ -335,13 +336,13 @@ describe('game screen: result (END-3..6)', () => {
     await page.stopGame()
 
     expect(page.resultButtons()).toEqual([
-      { label: 'New game settings', shownInFull: true },
       { label: 'Rematch', shownInFull: true },
+      { label: 'New game settings', shownInFull: true },
     ])
     await page.switchLanguage('uk')
     expect(page.resultButtons()).toEqual([
-      { label: 'Налаштування нової гри', shownInFull: true },
       { label: 'Реванш', shownInFull: true },
+      { label: 'Налаштування нової гри', shownInFull: true },
     ])
   })
 
