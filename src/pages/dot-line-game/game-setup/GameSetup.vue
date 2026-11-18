@@ -52,8 +52,14 @@
         v-slot="{ field, errorMessage }"
       >
         <div class="flex flex-col gap-2">
-          <BaseLabel :for="field.name">{{ t('setup.size') }}</BaseLabel>
-          <BaseInput v-bind="field" :id="field.name" :title="field.value" type="number" />
+          <BaseLabel :for="field.name" required>{{ t('setup.size') }}</BaseLabel>
+          <BaseInput
+            v-bind="field"
+            :id="field.name"
+            :title="field.value"
+            type="number"
+            aria-required="true"
+          />
           <BaseFieldError :errorMessage />
         </div>
       </Field>
