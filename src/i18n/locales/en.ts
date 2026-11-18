@@ -30,6 +30,18 @@ const en = {
     easy: 'Easy',
     normal: 'Normal',
   },
+  colors: {
+    coral: 'Coral',
+    teal: 'Teal',
+    sunflower: 'Sunflower',
+    sky: 'Sky',
+    lavender: 'Lavender',
+    leaf: 'Leaf',
+    berry: 'Berry',
+    tangerine: 'Tangerine',
+    // validation: the other player already has this swatch (VR-36)
+    taken: 'This color is already taken',
+  },
   players: {
     computer: 'Computer',
   },

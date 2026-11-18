@@ -38,6 +38,7 @@ export function setLocale(locale: AppLocale) {
 configure({
   generateMessage: ({ field, rule }) => {
     if (rule?.name === 'differentFromAll') return i18n.global.t('validation.differentNames')
+    if (rule?.name === 'differentColor') return i18n.global.t('colors.taken')
     if (rule?.name === 'notComputerName') return i18n.global.t('validation.computerName')
     if (rule?.name === 'max') {
       // string rules pass params as a list: `max:15` → ['15']
