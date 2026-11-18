@@ -202,6 +202,45 @@ describe('game screen: side panel layout (UP-4..UP-6)', () => {
   })
 })
 
+describe('game screen: button icons (UP-9)', () => {
+  const icon = (name: string, accessibleName: string) => ({
+    name,
+    decorative: true,
+    followsTextColor: true,
+    beforeLabel: true,
+    accessibleName,
+  })
+
+  it('Stop shows a hand before its label, which stays its accessible name (UP-9)', async () => {
+    const page = await startGame()
+
+    expect(page.buttonIcon('Stop')).toEqual(icon('stop-hand', 'Stop'))
+    await page.switchLanguage('uk')
+    expect(page.buttonIcon('Зупинити')).toEqual(icon('stop-hand', 'Зупинити'))
+  })
+
+  it('New game settings shows a gear and Rematch a refresh arrow, in both languages (UP-9)', async () => {
+    const page = await startGame()
+    await page.stopGame()
+
+    expect(page.buttonIcon('New game settings')).toEqual(icon('settings', 'New game settings'))
+    expect(page.buttonIcon('Rematch')).toEqual(icon('refresh', 'Rematch'))
+    await page.switchLanguage('uk')
+    expect(page.buttonIcon('Налаштування нової гри')).toEqual(
+      icon('settings', 'Налаштування нової гри'),
+    )
+    expect(page.buttonIcon('Реванш')).toEqual(icon('refresh', 'Реванш'))
+  })
+
+  it('the Stop dialog buttons stay text only (UP-9)', async () => {
+    const page = await startGame()
+    await page.click('Stop')
+
+    expect(page.buttonIcon('Cancel')).toBeNull()
+    expect(page.buttonIcon('Stop game')).toBeNull()
+  })
+})
+
 describe('game screen: stopping (END-2, END-4)', () => {
   it('Stop asks for confirmation and Cancel keeps playing (END-2)', async () => {
     const page = await startGame()

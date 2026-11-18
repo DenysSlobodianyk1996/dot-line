@@ -870,6 +870,27 @@ export class GamePage {
     return button
   }
 
+  // the icon a button shows before its label (UP-9): which one (its data-icon), and whether it is
+  // decorative inline SVG painted in the button's text color, placed before the label text.
+  // null when the button has no icon.
+  buttonIcon(label: string) {
+    const button = this.button(label).element
+    const icon = button.querySelector('svg')
+    if (!icon) return null
+    const firstContent = [...button.childNodes].find(
+      (node) =>
+        node.nodeType === Node.ELEMENT_NODE ||
+        (node.nodeType === Node.TEXT_NODE && node.textContent!.trim() !== ''),
+    )
+    return {
+      name: icon.getAttribute('data-icon'),
+      decorative: icon.getAttribute('aria-hidden') === 'true',
+      followsTextColor: icon.getAttribute('fill') === 'currentColor',
+      beforeLabel: firstContent === icon,
+      accessibleName: accessibleText(button),
+    }
+  }
+
   hasButton(label: string) {
     return this.wrapper.findAll('button').some((el) => el.text() === label)
   }

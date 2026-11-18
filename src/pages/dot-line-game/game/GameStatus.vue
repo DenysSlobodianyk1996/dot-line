@@ -4,9 +4,11 @@
     <div data-panel-actions class="flex">
       <BaseButton
         color="secondary"
-        class="min-h-11 w-full sm:min-h-0 sm:w-auto"
+        class="min-h-11 w-full gap-2 sm:min-h-0 sm:w-auto"
         @click="isConfirmOpen = true"
       >
+        <!-- icon before the label for children who can't read yet (UP-9) -->
+        <StopHandIcon :size="20" class="shrink-0" />
         {{ t('status.stop') }}
       </BaseButton>
     </div>
@@ -113,6 +115,7 @@ import { useI18n } from 'vue-i18n'
 import BaseButton from '@/shared/components/BaseButton.vue'
 import PlayerName from '@/shared/components/PlayerName.vue'
 import PlayerScore from './PlayerScore.vue'
+import StopHandIcon from '@/shared/icons/StopHandIcon.vue'
 
 const props = defineProps<{
   dotLineGame: DotLineGame
