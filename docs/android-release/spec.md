@@ -73,9 +73,9 @@ The developer account is a personal one, so Play requires a closed test with at 
 - **Native build mode**: `vite build --mode capacitor` with `BASE_PATH=/` and the PWA plugin disabled (no service worker, no manifests). Capacitor bundles the files, which covers offline play (AR-2). `npm run android:build` runs the web build, then `cap sync android`, then `gradlew bundleRelease`.
 - **Back button**: one `App.addListener('backButton')` in a small native-only module (`src/native/`), loaded only when `Capacitor.isNativePlatform()`. Order of handling:
   1. close the rules panel (`useRulesPanel().close()`);
-  2. otherwise close the Stop dialog;
+  2. otherwise close the Stop dialog (`useStopDialog().close()`, its open state shared like the rules panel's);
   3. otherwise `App.exitApp()`.
-- **Status bar**: `useTheme` calls a native hook that sets the status bar style and background to `--wc-paper` whenever the theme changes.
+- **Status bar**: the native module watches `useTheme().theme` and sets the status bar style and background to `--wc-paper` (read from the tokens) whenever the theme changes, so `useTheme` stays web-only.
 - **Icons and splash**: `@capacitor/assets` generates them from the logo source (`src/shared/logo.ts`, through `scripts/generate-icons.ts` output). That gives an adaptive icon (logo foreground on a cream background) and a splash screen on cream in both themes.
 - **SDK**: targetSdk is whatever API level Play requires at release time; minSdk is Capacitor's default. Orientation is unspecified (any).
 - Web deploys (GitHub Pages) don't change.

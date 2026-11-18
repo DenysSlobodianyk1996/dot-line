@@ -19,11 +19,15 @@
     "generate-icons": "node scripts/generate-icons.ts",
     "build:capacitor": "BASE_PATH=/ vite build --mode capacitor",
     "android:build": "npm run build:capacitor && cap sync android && cd android && ./gradlew bundleRelease",
-    "android:open": "cap open android"
+    "android:open": "cap open android",
+    "android:assets": "capacitor-assets generate --android"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.2",
+    "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.6.2",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4",
     "@fontsource-variable/nunito": "^5.3.0",
     "@tailwindcss/vite": "^4.3.3",
     "@vee-validate/rules": "^4.15.1",
@@ -35,6 +39,7 @@
     "vue-router": "^5.2.0"
   },
   "devDependencies": {
+    "@capacitor/assets": "^4.0.0",
     "@capacitor/cli": "^8.6.2",
     "@tsconfig/node24": "^24.0.4",
     "@types/jsdom": "^30.0.0",
