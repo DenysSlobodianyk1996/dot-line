@@ -38,3 +38,8 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+
+# Android signing keys and local signing env (never committed; CI decodes the keystore from a secret)
+*.jks
+*.keystore
+.env.android

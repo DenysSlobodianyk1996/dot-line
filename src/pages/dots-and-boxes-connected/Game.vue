@@ -17,7 +17,7 @@
         v-else
         :dots-and-boxes-game="dotsAndBoxesGame"
         :hint="hint"
-        v-model:confirming="isStopConfirmOpen"
+        v-model:confirming="isStopDialogOpen"
         :thinking="isBoardLocked"
         @stop="stop"
       />
@@ -29,13 +29,14 @@
 import type { Dot, DotsAndBoxesGame } from '@/models'
 import { StorageService } from '@/services'
 import { CURRENT_GAME } from '@/static'
-import { computed, ref, watchEffect } from 'vue'
+import { computed, onUnmounted, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import GameBoard from './game/GameBoard.vue'
 import GameResult from './game/GameResult.vue'
 import GameStatus from './game/GameStatus.vue'
 import { HINT_KEYS } from './game/hint-keys'
 import { useRulesPanel } from '@/shared/composables/useRulesPanel'
+import { useStopDialog } from '@/shared/composables/useStopDialog'
 import { useComputerTurn } from './useComputerTurn'
 
 const props = defineProps<{
@@ -57,14 +58,18 @@ const hint = computed(() => {
 })
 
 // the Stop dialog is open: the computer waits for the answer (VC-13); it waits while the rules
-// panel is open too (VR-31)
+// panel is open too (VR-31). The Stop dialog's state is shared so the Android back button can
+// close it (AR-3); it never outlives the game screen.
 const rulesPanel = useRulesPanel()
-const isStopConfirmOpen = ref(false)
+const stopDialog = useStopDialog()
+// a top-level ref, so the template unwraps it for v-model
+const isStopDialogOpen = stopDialog.isOpen
+onUnmounted(stopDialog.close)
 
 // the computer player's turns: ~1 s pause, then its line (CM-11, CM-15, CM-31)
 const computerTurn = useComputerTurn(
   () => props.dotsAndBoxesGame,
-  () => isStopConfirmOpen.value || rulesPanel.isOpen.value,
+  () => stopDialog.isOpen.value || rulesPanel.isOpen.value,
 )
 
 // on the computer's turn nothing can be picked and clicks are ignored (CM-16)
@@ -77,7 +82,7 @@ watchEffect(() => {
 })
 
 function stop() {
-  isStopConfirmOpen.value = false
+  stopDialog.close()
   computerTurn.cancel()
   selectedDot.value = null
   props.dotsAndBoxesGame.stop()
