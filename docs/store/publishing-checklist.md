@@ -55,7 +55,7 @@ Answers: [play-console.md](play-console.md). **Policy and programs → App conte
 
 The Play API can't create an app's first release, so this one upload is manual.
 
-- [ ] Build a signed AAB. Either push the first tag (`git tag v1.0.0 && git push origin v1.0.0`) and download the AAB from the **Android release** workflow run's artifacts (the Play upload step is expected to fail this once), or build it locally with `npm run android:build` and the keystore from step 0.
+- [ ] Build a signed AAB. Either push the first tag (`git tag v1.0.0 && git push origin v1.0.0`) and download the AAB from the **Android release** workflow run's artifacts (`app-release-1.0.0`; it is attached before the Play upload, and that upload step is expected to fail this once), or build it locally with `npm run android:build` and the keystore from step 0.
 - [ ] **Test and release → Testing → Internal testing → Create new release**.
 - [ ] Keep **Play App Signing** on (Google manages the app signing key; yours is the upload key).
 - [ ] Upload the AAB; paste the release notes from [en.md](en.md#release-notes-245--500) and [uk.md](uk.md#release-notes-269--500).
@@ -85,6 +85,6 @@ The Play API can't create an app's first release, so this one upload is manual.
 
 ## 8. Every later release is a tag push
 
-- [ ] Bump nothing by hand: `versionName` is the tag without `v`, and `versionCode` = `major*10000 + minor*100 + patch` (spec AR-11).
-- [ ] `git tag vX.Y.Z && git push origin vX.Y.Z` builds the signed AAB and uploads it to the **internal** track (AR-10).
+- [ ] Bump nothing by hand: `versionName` is the tag without `v`, and `versionCode` = `major*10000 + minor*100 + patch` (spec AR-11). Minor and patch stay at 0..99, and each tag must be higher than the last one Play has seen; a malformed tag (`v1.2`, `v1.2.3-beta`) stops the workflow before it builds.
+- [ ] `git tag vX.Y.Z && git push origin vX.Y.Z` runs the **Android release** workflow (`.github/workflows/android-release.yml`): tests, a signed AAB attached to the run as `app-release-X.Y.Z`, and an upload to the **internal** track (AR-10). If the upload fails (for example the service account lacks release rights), fix it and re-run the job, or upload the attached AAB by hand.
 - [ ] Check it on a device from the internal track, then promote it to closed testing or production by hand in Play Console, with release notes in both languages.
