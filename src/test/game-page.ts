@@ -204,6 +204,18 @@ export class GamePage {
     return theme === 'light' || theme === 'dark' ? theme : null
   }
 
+  // ---- document ----
+
+  async switchLanguage(locale: 'uk' | 'en') {
+    await this.header.get(`button[lang="${locale}"]`).trigger('click')
+    await flushPromises()
+  }
+
+  // the install manifest the page links to; it names the installed app (VR-50, VR-51)
+  manifestHref() {
+    return document.head.querySelector('link[rel="manifest"]')?.getAttribute('href') ?? null
+  }
+
   // ---- setup screen ----
 
   get isSetupShown() {
