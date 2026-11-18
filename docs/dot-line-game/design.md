@@ -54,7 +54,7 @@ Mobile page (second row, 390 px):
 
 Visual rules used on these screens:
 
-- **Mode and difficulty switches**: a labelled `role="radiogroup"` styled like the language toggle (`rounded-md border border-border bg-surface p-0.5 shadow-sm`), stretched to full width with equal-width options. The selected option is `bg-accent-strong text-surface`. Options are `min-h-8` from `sm` up and `min-h-11` on phones. Difficulty sits right under the mode switch and is shown only in Versus computer mode [CM-6].
+- **Mode and difficulty switches**: a labelled `role="radiogroup"` styled like the language toggle (`rounded-md border border-border bg-surface p-0.5 shadow-sm`), stretched to full width with equal-width options. The selected option is `bg-accent text-on-accent`. Options are `min-h-8` from `sm` up and `min-h-11` on phones. Difficulty sits right under the mode switch and is shown only in Versus computer mode [CM-6].
 - **Robot icon**: Material Symbols `smart_toy` (outlined, `viewBox="0 -960 960 960"`) as inline SVG with `fill: currentColor` and `aria-hidden="true"`. It is 20 px in Turn, 16 px in score rows, 24 px in the result heading and 18 px in the setup Opponent field. It always sits between the color swatch and the written name, which stays the accessible text [CM-13, CM-37].
 - **Thinking**: `text-sm text-muted animate-pulse` in an `aria-live="polite"` element under the name in Turn (as on mobile artboard 24, on both layouts). The hint is hidden while the computer's move is pending.
 - **Last computer line**: the normal line plus `box-shadow: 0 0 0 4px` in the computer's color at 40%. It is shown only while the game is playing and the newest line is the computer's.
@@ -87,7 +87,7 @@ Message keys added to both locales (`src/i18n/locales`):
 
 ### Visual refresh (approved 2026-11-18, #23)
 
-Spec: [visual-refresh/spec.md](../visual-refresh/spec.md) (stories VR-n). The design is the approved prototype on branch `prototype/visual-refresh` (`/game?variant=A`, `/prototype-icons` combo 1). Every artboard above is restyled in light Warm cream: the header replaces the bare language toggle, the swatch picker replaces the color input, and the Show/Hide rules toggle is gone [VR-1..VR-10, VR-18, VR-28, VR-32]. The sample players are now coral (Оля, Ярослава Петрук, Ann) and teal (Богдан, Bob, the computer); teal is exactly the swatch the computer picks against coral [VR-37]. Desktop game artboards are 520 px wide to fit the 16 px app padding from `sm` up.
+Spec: [visual-refresh/spec.md](../visual-refresh/spec.md) (stories VR-n). The design is the approved prototype on branch `prototype/visual-refresh` (`/game?variant=A`, `/prototype-icons` combo 1). Every artboard above is restyled in light Warm cream: the header replaces the bare language toggle, the swatch picker replaces the color input, and the Show/Hide rules toggle is gone [VR-1..VR-10, VR-18, VR-28, VR-32]. The sample players are now coral (Оля, Ярослава Петрук, Ann) and teal (Богдан, Bob, the computer); teal is exactly the swatch the computer picks against coral [VR-37]. Desktop game artboards are 520 px wide so the 212 px result panel fits beside the board.
 
 Desktop page, D row (dark):
 
@@ -273,7 +273,7 @@ All sizes and colors come from the approved canvas.
     - With a selection, clicking a valid target calls `game.drawLine(selected, dot)` and clears the selection.
     - Otherwise, clicking a valid start selects it (or switches the selection to it).
     - Anything else is ignored.
-- **GameStatus.vue** [GB-4, END-2]: a `w-50` column with Turn (swatch and name), Score (`PlayerScore` rows), the hint and a Stop button (`BaseButton` secondary). Stop opens a dialog: a `fixed inset-0 bg-scrim` backdrop and a `w-75 p-6 rounded-lg border shadow-lg` card with "Stop the game?", "Whoever owns more squares now wins.", the scores, and Cancel (secondary) and Stop game (primary). Clicking the backdrop cancels; confirming emits `stop`.
+- **GameStatus.vue** [GB-4, END-2]: a `w-50` column with Turn (swatch and name), Score (`PlayerScore` rows), the hint and a Stop button (`BaseButton` secondary). Stop opens a dialog: a `fixed inset-0 bg-ink/40` backdrop and a `w-75 p-6 rounded-lg border shadow-lg` card with "Stop the game?", "Whoever owns more squares now wins.", the scores, and Cancel (secondary) and Stop game (primary). Clicking the backdrop cancels; confirming emits `stop`.
 - **GameResult.vue** [END-3..6]: a `w-53` column with "Result", "`<name>` wins" with a swatch or "Draw", "All squares are filled." or "The game was stopped.", the scores with the winner first, and New game (secondary) and Rematch (primary).
   - New game: `StorageService.removeItem(CURRENT_GAME)` then `game.reset()`.
   - Rematch: `game.start()`.
@@ -309,16 +309,16 @@ The phone layout is the default, and `sm:` classes (640 px and up) restore the d
 
 ## Rules [RL-1, RL-5, VR-23..VR-31, APP-1]
 
-- **GameRules.vue** [RL-1, RL-5]: a `section` (gap 12 px) labelled by its "How to play" heading (`text-sm font-semibold text-ink`). Below it, an ordered list of five rules (`text-sm text-ink-soft`, gap 8 px), each with a 20 px round `bg-fill-strong` number. It has no card styling of its own any more: it sits directly on the rules panel. The rules text comes from `rules.step1`–`step5` in `src/i18n/locales` (see Languages). The English wording is:
+- **GameRules.vue** [RL-1, RL-5]: a `section` (gap 12 px) labelled by its "How to play" heading (`text-sm font-semibold text-ink`). Below it, an ordered list of five rules (`text-sm text-ink-soft`, gap 8 px), each with a 20 px round `bg-surface-strong` number. It has no card styling of its own any more: it sits directly on the rules panel. The rules text comes from `rules.step1`–`step5` in `src/i18n/locales` (see Languages). The English wording is:
   1. Take turns drawing a line between two neighboring dots: left, right, up or down.
   2. The first line can go anywhere. After that, start from a dot that already has a line.
   3. Draw the fourth side of a square to claim it. One line can claim two squares.
   4. After every line, the turn passes to the other player.
   5. The game ends when all squares are claimed or someone presses Stop. Most squares wins; equal scores are a draw.
 - **RulesPanel.vue** replaces `RulesToggle.vue` (the Show/Hide rules button and the inline rules on setup and game are gone) [VR-24..VR-29]. It is rendered once in `App.vue` and teleported to `body`:
-  - Backdrop: `fixed inset-0 z-20 bg-scrim/75` (a little lighter than the Stop dialog's), fading in and out over 200 ms. A click on it closes the panel.
-  - Panel: an `aside` with `role="dialog"`, `aria-modal="true"`, labelled by the "How to play" heading. `fixed inset-y-0 right-0 z-30 flex w-full flex-col gap-4 overflow-y-auto bg-page p-5 shadow-2xl`, and from `sm` up `sm:w-96 sm:rounded-l-3xl` (384 px, 24 px radius on the left edge). It slides in from the right (`translate-x-full` → 0, 250 ms ease-out; out in 200 ms ease-in). On phones it covers the whole screen.
-  - Top row: the 40 px logo (animated, like the header) on the left and a 44 px round close button (`CloseIcon`, `text-ink-soft hover:bg-fill`, `aria-label` `rules.hide`) on the right. Then `GameRules`.
+  - Backdrop: `fixed inset-0 z-20 bg-ink/30` (a little lighter than the Stop dialog's), fading in and out over 200 ms. A click on it closes the panel.
+  - Panel: an `aside` with `role="dialog"`, `aria-modal="true"`, labelled by the "How to play" heading. `fixed inset-y-0 right-0 z-30 flex w-full flex-col gap-4 overflow-y-auto bg-paper p-5 shadow-2xl`, and from `sm` up `sm:w-96 sm:rounded-l-3xl` (384 px, 24 px radius on the left edge). It slides in from the right (`translate-x-full` → 0, 250 ms ease-out; out in 200 ms ease-in). On phones it covers the whole screen.
+  - Top row: the 40 px logo (animated, like the header) on the left and a 44 px round close button (`CloseIcon`, `text-ink-soft hover:bg-surface-muted`, `aria-label` `rules.hide`) on the right. Then `GameRules`.
   - Focus: moves into the panel on open, is trapped while it is open, and returns to the info button on close. ✕, a backdrop click and Esc all close it [VR-26, VR-29].
   - Closed by default on every screen, and the open state isn't saved [VR-27].
 - **useRulesPanel.ts**: a module-level `isOpen` ref with `open()` and `close()`, shared by the header's info button, the panel and `Game.vue`.
@@ -348,7 +348,7 @@ src/shared/components/LanguageToggle.vue
 - **LanguageToggle.vue** [I18N-3, I18N-5]:
   - A `role="group"` element labelled `t('language.label')`: `inline-flex rounded-md border border-border bg-surface p-0.5 shadow-sm`.
   - One button per locale, showing "UA" / "EN" with `aria-label` set to the language's own name ("Українська" / "English"), `lang` set to the locale, and `aria-pressed`.
-  - Pressed style `bg-accent-strong text-surface`; otherwise `text-ink-soft hover:bg-fill`. Size `min-h-11 min-w-11 px-3 text-sm font-medium`, with `sm:min-h-8 sm:min-w-0` from 640 px up.
+  - Pressed style `bg-accent text-on-accent`; otherwise `text-ink-soft hover:bg-surface-muted`. Size `min-h-11 min-w-11 px-3 text-sm font-medium`, with `sm:min-h-8 sm:min-w-0` from 640 px up.
 - **App.vue**: the header, above `RouterView`, so it's on every screen; see [Header](#header-vr-13-vr-16-vr-18vr-23). It replaces the old `<header class="mb-2 flex justify-end">` that held only `LanguageToggle`.
 - **vite.config.ts**: `define` sets the vue-i18n esm-bundler flags: `__VUE_I18N_FULL_INSTALL__: true`, `__VUE_I18N_LEGACY_API__: false`, `__INTLIFY_PROD_DEVTOOLS__: false`.
 - **StorageService.setItem** accepts a `string` as well as an `object`, and strings are stored as they are.
@@ -403,7 +403,7 @@ src/shared/components/LanguageToggle.vue
   - Versus computer: a `PlayerField` with `legend="You"` (field label `setup.name`, so messages read "Name is not valid."), `reject-computer-name` and no other names to differ from, then `ComputerOpponentField` with `computerColorFor(values.player1.color)`.
   - Two players: the two `PlayerField`s as before.
   - `submit()` emits a `GameSetupForm`. In computer mode `player2 = createComputerPlayer(player1.color)`, and a second person typed earlier is ignored. `Page.vue` applies it with `setGameMode(...).setPlayer1(...).setPlayer2(...).setSize(...).start()`.
-- `BaseSegmentedControl.vue` (generic over the value type): a visible label (`aria-hidden`) plus a `role="radiogroup"` with the same `aria-label`. Each option is a `role="radio"` button with `aria-checked`, `flex-1` and `min-h-11 sm:min-h-8`; the selected one is `bg-accent-strong text-surface`.
+- `BaseSegmentedControl.vue` (generic over the value type): a visible label (`aria-hidden`) plus a `role="radiogroup"` with the same `aria-label`. Each option is a `role="radio"` button with `aria-checked`, `flex-1` and `min-h-11 sm:min-h-8`; the selected one is `bg-accent text-on-accent`.
 - `PlayerField.vue` registers `notComputerName`: the name, trimmed, with `'`, `’` and `ʼ` unified and lower-cased, must not equal `players.computer` of any locale in `SUPPORTED_LOCALES`, normalized the same way [VC-5].
 
 ### Preferences [VC-2]
@@ -418,47 +418,48 @@ Spec: [visual-refresh/spec.md](../visual-refresh/spec.md). Artboards: see [Visua
 
 ### Palette and theme [VR-1..VR-5, VR-11..VR-17]
 
-The **Warm cream** palette is a set of semantic CSS custom properties in `src/assets/styles.css`: light values on `:root`, dark values on `:root[data-theme='dark']`, each exposed to Tailwind v4 through `@theme` as `--color-<token>`, so components write `bg-surface`, `text-ink`, `border-border` and so on. Tailwind's `gray`, `blue` and `white` scales are not remapped (the prototype did that as a shortcut); components move to the tokens. The canvas uses the same names as `--wc-<token>`.
+The **Warm cream** palette is a set of semantic CSS custom properties in `src/assets/styles.css`: light values on `:root`, dark values on `:root[data-theme='dark']`, exposed to Tailwind v4 through `@theme inline` as `--color-<token>`, so components write `bg-surface`, `text-ink`, `border-border` and so on, never raw `gray`/`blue`/`white`. (The prototype remapped Tailwind's `gray`, `blue` and `white` scales as a shortcut; that isn't carried over.) The canvas uses the same names as `--wc-<token>`.
 
 | Token | Used for | Light | Dark |
 | --- | --- | --- | --- |
-| `page` | app background, rules panel | `#fbf5ec` | `#241c17` |
-| `surface` | cards, fields, board, header buttons; text on accent | `#fffdf8` | `#30261f` |
-| `fill` | hover background, read-only field | `#f3e8d9` | `#3a2e26` |
-| `fill-strong` | secondary button, rule numbers | `#ecdfcc` | `#45372d` |
-| `border` | borders | `#e2d3bd` | `#574638` |
+| `paper` | app background, rules panel, swatch ring gap | `#fbf5ec` | `#241c17` |
+| `surface` | fields, board, rules card, header buttons, dialog | `#fffdf8` | `#30261f` |
+| `surface-muted` | hover background, read-only fields | `#f3e8d9` | `#3a2e26` |
+| `surface-strong` | secondary button, rule numbers | `#ecdfcc` | `#45372d` |
+| `border` | borders, secondary hover | `#e2d3bd` | `#574638` |
 | `dot` | idle dots | `#bfa98f` | `#8c7663` |
 | `muted` | hints, "Thinking…", captions | `#8f7963` | `#b7a28d` |
 | `ink-soft` | labels, legends, rules text, icons | `#6a5544` | `#dccbb7` |
-| `ink` | main text, dots on the board, logo dots | `#4a3a2e` | `#f6ebdc` |
-| `accent` (coral) | start-dot ring, focus outline | `#e8735a` | `#f08c73` |
-| `accent-strong` | primary button, pressed toggle, selected switch option | `#dc5f45` | `#e8735a` |
-| `accent-hover` | primary hover, validation messages | `#c44f37` | `#f5a48f` |
-| `teal` | secondary accent | `#2a9d8f` | `#4db6a8` |
-| `scrim` | Stop dialog and rules panel backdrop | `rgb(74 58 46 / 0.4)` | `rgb(0 0 0 / 0.55)` |
+| `ink` | main text, dots on the board, logo dots, backdrops (`ink/40`) | `#4a3a2e` | `#f6ebdc` |
+| `accent` (coral) | primary button, pressed toggle, selected switch option, start-dot ring, focus | `#e8735a` | `#f08c73` |
+| `accent-hover` | primary hover | `#dc5f45` | `#f5a48f` |
+| `on-accent` | text on `accent` | `#fffdf8` | `#241c17` |
+| `secondary` (teal) | secondary accent | `#2a9d8f` | `#4db6a8` |
+| `danger` | validation messages | `#c2412d` | `#ff9b85` |
 
-The values are the prototype's. One change: the prototype's backdrop was its `gray-900` at 40%, which turns cream in dark; `scrim` keeps it dark in both themes.
+The palette values are the prototype's (spec token table); `on-accent` and `danger` were added so text on coral and error messages stay readable in dark.
 
 - **Font**: Nunito Variable (Latin + Cyrillic) from `@fontsource-variable/nunito`, bundled so it works offline; `--font-sans: 'Nunito Variable', ui-rounded, system-ui, sans-serif` [VR-2].
 - **Shapes**: `--radius-md: 0.75rem` (12 px: buttons, fields, switches, the language toggle) and `--radius-lg: 1.25rem` (20 px: fieldsets, board, dialog). Shadows stay Tailwind's `shadow-sm` / `shadow-lg` [VR-3].
-- **Buttons**: primary `bg-accent-strong text-surface hover:bg-accent-hover`, secondary `bg-fill-strong text-ink hover:bg-border`; focus rings use `accent` [VR-4].
+- **Buttons**: primary `bg-accent text-on-accent hover:bg-accent-hover` with an `accent` focus ring offset on `paper`; secondary `bg-surface-strong text-ink shadow-sm hover:bg-border` [VR-4].
+- **Backdrops**: the Stop dialog uses `bg-ink/40`, the rules panel `bg-ink/30`, as in the prototype.
 - **Player colors** stay as they are in both themes: lines in the owner's color, owned squares at 30% with the initial in the owner's color [VR-7].
-- **useTheme.ts** [VR-11, VR-14, VR-15]: `systemTheme` follows `matchMedia('(prefers-color-scheme: dark)')` live; `override` is the saved `THEME` value (`'light' | 'dark'`, new key in `src/static/storage-keys.ts`, through `StorageService`); `theme = override ?? systemTheme`. A `watchEffect` sets `document.documentElement.dataset.theme`. `toggle()` saves the opposite of the current `theme` as the override. With no saved override the system preference wins, live.
-- `index.html` sets `data-theme` from the saved override (or the media query) in a tiny inline script before the app loads, so a reload doesn't flash the light theme.
+- **useTheme.ts** [VR-11, VR-14, VR-15]: the system preference follows `matchMedia('(prefers-color-scheme: dark)')` live; the override is the saved `THEME` value (`src/static/storage-keys.ts`, through `StorageService`); the effective theme is the override, else the system preference. It sets `document.documentElement.dataset.theme`, and `toggle()` saves the opposite of the current theme as the override.
+- `index.html` sets `data-theme` from the saved `THEME` (or the media query) in a small inline script before the app loads, so a reload doesn't flash the light theme.
 
 ### Header [VR-13, VR-16, VR-18..VR-23]
 
-`App.vue`: `<header class="mb-4 flex items-center gap-2">` above `RouterView`, inside the existing `p-2 sm:p-4` wrapper:
+`App.vue`: `<header class="mb-4 flex items-center gap-2">` above `RouterView`, inside the existing `p-2` wrapper:
 
 1. `AppLogo` at 36 px, animated, dot color `ink` of the current theme.
 2. The game name, `t('app.title')`, `mr-auto min-w-0 text-lg font-extrabold text-ink` (18 px, 800). It wraps on very narrow phones (320 px); the buttons never shrink [VR-22].
-3. Theme button: shows `DarkModeIcon` (moon) in light and `LightModeIcon` (sun) in dark; `aria-label` says what it switches to, `theme.dark` / `theme.light` [VR-13, VR-16].
+3. Theme button (`ThemeToggle.vue`): shows `DarkModeIcon` (moon) in light and `LightModeIcon` (sun) in dark; `aria-label` says what it switches to, `theme.dark` / `theme.light` [VR-13, VR-16].
 4. Info button: `InfoIcon`, `aria-label` `rules.show`, `aria-expanded` bound to the rules panel, `aria-haspopup="dialog"`; opens the rules panel [VR-23].
 5. `LanguageToggle` (unchanged behavior).
 
-The two icon buttons are `flex size-11 sm:size-9 items-center justify-center rounded-full border border-border bg-surface text-ink-soft shadow-sm hover:bg-fill focus-visible:outline-2 focus-visible:outline-accent`, with 24 px icons: 44 px tap targets on phones, 36 px from `sm` up [VR-21].
+The two icon buttons are `flex size-11 sm:size-9 items-center justify-center rounded-full border border-border bg-surface text-ink-soft shadow-sm hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-accent`, with 20 px icons: 44 px tap targets on phones, 36 px from `sm` up [VR-21].
 
-**Icons** (`src/shared/icons/`): `InfoIcon`, `CloseIcon`, `LightModeIcon`, `DarkModeIcon`, copied from Material Symbols Rounded (Apache-2.0, license note in the folder) as inline SVG components: `viewBox="0 -960 960 960"`, `fill="currentColor"`, `aria-hidden="true"`, a `size` prop (default 24). No icon font. `RobotIcon` keeps its place in `src/shared/components/`.
+**Icons** (`src/shared/icons/`): `InfoIcon`, `CloseIcon`, `LightModeIcon`, `DarkModeIcon`, copied from Material Symbols Rounded (Apache-2.0, license note in the folder's README) as inline SVG components: `viewBox="0 -960 960 960"`, `fill="currentColor"`, `aria-hidden="true"`, a `size` prop (default 24). No icon font. `RobotIcon` keeps its place in `src/shared/components/`.
 
 ### Swatch picker [VR-32..VR-39]
 
@@ -476,10 +477,10 @@ The two icon buttons are `flex size-11 sm:size-9 items-center justify-center rou
   | `tangerine` | `#ee8a3c` | Tangerine | Мандариновий |
 
   `randomSwatch(except?)` returns a random swatch hex other than `except`. `randomHexColor()` goes once nothing uses it.
-- **PlayerField.vue**: the fieldset becomes `flex min-w-0 flex-1 flex-col gap-3 rounded-lg border border-border bg-surface p-4`: name field on top, color below. The color `<Field>` (same `player.color` value, a hex string, so `GameSetupForm` and `Player` don't change) renders a visible "Color" label (`aria-hidden`) and a `role="radiogroup"` with the same `aria-label`, laid out `grid grid-cols-4 gap-1.5` on every width. Each swatch is a `role="radio"` button with `aria-checked`, `aria-label` and `title` set to `t('colors.<key>')`, `size-8 rounded-full` in its hex, `hover:scale-110`, and a focus outline in `accent`. The selected one is `scale-110 ring-3 ring-ink ring-offset-2 ring-offset-surface` [VR-33, VR-34]. Arrow keys move the selection, as in `BaseSegmentedControl`.
+- **PlayerField.vue**: the fieldset becomes `flex min-w-0 flex-1 flex-col gap-3 rounded-lg border border-border p-4`: name field on top, color below. The color `<Field>` (same `player.color` value, a hex string, so `GameSetupForm` and `Player` don't change) renders a visible "Color" label (`aria-hidden`) and a `role="radiogroup"` with the same `aria-label`, laid out `grid grid-cols-4 gap-2 p-1` on every width. Each swatch is a `role="radio"` button with `aria-checked`, `aria-label` and `title` set to `t('colors.<key>')`, `size-8 rounded-full` in its hex, `hover:scale-110`, and a focus outline in `accent` (offset 4 px). The selected one is `scale-110 ring-3 ring-ink ring-offset-2 ring-offset-paper` [VR-33, VR-34].
 - **GameSetup.vue**: `player1.color = randomSwatch()`, `player2.color = randomSwatch(player1.color)` [VR-35].
-- **Different colors** [VR-36]: in Two players, each color field gets a `differentColor:<other color>` rule (registered in `PlayerField`), with the message `validation.differentColors` from `generateMessage`. It's shown under the swatches in `accent-hover`, like other field errors.
-- **ComputerOpponentField.vue**: the read-only color well becomes one 32 px round swatch in the computer's color (not a radio group), next to the read-only name [VR-37].
+- **Different colors** [VR-36]: in Two players, each color field gets a `differentColor:<other color>` rule (registered in `PlayerField`); `generateMessage` gives it `colors.taken`. It's shown under the swatches through `BaseFieldError` (`text-danger`), like other field errors.
+- **ComputerOpponentField.vue**: keeps its read-only color well (`bg-surface-muted`, rounded), filled with the computer's swatch [VR-37].
 - **Old saves** [VR-39]: a save whose colors are any hex (not a swatch) loads and plays with those colors; the model doesn't check them. Setup only starts from swatches.
 
 ### Logo and app icons [VR-19, VR-20, VR-40..VR-43]
@@ -506,7 +507,7 @@ Added to both locales:
 | `theme.light` | Light theme | Світла тема |
 | `theme.dark` | Dark theme | Темна тема |
 | `colors.<key>` | see [Swatch picker](#swatch-picker-vr-32vr-39) | |
-| `validation.differentColors` | Players need different colors. | Гравці мають обрати різні кольори. |
+| `colors.taken` | This color is already taken | Цей колір уже зайнятий |
 
 Changed: `app.title` in English, "Dots & Lines". `rules.show` and `rules.hide` stay and label the info and close buttons.
 
