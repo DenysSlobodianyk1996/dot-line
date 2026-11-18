@@ -17,6 +17,7 @@
     "lint-check": "oxlint . && eslint .",
     "format": "prettier --write --experimental-cli src/",
     "generate-icons": "node scripts/generate-icons.ts",
+    "store:screenshots": "node scripts/store-screenshots.ts",
     "build:capacitor": "BASE_PATH=/ vite build --mode capacitor",
     "android:build": "npm run build:capacitor && cap sync android && cd android && ./gradlew bundleRelease",
     "android:open": "cap open android"
@@ -51,6 +52,7 @@
     "jsdom": "^31.0.1",
     "npm-run-all2": "^9.0.2",
     "oxlint": "^1.73.0",
+    "playwright": "^1.65.1",
     "png-to-ico": "^3.0.2",
     "prettier": "3.9.5",
     "sass-embedded": "^1.100.0",
