@@ -6,11 +6,12 @@ The paths come from [Material Symbols Rounded](https://github.com/google/materia
 licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 Each component names the symbol it was copied from.
 
-| Component                        | Symbol                     | Used on                            |
-| -------------------------------- | -------------------------- | ---------------------------------- |
-| `InfoIcon`                       | `info`                     | header button that opens the rules |
-| `CloseIcon`                      | `close`                    | rules panel close button           |
-| `LightModeIcon` / `DarkModeIcon` | `light_mode` / `dark_mode` | theme toggle                       |
-| `StopHandIcon`                   | `back_hand`                | Stop (UP-9)                        |
-| `SettingsIcon`                   | `settings`                 | New game settings (UP-9)           |
-| `RefreshIcon`                    | `refresh`                  | Rematch (UP-9)                     |
+| Component                        | Symbol                     | Used on                                                         |
+| -------------------------------- | -------------------------- | --------------------------------------------------------------- |
+| `InfoIcon`                       | `info`                     | info buttons that open the rules: header and setup title (UP-1) |
+| `CloseIcon`                      | `close`                    | rules panel close button                                        |
+| `LightModeIcon` / `DarkModeIcon` | `light_mode` / `dark_mode` | theme toggle                                                    |
+| `StopHandIcon`                   | `back_hand`                | Stop (UP-9)                                                     |
+| `SettingsIcon`                   | `settings`                 | New game settings (UP-9)                                        |
+| `RefreshIcon`                    | `refresh`                  | Rematch (UP-9)                                                  |
+| `TrophyIcon`                     | `emoji_events`             | result card, when a person wins (UP-10)                         |
