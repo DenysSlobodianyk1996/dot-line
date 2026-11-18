@@ -1,6 +1,6 @@
 <template>
-  <fieldset class="flex min-w-0 flex-1 gap-2 rounded-lg border border-gray-300 p-4">
-    <legend class="px-2 text-sm font-semibold text-gray-700">
+  <fieldset class="flex min-w-0 flex-1 gap-2 rounded-lg border border-border p-4">
+    <legend class="px-2 text-sm font-semibold text-ink-soft">
       {{ legend ?? t('setup.player', { number }) }}
     </legend>
     <Field

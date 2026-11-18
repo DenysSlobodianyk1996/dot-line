@@ -1,6 +1,6 @@
 <template>
   <!-- the whole name, wrapping if needed; the swatch stays on the first line (GB-5) -->
-  <div class="flex items-start gap-2 text-sm leading-6 text-gray-900">
+  <div class="flex items-start gap-2 text-sm leading-6 text-ink">
     <span
       class="mt-1.5 size-3 shrink-0 rounded-full"
       :style="{ backgroundColor: player.color }"

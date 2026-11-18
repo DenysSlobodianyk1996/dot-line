@@ -3,9 +3,9 @@
     <!-- phones: Turn and Score side by side (MB-2) -->
     <div class="grid grid-cols-2 gap-4 sm:flex sm:flex-col">
       <div class="flex min-w-0 flex-col gap-1">
-        <div class="text-sm font-medium text-gray-700">{{ t('status.turn') }}</div>
+        <div class="text-sm font-medium text-ink-soft">{{ t('status.turn') }}</div>
         <!-- the whole name, wrapping if needed (GB-5) -->
-        <div class="flex items-start gap-2 leading-6 font-semibold text-gray-900">
+        <div class="flex items-start gap-2 leading-6 font-semibold text-ink">
           <span
             class="mt-1.5 size-3 shrink-0 rounded-full"
             :style="{ backgroundColor: dotLineGame.currentPlayer?.color }"
@@ -23,13 +23,13 @@
         </div>
         <!-- always rendered, so screen readers announce "Thinking…" and then the computer's line
              (CM-14, CM-37) -->
-        <p aria-live="polite" class="text-sm text-gray-500" :class="{ 'animate-pulse': thinking }">
+        <p aria-live="polite" class="text-sm text-muted" :class="{ 'animate-pulse': thinking }">
           {{ announcement }}
         </p>
       </div>
 
       <div class="flex min-w-0 flex-col gap-1">
-        <div class="text-sm font-medium text-gray-700">{{ t('status.score') }}</div>
+        <div class="text-sm font-medium text-ink-soft">{{ t('status.score') }}</div>
         <PlayerScore
           v-for="player in dotLineGame.players"
           :key="player.name"
@@ -40,7 +40,7 @@
     </div>
 
     <!-- "Thinking…" takes the hint's place on the computer's turn (CM-14) -->
-    <p v-if="!thinking" data-hint class="text-sm text-gray-500">{{ hint }}</p>
+    <p v-if="!thinking" data-hint class="text-sm text-muted">{{ hint }}</p>
 
     <div class="flex">
       <BaseButton
@@ -54,19 +54,19 @@
 
     <div
       v-if="isConfirmOpen"
-      class="fixed inset-0 z-10 flex items-center justify-center bg-gray-900/40 p-4"
+      class="fixed inset-0 z-10 flex items-center justify-center bg-ink/40 p-4"
       @click.self="isConfirmOpen = false"
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="stop-game-title"
-        class="flex w-full max-w-75 flex-col gap-4 rounded-lg border border-gray-300 bg-white p-6 shadow-lg"
+        class="flex w-full max-w-75 flex-col gap-4 rounded-lg border border-border bg-surface p-6 shadow-lg"
       >
-        <h3 id="stop-game-title" class="text-xl font-bold text-gray-900">
+        <h3 id="stop-game-title" class="text-xl font-bold text-ink">
           {{ t('status.stopTitle') }}
         </h3>
-        <p class="text-sm text-gray-700">{{ t('status.stopText') }}</p>
+        <p class="text-sm text-ink-soft">{{ t('status.stopText') }}</p>
         <div class="flex flex-col">
           <PlayerScore
             v-for="player in dotLineGame.players"

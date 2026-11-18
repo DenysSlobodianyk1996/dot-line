@@ -1,13 +1,13 @@
 <template>
   <section
     :aria-labelledby="titleId"
-    class="flex flex-col gap-3 rounded-lg border border-gray-300 bg-white p-4"
+    class="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4"
   >
-    <h4 :id="titleId" class="text-sm font-semibold text-gray-900">{{ t('rules.title') }}</h4>
+    <h4 :id="titleId" class="text-sm font-semibold text-ink">{{ t('rules.title') }}</h4>
     <ol class="flex flex-col gap-2">
-      <li v-for="step in STEPS" :key="step" class="flex items-start gap-2 text-sm text-gray-700">
+      <li v-for="step in STEPS" :key="step" class="flex items-start gap-2 text-sm text-ink-soft">
         <span
-          class="flex size-5 shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-semibold"
+          class="flex size-5 shrink-0 items-center justify-center rounded-full bg-surface-strong text-xs font-semibold"
           aria-hidden="true"
         >
           {{ step }}
