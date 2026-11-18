@@ -1,9 +1,6 @@
 <template>
-  <section
-    :aria-labelledby="titleId"
-    class="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4"
-  >
-    <h4 :id="titleId" class="text-sm font-semibold text-ink">{{ t('rules.title') }}</h4>
+  <section :aria-labelledby="titleId" class="flex flex-col gap-3">
+    <h2 :id="titleId" class="text-lg font-bold text-ink">{{ t('rules.title') }}</h2>
     <ol class="flex flex-col gap-2">
       <li v-for="step in STEPS" :key="step" class="flex items-start gap-2 text-sm text-ink-soft">
         <span
@@ -19,12 +16,13 @@
 </template>
 
 <script setup lang="ts">
-import { useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-// rules text lives in src/i18n/locales (rules.step1–step5) and must match the spec (RL-5)
+// the rules panel labels itself with this title (VR-29)
+defineProps<{ titleId: string }>()
+
+// rules text lives in src/i18n/locales (rules.step1–step5) and must match the spec (RL-5, VR-30)
 const STEPS = [1, 2, 3, 4, 5] as const
 
 const { t } = useI18n()
-const titleId = useId()
 </script>
