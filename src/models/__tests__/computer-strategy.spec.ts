@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { chooseComputerLine, COMPUTER_NAME, Dot, DotLineGame, Line } from '@/models'
+import { chooseComputerLine, COMPUTER_NAME, Dot, DotsAndBoxesGame, Line } from '@/models'
 
 const ann = { name: 'Ann', color: '#ff0000' }
 const computer = { name: COMPUTER_NAME, color: '#32a06e' }
 const dot = (row: number, col: number) => new Dot({ row, col })
 
 function computerGame(size: number) {
-  return new DotLineGame({
+  return new DotsAndBoxesGame({
     player1: ann,
     player2: computer,
     size,
@@ -70,7 +70,7 @@ function normalGame(size: number, lineKeys: string[]) {
     })
     return new Line({ from, to, ownerName: ann.name })
   })
-  return new DotLineGame({
+  return new DotsAndBoxesGame({
     player1: ann,
     player2: computer,
     size,
@@ -80,12 +80,12 @@ function normalGame(size: number, lineKeys: string[]) {
 }
 
 // an independent copy, so trying a line doesn't change the original
-const copyOf = (game: DotLineGame) => new DotLineGame(JSON.parse(JSON.stringify(game)))
+const copyOf = (game: DotsAndBoxesGame) => new DotsAndBoxesGame(JSON.parse(JSON.stringify(game)))
 
 const RANDOM_VALUES = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.999]
 
 // every line Normal picks over a spread of random values
-function normalPicks(game: DotLineGame) {
+function normalPicks(game: DotsAndBoxesGame) {
   return new Set(
     RANDOM_VALUES.map((value) => chooseComputerLine(game, 'normal', fixed(value))?.key),
   )

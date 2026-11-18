@@ -1,8 +1,8 @@
-import { Dot, DotLineGame, type Line, type Square } from '@/models'
+import { Dot, DotsAndBoxesGame, type Line, type Square } from '@/models'
 import { SWATCHES } from '@/utils/swatches'
 
 // The scripted 3×3 game behind the rules panel's storyboard (RL-7). It is played on a real
-// DotLineGame, so every line is legal (MV-1..3) and squares are claimed by the game rules (SQ-1..2).
+// DotsAndBoxesGame, so every line is legal (MV-1..3) and squares are claimed by the game rules (SQ-1..2).
 
 export type StoryPlayer = 'coral' | 'teal'
 
@@ -39,7 +39,7 @@ const MOVES: [Dot, Dot][] = [
   [dot(1, 1), dot(2, 1)], // Teal closes squares 1,0 and 1,1 with one line
 ]
 
-function snapshot(game: DotLineGame, dot1: Dot | null = null): StoryFrame {
+function snapshot(game: DotsAndBoxesGame, dot1: Dot | null = null): StoryFrame {
   return {
     lines: [...game.lines],
     squares: [...game.dirtySquares],
@@ -54,7 +54,7 @@ function snapshot(game: DotLineGame, dot1: Dot | null = null): StoryFrame {
  * Throws if a scripted line breaks the rules, so a bad script can't silently drop a move.
  */
 export function storyFrames(moves: [Dot, Dot][] = MOVES): StoryFrame[] {
-  const game = new DotLineGame({
+  const game = new DotsAndBoxesGame({
     player1: { name: 'coral', color: STORY_COLORS.coral },
     player2: { name: 'teal', color: STORY_COLORS.teal },
     size: STORY_SIZE,

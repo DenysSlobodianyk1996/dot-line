@@ -1,5 +1,5 @@
 import { onBeforeUnmount, readonly, ref, watch } from 'vue'
-import { chooseComputerLine, type DotLineGame } from '@/models'
+import { chooseComputerLine, type DotsAndBoxesGame } from '@/models'
 
 // a fixed pause so the computer's move is easy to follow, not a measure of real work (CM-15)
 export const COMPUTER_DELAY_MS = 1000
@@ -16,7 +16,7 @@ export const COMPUTER_DELAY_MS = 1000
  * While `paused()` is true (the Stop dialog or the rules panel is open) no move is pending; when it
  * turns false again the computer gets its full pause before moving (VC-13, VR-31).
  */
-export function useComputerTurn(game: () => DotLineGame, paused: () => boolean) {
+export function useComputerTurn(game: () => DotsAndBoxesGame, paused: () => boolean) {
   const isThinking = ref(false)
   let pendingMove: ReturnType<typeof setTimeout> | null = null
 

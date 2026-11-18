@@ -4,18 +4,18 @@
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-center sm:gap-6">
       <GameBoard
         v-model:selected-dot="selectedDot"
-        :dot-line-game="dotLineGame"
+        :dots-and-boxes-game="dotsAndBoxesGame"
         :locked="isBoardLocked"
       />
       <GameResult
-        v-if="dotLineGame.isFinished"
-        :dot-line-game="dotLineGame"
+        v-if="dotsAndBoxesGame.isFinished"
+        :dots-and-boxes-game="dotsAndBoxesGame"
         @new-game-settings="newGameSettings"
         @rematch="rematch"
       />
       <GameStatus
         v-else
-        :dot-line-game="dotLineGame"
+        :dots-and-boxes-game="dotsAndBoxesGame"
         :hint="hint"
         v-model:confirming="isStopConfirmOpen"
         :thinking="isBoardLocked"
@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Dot, DotLineGame } from '@/models'
+import type { Dot, DotsAndBoxesGame } from '@/models'
 import { StorageService } from '@/services'
 import { CURRENT_GAME } from '@/static'
 import { computed, ref, watchEffect } from 'vue'
@@ -38,7 +38,7 @@ import { useRulesPanel } from '@/shared/composables/useRulesPanel'
 import { useComputerTurn } from './useComputerTurn'
 
 const props = defineProps<{
-  dotLineGame: DotLineGame
+  dotsAndBoxesGame: DotsAndBoxesGame
 }>()
 
 const selectedDot = ref<Dot | null>(null)
@@ -49,7 +49,7 @@ const hint = computed(() => {
   if (selectedDot.value) {
     return t('game.hintSelected')
   }
-  if (props.dotLineGame.lines.length === 0) {
+  if (props.dotsAndBoxesGame.lines.length === 0) {
     return t('game.hintFirstLine')
   }
   return t('game.hintStart')
@@ -62,36 +62,36 @@ const isStopConfirmOpen = ref(false)
 
 // the computer player's turns: ~1 s pause, then its line (CM-11, CM-15, CM-31)
 const computerTurn = useComputerTurn(
-  () => props.dotLineGame,
+  () => props.dotsAndBoxesGame,
   () => isStopConfirmOpen.value || rulesPanel.isOpen.value,
 )
 
 // on the computer's turn nothing can be picked and clicks are ignored (CM-16)
 const isBoardLocked = computed(
-  () => computerTurn.isThinking.value || props.dotLineGame.isComputerTurn,
+  () => computerTurn.isThinking.value || props.dotsAndBoxesGame.isComputerTurn,
 )
 
 watchEffect(() => {
-  StorageService.setItem(CURRENT_GAME, props.dotLineGame)
+  StorageService.setItem(CURRENT_GAME, props.dotsAndBoxesGame)
 })
 
 function stop() {
   isStopConfirmOpen.value = false
   computerTurn.cancel()
   selectedDot.value = null
-  props.dotLineGame.stop()
+  props.dotsAndBoxesGame.stop()
 }
 
 function rematch() {
   computerTurn.cancel()
   selectedDot.value = null
-  props.dotLineGame.start()
+  props.dotsAndBoxesGame.start()
 }
 
 function newGameSettings() {
   computerTurn.cancel()
   StorageService.removeItem(CURRENT_GAME)
-  props.dotLineGame.reset()
+  props.dotsAndBoxesGame.reset()
 }
 </script>
 

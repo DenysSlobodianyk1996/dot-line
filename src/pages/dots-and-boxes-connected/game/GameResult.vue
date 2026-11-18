@@ -47,7 +47,7 @@
             <!-- spaced for screen readers and copy ("5 : 3"); the gap does it on screen -->
             <span v-if="index > 0">{{ ' : ' }}</span>
             <span class="min-w-14 rounded-xl border-2 px-2.5" :style="chipStyle(player.color)">
-              {{ dotLineGame.scoreOf(player.name) }}
+              {{ dotsAndBoxesGame.scoreOf(player.name) }}
             </span>
           </template>
         </div>
@@ -61,14 +61,14 @@
         v-for="player in rankedPlayers"
         :key="player.name"
         :player
-        :score="dotLineGame.scoreOf(player.name)"
+        :score="dotsAndBoxesGame.scoreOf(player.name)"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { isComputerPlayer, type DotLineGame } from '@/models'
+import { isComputerPlayer, type DotsAndBoxesGame } from '@/models'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseButton from '@/shared/components/BaseButton.vue'
@@ -80,7 +80,7 @@ import SettingsIcon from '@/shared/icons/SettingsIcon.vue'
 import { useDisplayName } from '@/shared/composables/useDisplayName'
 
 const props = defineProps<{
-  dotLineGame: DotLineGame
+  dotsAndBoxesGame: DotsAndBoxesGame
 }>()
 
 const emit = defineEmits<{
@@ -91,19 +91,19 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const displayName = useDisplayName()
 
-const winner = computed(() => props.dotLineGame.winner)
+const winner = computed(() => props.dotsAndBoxesGame.winner)
 
 // Versus computer speaks to the person; Two players names the winner (CM-27)
 const winnerTitle = computed(() => {
   const name = winner.value?.name
-  if (props.dotLineGame.isComputerGame) {
+  if (props.dotsAndBoxesGame.isComputerGame) {
     return isComputerPlayer(name) ? t('result.computerWon') : t('result.youWon')
   }
   return t('result.wins', { name: displayName(name ?? '') })
 })
 
 const reason = computed(() =>
-  props.dotLineGame.finishReason === 'stopped' ? t('result.stopped') : t('result.completed'),
+  props.dotsAndBoxesGame.finishReason === 'stopped' ? t('result.stopped') : t('result.completed'),
 )
 
 // a tint of the player's color under the ink number, edged in the full color (UP-10, VR-17)
@@ -116,7 +116,7 @@ function chipStyle(color: string) {
 
 // winner first; a draw keeps player order
 const rankedPlayers = computed(() => {
-  const game = props.dotLineGame
+  const game = props.dotsAndBoxesGame
   return [...game.players].sort((a, b) => game.scoreOf(b.name) - game.scoreOf(a.name))
 })
 </script>

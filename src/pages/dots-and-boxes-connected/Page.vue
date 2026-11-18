@@ -10,31 +10,35 @@
 </template>
 
 <script setup lang="ts">
-import { DotLineGame, type GameSetupForm } from '@/models'
+import { DotsAndBoxesGame, type GameSetupForm } from '@/models'
 import { computed, reactive } from 'vue'
 import GameSetup from './game-setup/GameSetup.vue'
 import Game from './Game.vue'
 import { StorageService } from '@/services/storage.service.ts'
 import { CURRENT_GAME } from '@/static/storage-keys.ts'
 
-const dotLineGame = reactive<DotLineGame>(new DotLineGame())
+const dotsAndBoxesGame = reactive<DotsAndBoxesGame>(new DotsAndBoxesGame())
 
-const savedGame: Partial<DotLineGame> | null = StorageService.getItem(CURRENT_GAME, {
+const savedGame: Partial<DotsAndBoxesGame> | null = StorageService.getItem(CURRENT_GAME, {
   applyParse: true,
 })
-dotLineGame.reset(savedGame)
+dotsAndBoxesGame.reset(savedGame)
 
 // games saved before gameplay existed have no current player yet (PS-3)
-if (dotLineGame.isGameStarted && !dotLineGame.isFinished && !dotLineGame.currentPlayerName) {
-  dotLineGame.start()
+if (
+  dotsAndBoxesGame.isGameStarted &&
+  !dotsAndBoxesGame.isFinished &&
+  !dotsAndBoxesGame.currentPlayerName
+) {
+  dotsAndBoxesGame.start()
 }
 
 const componentConfig = computed(() => {
-  if (dotLineGame.isGameStarted) {
+  if (dotsAndBoxesGame.isGameStarted) {
     return {
       component: Game,
       props: {
-        dotLineGame,
+        dotsAndBoxesGame,
       },
       listeners: {},
     }
@@ -50,7 +54,7 @@ const componentConfig = computed(() => {
 
 // in Versus computer mode player2 is already the computer player (CM-9, ADR-0001)
 function gameSetup({ gameMode, difficulty, player1, player2, size }: GameSetupForm) {
-  dotLineGame
+  dotsAndBoxesGame
     .setGameMode(gameMode, difficulty)
     .setPlayer1(player1)
     .setPlayer2(player2)

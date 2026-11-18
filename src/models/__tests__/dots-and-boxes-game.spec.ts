@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { COMPUTER_NAME, Dot, DotLineGame, Line } from '@/models'
+import { COMPUTER_NAME, Dot, DotsAndBoxesGame, Line } from '@/models'
 
 const ann = { name: 'Ann', color: '#ff0000' }
 const bob = { name: 'Bob', color: '#0000ff' }
@@ -7,11 +7,11 @@ const dot = (row: number, col: number) => new Dot({ row, col })
 type Edge = [number, number, number, number]
 
 function newGame(size: number, first = 'Ann') {
-  return new DotLineGame({ player1: ann, player2: bob, size, currentPlayerName: first })
+  return new DotsAndBoxesGame({ player1: ann, player2: bob, size, currentPlayerName: first })
 }
 
 /** Draws each edge for whoever's turn it is; fails if a move is rejected. */
-function play(game: DotLineGame, edges: Edge[]) {
+function play(game: DotsAndBoxesGame, edges: Edge[]) {
   for (const [r1, c1, r2, c2] of edges) {
     expect(game.canDraw(dot(r1, c1), dot(r2, c2)), `edge ${[r1, c1, r2, c2]}`).toBe(true)
     game.drawLine(dot(r1, c1), dot(r2, c2))
@@ -170,7 +170,7 @@ describe('turns', () => {
   })
 
   it('picks a random first player on start (TR-2)', () => {
-    const game = new DotLineGame({ player1: ann, player2: bob, size: 2 })
+    const game = new DotsAndBoxesGame({ player1: ann, player2: bob, size: 2 })
 
     vi.spyOn(Math, 'random').mockReturnValue(0)
     expect(game.start().currentPlayerName).toBe('Ann')
@@ -261,7 +261,8 @@ describe('end of game', () => {
 })
 
 describe('rehydration', () => {
-  const roundTrip = (game: DotLineGame) => new DotLineGame(JSON.parse(JSON.stringify(game)))
+  const roundTrip = (game: DotsAndBoxesGame) =>
+    new DotsAndBoxesGame(JSON.parse(JSON.stringify(game)))
 
   it('restores lines, owned squares, current player and status, including row/col 0 (PS-1, PS-2)', () => {
     const game = newGame(2)
@@ -304,7 +305,7 @@ describe('rehydration', () => {
 
   it('reset keeps the same object and replaces its state (PS-2)', () => {
     const saved = JSON.parse(JSON.stringify(newGame(2, 'Bob')))
-    const game = new DotLineGame()
+    const game = new DotsAndBoxesGame()
 
     game.reset(saved)
 
@@ -315,7 +316,7 @@ describe('rehydration', () => {
   })
 
   it('restores a save without a current player so start can pick one (PS-3)', () => {
-    const legacy = new DotLineGame(
+    const legacy = new DotsAndBoxesGame(
       JSON.parse(JSON.stringify({ player1: ann, player2: bob, size: 3 })),
     )
 
@@ -328,11 +329,12 @@ describe('rehydration', () => {
 })
 
 describe('game mode', () => {
-  const roundTrip = (game: DotLineGame) => new DotLineGame(JSON.parse(JSON.stringify(game)))
+  const roundTrip = (game: DotsAndBoxesGame) =>
+    new DotsAndBoxesGame(JSON.parse(JSON.stringify(game)))
   const computer = { name: COMPUTER_NAME, color: '#32a06e' }
 
   function computerGame(first: string) {
-    return new DotLineGame({
+    return new DotsAndBoxesGame({
       player1: ann,
       player2: computer,
       size: 2,
@@ -341,7 +343,7 @@ describe('game mode', () => {
   }
 
   it('loads a save from before game modes as Two players (CM-33)', () => {
-    const legacy = new DotLineGame(
+    const legacy = new DotsAndBoxesGame(
       JSON.parse(JSON.stringify({ player1: ann, player2: bob, size: 2, currentPlayerName: 'Ann' })),
     )
 
@@ -391,7 +393,7 @@ describe('game mode', () => {
 })
 
 describe('legal moves', () => {
-  const keys = (game: DotLineGame) =>
+  const keys = (game: DotsAndBoxesGame) =>
     game
       .legalMoves()
       .map((line) => line.key)

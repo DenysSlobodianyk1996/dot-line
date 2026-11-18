@@ -22,7 +22,7 @@ const DIRECTIONS: [number, number][] = [
   [0, 1],
 ]
 
-export class DotLineGame {
+export class DotsAndBoxesGame {
   public player1: Player | null
   public player2: Player | null
   public size: number | null
@@ -45,7 +45,7 @@ export class DotLineGame {
     finishReason,
     gameMode,
     difficulty,
-  }: Partial<DotLineGame> = {}) {
+  }: Partial<DotsAndBoxesGame> = {}) {
     this.player1 = player1 ?? null
     this.player2 = player2 ?? null
     this.size = size ? Number(size) : null
@@ -264,8 +264,8 @@ export class DotLineGame {
     return this
   }
 
-  reset(game?: Partial<DotLineGame> | null) {
-    Object.assign(this, new DotLineGame(game ?? {}))
+  reset(game?: Partial<DotsAndBoxesGame> | null) {
+    Object.assign(this, new DotsAndBoxesGame(game ?? {}))
   }
 
   private finish(reason: FinishReason) {

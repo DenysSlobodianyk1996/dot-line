@@ -5,7 +5,7 @@
       :style="{ width: `${boardSize + BORDER * 2}px`, height: `${boardSize + BORDER * 2}px` }"
     >
       <div
-        v-for="square in dotLineGame.dirtySquares"
+        v-for="square in dotsAndBoxesGame.dirtySquares"
         :key="`square-${square.row}-${square.col}`"
         class="absolute flex items-center justify-center text-base font-bold"
         :style="squareStyle(square)"
@@ -14,7 +14,7 @@
       </div>
 
       <div
-        v-for="line in dotLineGame.lines"
+        v-for="line in dotsAndBoxesGame.lines"
         :key="line.key"
         class="absolute rounded-[2px]"
         :style="lineStyle(line)"
@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { Dot, isComputerPlayer, type DotLineGame, type Line, type Square } from '@/models'
+import { Dot, isComputerPlayer, type DotsAndBoxesGame, type Line, type Square } from '@/models'
 import { computed, onBeforeUnmount, onMounted, ref, type CSSProperties } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDisplayName } from '@/shared/composables/useDisplayName'
@@ -81,7 +81,7 @@ const DOT_CLASS: Record<DotState, string> = {
 }
 
 const props = defineProps<{
-  dotLineGame: DotLineGame
+  dotsAndBoxesGame: DotsAndBoxesGame
   // the computer's turn: every dot idle and clicks ignored (CM-16)
   locked?: boolean
 }>()
@@ -106,7 +106,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateViewport))
 
 // squares keep 48 px while the board fits and shrink on narrow screens (MB-3)
 const cell = computed(() => {
-  const size = props.dotLineGame.size || 1
+  const size = props.dotsAndBoxesGame.size || 1
   const sidePanel = isSideBySide.value ? SIDE_PANEL_WITH_GAP : 0
   const available = viewportWidth.value - APP_GUTTERS - sidePanel - PADDING * 2 - BORDER * 2
   return Math.min(MAX_CELL, Math.max(MIN_CELL, Math.floor(available / size)))
@@ -115,12 +115,12 @@ const cell = computed(() => {
 // each dot is tappable across a whole square, capped at 44 px (MB-4)
 const tapArea = computed(() => Math.min(cell.value, MAX_TAP_AREA))
 
-const boardSize = computed(() => (props.dotLineGame.size ?? 0) * cell.value + PADDING * 2)
+const boardSize = computed(() => (props.dotsAndBoxesGame.size ?? 0) * cell.value + PADDING * 2)
 
-const currentColor = computed(() => props.dotLineGame.currentPlayer?.color ?? FALLBACK_COLOR)
+const currentColor = computed(() => props.dotsAndBoxesGame.currentPlayer?.color ?? FALLBACK_COLOR)
 
 const dots = computed(() => {
-  const game = props.dotLineGame
+  const game = props.dotsAndBoxesGame
   const size = game.size ?? 0
   const selected = selectedDot.value
   const targets = selected ? game.validNeighbors(selected) : []
@@ -145,7 +145,7 @@ function toPoint({ row, col }: { row: number; col: number }) {
 }
 
 function colorOf(playerName: string | null): string {
-  return props.dotLineGame.getPlayerByName(playerName)?.color ?? FALLBACK_COLOR
+  return props.dotsAndBoxesGame.getPlayerByName(playerName)?.color ?? FALLBACK_COLOR
 }
 
 function squareStyle(square: Square): CSSProperties {
@@ -164,7 +164,7 @@ function squareStyle(square: Square): CSSProperties {
 // The computer's last line stays highlighted until the person draws: the newest line, if the computer
 // player drew it and the game is still playing. Derived from the saved lines, so it survives a reload (CM-32).
 const lastComputerLine = computed(() => {
-  const game = props.dotLineGame
+  const game = props.dotsAndBoxesGame
   const newest = game.lines[game.lines.length - 1]
   return !game.isFinished && newest && isComputerPlayer(newest.ownerName) ? newest : null
 })
@@ -210,7 +210,7 @@ function dotFillStyle(state: DotState): CSSProperties {
 }
 
 function onDotClick(dot: Dot) {
-  const game = props.dotLineGame
+  const game = props.dotsAndBoxesGame
   const selected = selectedDot.value
   if (game.isFinished || props.locked) return
 

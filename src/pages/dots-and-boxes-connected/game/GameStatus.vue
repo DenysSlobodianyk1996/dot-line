@@ -21,7 +21,7 @@
         <div class="flex items-start gap-2 leading-6 font-semibold text-ink">
           <span
             class="mt-1.5 size-3 shrink-0 rounded-full"
-            :style="{ backgroundColor: dotLineGame.currentPlayer?.color }"
+            :style="{ backgroundColor: dotsAndBoxesGame.currentPlayer?.color }"
           ></span>
           <!-- Versus computer: the person's own turn reads "Your turn" (CM-19) -->
           <span v-if="isPersonTurn" class="min-w-0 wrap-break-word">{{
@@ -30,7 +30,7 @@
           <PlayerName
             v-else
             class="min-w-0 wrap-break-word"
-            :name="dotLineGame.currentPlayer?.name"
+            :name="dotsAndBoxesGame.currentPlayer?.name"
             :icon-size="20"
           />
         </div>
@@ -48,10 +48,10 @@
       <div class="flex min-w-0 flex-col gap-1">
         <div class="text-sm font-medium text-ink-soft">{{ t('status.score') }}</div>
         <PlayerScore
-          v-for="player in dotLineGame.players"
+          v-for="player in dotsAndBoxesGame.players"
           :key="player.name"
           :player
-          :score="dotLineGame.scoreOf(player.name)"
+          :score="dotsAndBoxesGame.scoreOf(player.name)"
         />
       </div>
     </div>
@@ -89,10 +89,10 @@
         <p class="text-sm text-ink-soft">{{ t('status.stopText') }}</p>
         <div class="flex flex-col">
           <PlayerScore
-            v-for="player in dotLineGame.players"
+            v-for="player in dotsAndBoxesGame.players"
             :key="player.name"
             :player
-            :score="dotLineGame.scoreOf(player.name)"
+            :score="dotsAndBoxesGame.scoreOf(player.name)"
           />
         </div>
         <div class="grid grid-cols-2 gap-2 sm:flex sm:justify-end">
@@ -109,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import { isComputerPlayer, type DotLineGame } from '@/models'
+import { isComputerPlayer, type DotsAndBoxesGame } from '@/models'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseButton from '@/shared/components/BaseButton.vue'
@@ -118,14 +118,14 @@ import PlayerScore from './PlayerScore.vue'
 import StopHandIcon from '@/shared/icons/StopHandIcon.vue'
 
 const props = defineProps<{
-  dotLineGame: DotLineGame
+  dotsAndBoxesGame: DotsAndBoxesGame
   hint: string
   // the computer's move is pending (CM-14)
   thinking?: boolean
 }>()
 
 const isPersonTurn = computed(
-  () => props.dotLineGame.isComputerGame && !props.dotLineGame.isComputerTurn,
+  () => props.dotsAndBoxesGame.isComputerGame && !props.dotsAndBoxesGame.isComputerTurn,
 )
 
 const { t } = useI18n()
@@ -137,13 +137,13 @@ const HINT_KEYS = ['game.hintFirstLine', 'game.hintStart', 'game.hintSelected'] 
 // did until the next line is drawn (CM-37)
 const announcement = computed(() => {
   if (props.thinking) return t('status.thinking')
-  const { lines } = props.dotLineGame
+  const { lines } = props.dotsAndBoxesGame
   const newest = lines[lines.length - 1]
   if (!newest || !isComputerPlayer(newest.ownerName)) return ''
   // an owned square next to the newest line was closed by it
-  const claimed = props.dotLineGame
+  const claimed = props.dotsAndBoxesGame
     .squaresNextTo(newest)
-    .filter(({ row, col }) => props.dotLineGame.getSquare(row, col)).length
+    .filter(({ row, col }) => props.dotsAndBoxesGame.getSquare(row, col)).length
   if (claimed === 2) return t('status.computerClaimedTwo')
   if (claimed === 1) return t('status.computerClaimedOne')
   return t('status.computerDrew')
