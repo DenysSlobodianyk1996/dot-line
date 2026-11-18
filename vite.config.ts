@@ -93,6 +93,8 @@ export default defineConfig({
         // every built asset, incl. 404.html, the font and the icons, so it all works offline (VR-47)
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}', MANIFEST_FILES.en],
         navigateFallback: 'index.html',
+        // the privacy policy is its own page (precached through privacy/index.html), not the app (AR-15)
+        navigateFallbackDenylist: [/\/privacy\/?$/],
       },
     }),
     extraPwaFiles(),
