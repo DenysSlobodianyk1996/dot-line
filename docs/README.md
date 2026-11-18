@@ -32,6 +32,6 @@ Rules:
 
 | Feature | Status | Docs |
 | --- | --- | --- |
-| Dot-line game (gameplay, mobile, rules, languages) | Implemented (browser QA pending) | [requirements](dot-line-game/requirements.md) · [design](dot-line-game/design.md) |
-| Visual refresh and installable app (PWA) | Implemented on `feat/visual-refresh`, not yet on `master` (browser QA pending) | [spec](visual-refresh/spec.md) · [requirements TH, HD, PWA, RL](dot-line-game/requirements.md#th-look-and-theme) · [design](dot-line-game/design.md#visual-refresh-vr-152) |
-| Versus computer game mode | Implemented on `feat/computer-opponent`, not yet on `master` (browser QA pending) | [spec](computer-opponent/spec.md) · [requirements VC](dot-line-game/requirements.md#vc-versus-computer) · [design](dot-line-game/design.md#versus-computer-vc-125) |
+| Dot-line game (gameplay, mobile, rules, languages) | Shipped | [requirements](dot-line-game/requirements.md) · [design](dot-line-game/design.md) |
+| Visual refresh and installable app (PWA) | Shipped (#33, device QA #31 passed) | [spec](visual-refresh/spec.md) · [requirements TH, HD, PWA, RL](dot-line-game/requirements.md#th-look-and-theme) · [design](dot-line-game/design.md#visual-refresh-vr-152) |
+| Versus computer game mode | Shipped (#21, browser QA #19 passed) | [spec](computer-opponent/spec.md) · [requirements VC](dot-line-game/requirements.md#vc-versus-computer) · [design](dot-line-game/design.md#versus-computer-vc-125) |
