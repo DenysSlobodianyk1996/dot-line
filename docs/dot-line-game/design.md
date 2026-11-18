@@ -314,7 +314,7 @@ The phone layout is the default, and `sm:` classes (640 px and up) restore the d
 - **Stop dialog** card: `w-full max-w-75`, inside the `p-4` backdrop.
 - **GameResult** [END-4, END-9, MB-6]: the button row comes first, in Stop's slot: `grid grid-cols-2 gap-2 sm:flex sm:flex-col`, both buttons `w-full min-h-11 sm:min-h-0`. On phones New game settings is left and Rematch right; from `sm` up Rematch is on top (`sm:order-first`). A label that does not fit wraps (no `truncate`/`whitespace-nowrap`).
 - **Centering** [MB-9]: horizontal only. The setup root is `mx-auto max-w-130`; the game screen is centered by Game.vue's `sm:justify-center` (on phones it is already full width with the board `self-center`). Nothing is centered vertically (no `items-center`/`min-h-screen` on the page), so content stays top-aligned when its height changes. The board wrapper keeps `max-w-full overflow-x-auto`, a scroll container whose minimum width is 0, so a board that can't shrink scrolls inside itself rather than overflowing the page [MB-1, MB-3].
-- **GameSetup**: the player fieldsets row becomes `flex flex-col gap-2 sm:flex-row`; each fieldset is `min-w-0 flex-1`, so the two share the row equally ("You" and "Opponent" included).
+- **GameSetup**: the player fieldsets row becomes `flex flex-col gap-4 sm:flex-row` (16 px, as is the `<Form>` column between mode, difficulty, players, size and Start; inside the size field label, input, hint and error keep `gap-2`) [UP-3]; each fieldset is `min-w-0 flex-1`, so the two share the row equally ("You" and "Opponent" included).
 
 ## Rules [RL-1, RL-5, RL-7, VR-23..VR-31, APP-1]
 

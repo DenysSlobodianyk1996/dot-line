@@ -1,12 +1,24 @@
 <template>
   <!-- centered horizontally, top-aligned (MB-9) -->
   <div class="mx-auto max-w-130">
-    <h3 class="w-full text-center font-bold text-xl mb-4">{{ t('setup.title') }}</h3>
+    <!-- the title with an info button that opens the rules panel, like the header's (UP-1) -->
+    <div class="mb-4 flex items-center justify-center gap-2">
+      <h3 class="text-center font-bold text-xl">{{ t('setup.title') }}</h3>
+      <BaseIconButton
+        data-setup-rules-button
+        :aria-label="t('rules.open')"
+        aria-haspopup="dialog"
+        :aria-expanded="rulesPanel.isOpen.value"
+        @click="rulesPanel.open"
+      >
+        <InfoIcon :size="20" />
+      </BaseIconButton>
+    </div>
     <!-- keep-values: what's typed survives a game mode switch (CM-10) -->
     <Form
       :initial-values="formInitialValues"
       keep-values
-      class="flex flex-col gap-2"
+      class="flex flex-col gap-4"
       @submit="submit"
       v-slot="{ values }"
     >
@@ -20,7 +32,7 @@
         :hint="difficultyHint"
       />
 
-      <div class="flex flex-col gap-2 sm:flex-row">
+      <div class="flex flex-col gap-4 sm:flex-row">
         <template v-if="isComputerMode">
           <PlayerField
             :number="1"
@@ -93,6 +105,9 @@ import BaseFieldError from '@/shared/components/BaseFieldError.vue'
 import BaseButton from '@/shared/components/BaseButton.vue'
 import BaseSegmentedControl from '@/shared/components/BaseSegmentedControl.vue'
 import BaseHint from '@/shared/components/BaseHint.vue'
+import BaseIconButton from '@/shared/components/BaseIconButton.vue'
+import { useRulesPanel } from '@/shared/composables/useRulesPanel'
+import InfoIcon from '@/shared/icons/InfoIcon.vue'
 
 import { computerColorFor, randomSwatch } from '@/utils'
 import { StorageService } from '@/services'
@@ -104,6 +119,7 @@ defineRule('min_value', min_value)
 defineRule('max_value', max_value)
 
 const { t } = useI18n()
+const rulesPanel = useRulesPanel()
 const sizeHintId = useId()
 const sizeErrorId = useId()
 
