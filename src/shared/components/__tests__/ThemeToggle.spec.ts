@@ -50,10 +50,10 @@ describe('theme', () => {
     expect(localStorage.getItem('THEME')).toBe('dark')
   })
 
-  it('names the theme button in Ukrainian on a first visit (VR-16)', async () => {
+  it('names the theme button in Ukrainian on a first visit from a Ukrainian device (VR-16, AR-6)', async () => {
     stubSystemTheme('dark')
 
-    const page = new GamePage(await mountGamePage())
+    const page = new GamePage(await mountGamePage({ deviceLanguage: 'uk-UA' }))
 
     expect(page.themeButtonLabel()).toBe('Світла тема')
     expect(page.headerTitle()).toBe('Крапки й квадрати: ланцюжок')
