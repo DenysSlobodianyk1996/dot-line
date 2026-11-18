@@ -3,16 +3,16 @@ import { mountGamePage } from '@/test/mount-game-page'
 import { GamePage, openGamePage } from '@/test/game-page'
 
 describe('language toggle', () => {
-  it('starts in Ukrainian with UA pressed (I18N-2, I18N-5)', async () => {
+  it('starts in Ukrainian with UA pressed (I18N-2, I18N-5, UP-15)', async () => {
     const page = await mountGamePage()
 
     expect(page.get('button[lang="uk"]').attributes('aria-pressed')).toBe('true')
     expect(page.get('button[lang="en"]').attributes('aria-pressed')).toBe('false')
     expect(page.get('button[lang="en"]').attributes('aria-label')).toBe('English')
-    expect(document.title).toBe('Точки й лінії')
+    expect(document.title).toBe('Крапки й квадрати: ланцюжок')
   })
 
-  it('switches the text, page language and tab title when EN is pressed (I18N-3, APP-1)', async () => {
+  it('switches the text, page language and tab title when EN is pressed (I18N-3, APP-1, UP-15)', async () => {
     const page = await mountGamePage()
 
     await page.get('button[lang="en"]').trigger('click')
@@ -21,7 +21,7 @@ describe('language toggle', () => {
     expect(page.get('button[type="submit"]').text()).toBe('Save')
     expect(page.get('button[lang="en"]').attributes('aria-pressed')).toBe('true')
     expect(document.documentElement.lang).toBe('en')
-    expect(document.title).toBe('Dots & Lines')
+    expect(document.title).toBe('Dots and Boxes: Connected')
   })
 
   it('keeps the chosen language after a reload (I18N-4)', async () => {

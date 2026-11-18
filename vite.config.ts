@@ -16,16 +16,18 @@ const base = process.env.BASE_PATH ?? '/'
 // add the dark (cocoa) one (VR-46)
 const CREAM = '#fbf5ec'
 
-// Install manifest shared by both languages; only the name differs (VR-44..VR-46, VR-50, VR-51).
-// No short_name, so launchers show the full name. Icon paths are relative to the manifest,
-// which sits at the base, so they work under /dot-line/ as well as /.
-function manifestFor(lang: keyof typeof MANIFEST_FILES, name: string): Partial<ManifestOptions> {
+// Install manifest shared by both languages; only the names differ (VR-44..VR-46, VR-50, VR-51).
+// short_name is the shorter launcher label, because launchers truncate the full name (UP-15).
+// Icon paths are relative to the manifest, which sits at the base, so they work under any base.
+function manifestFor(
+  lang: keyof typeof MANIFEST_FILES,
+  { title, shortName }: { title: string; shortName: string },
+): Partial<ManifestOptions> {
   return {
     id: base,
     lang,
-    name,
-    // undefined overrides the plugin's default (the package name) and drops out of the JSON
-    short_name: undefined,
+    name: title,
+    short_name: shortName,
     start_url: base,
     scope: base,
     display: 'standalone',
@@ -44,14 +46,14 @@ function manifestFor(lang: keyof typeof MANIFEST_FILES, name: string): Partial<M
 // one and a 404.html copy of the page (GitHub Pages' deep-link fallback) so both get precached.
 function extraPwaFiles(): Plugin {
   return {
-    name: 'dot-line:extra-pwa-files',
+    name: 'dots-and-boxes:extra-pwa-files',
     apply: 'build',
     enforce: 'post',
     generateBundle(_options, bundle) {
       this.emitFile({
         type: 'asset',
         fileName: MANIFEST_FILES.en,
-        source: JSON.stringify(manifestFor('en', en.app.title)),
+        source: JSON.stringify(manifestFor('en', en.app)),
       })
       const page = bundle['index.html']
       if (page?.type === 'asset') {
@@ -79,7 +81,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifestFilename: MANIFEST_FILES.uk,
-      manifest: manifestFor('uk', uk.app.title),
+      manifest: manifestFor('uk', uk.app),
       // the icons are already matched by globPatterns, and the plugin precaches its own manifest
       includeManifestIcons: false,
       workbox: {
