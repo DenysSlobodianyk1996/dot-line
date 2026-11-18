@@ -10,6 +10,10 @@ const uk: typeof en = {
     uk: 'Українська',
     en: 'English',
   },
+  theme: {
+    light: 'Світла тема',
+    dark: 'Темна тема',
+  },
   setup: {
     title: 'Налаштування гри',
     player: 'Гравець {number}',
@@ -26,6 +30,17 @@ const uk: typeof en = {
     difficulty: 'Складність',
     easy: 'Легко',
     normal: 'Нормально',
+  },
+  colors: {
+    coral: 'Кораловий',
+    teal: 'Бірюзовий',
+    sunflower: 'Соняшниковий',
+    sky: 'Небесний',
+    lavender: 'Лавандовий',
+    leaf: 'Зелений',
+    berry: 'Ягідний',
+    tangerine: 'Мандариновий',
+    taken: 'Цей колір уже зайнятий',
   },
   players: {
     computer: 'Комп’ютер',

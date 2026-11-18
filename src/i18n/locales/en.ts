@@ -8,6 +8,11 @@ const en = {
     uk: 'Українська',
     en: 'English',
   },
+  // the theme button names the theme it switches to (VR-16)
+  theme: {
+    light: 'Light theme',
+    dark: 'Dark theme',
+  },
   setup: {
     title: 'Game Setup',
     player: 'Player {number}',
@@ -24,6 +29,18 @@ const en = {
     difficulty: 'Difficulty',
     easy: 'Easy',
     normal: 'Normal',
+  },
+  colors: {
+    coral: 'Coral',
+    teal: 'Teal',
+    sunflower: 'Sunflower',
+    sky: 'Sky',
+    lavender: 'Lavender',
+    leaf: 'Leaf',
+    berry: 'Berry',
+    tangerine: 'Tangerine',
+    // validation: the other player already has this swatch (VR-36)
+    taken: 'This color is already taken',
   },
   players: {
     computer: 'Computer',

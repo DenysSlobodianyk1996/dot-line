@@ -1,5 +1,5 @@
 <template>
-  <span v-if="errorMessage" class="text-sm text-red-600">{{ errorMessage }}</span>
+  <span v-if="errorMessage" data-field-error class="text-sm text-danger">{{ errorMessage }}</span>
 </template>
 
 <script setup lang="ts">

@@ -131,7 +131,7 @@ Acceptance:
 
 - **I18N-1**: Every text the UI shows is available in Ukrainian and English: labels, buttons, hints, the Stop dialog, the result panel, the rules, validation messages, dot `aria-label`s and the browser tab title, plus the Versus computer texts (VC-24). Player names are shown exactly as typed; only the computer player's name is translated (VC-8).
 - **I18N-2**: Ukrainian is the default language on the first visit.
-- **I18N-3**: A language toggle ("UA" / "EN") sits at the top right of every screen. Switching changes all text at once, along with the page's `lang` attribute and the tab title.
+- **I18N-3**: A language toggle ("UA" / "EN") sits in the header of every screen (VR-18). Switching changes all text at once, along with the page's `lang` attribute and the tab title.
 - **I18N-4**: The chosen language is saved in localStorage and restored on reload.
 - **I18N-5**: The toggle is a labelled button group. Each button has `aria-pressed` and the full language name for assistive technology, and below 640 px wide each button is at least 44×44 px.
 - **I18N-6**: A validation message that's already on screen switches language the next time its field is validated.

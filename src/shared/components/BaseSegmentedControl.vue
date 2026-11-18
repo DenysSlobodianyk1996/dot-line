@@ -1,11 +1,11 @@
 <template>
   <div class="flex flex-col gap-2">
     <!-- the visible label; the group carries the same text as its accessible name -->
-    <div aria-hidden="true" class="block text-sm font-medium text-gray-700">{{ label }}</div>
+    <div aria-hidden="true" class="block text-sm font-medium text-ink-soft">{{ label }}</div>
     <div
       role="radiogroup"
       :aria-label="label"
-      class="flex gap-0.5 rounded-md border border-gray-300 bg-white p-0.5 shadow-sm"
+      class="flex gap-0.5 rounded-md border border-border bg-surface p-0.5 shadow-sm"
     >
       <button
         v-for="option in options"
@@ -13,9 +13,11 @@
         type="button"
         role="radio"
         :aria-checked="model === option.value"
-        class="min-h-11 flex-1 cursor-pointer rounded px-3 text-center text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-blue-500 sm:min-h-8"
+        class="min-h-11 flex-1 cursor-pointer rounded px-3 text-center text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-accent sm:min-h-8"
         :class="
-          model === option.value ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100'
+          model === option.value
+            ? 'bg-accent text-on-accent'
+            : 'text-ink-soft hover:bg-surface-muted'
         "
         @click="model = option.value"
       >

@@ -1,1 +1,77 @@
 @import 'tailwindcss';
+/* Nunito variable, bundled (no font CDN); unicode-range subsets cover Latin and Cyrillic */
+@import '@fontsource-variable/nunito';
+
+/*
+ * Warm cream design tokens (VR-1..VR-10). The palette lives in these custom properties;
+ * `@theme inline` below exposes them to Tailwind under semantic names (bg-paper, text-ink,
+ * bg-accent, …). Components use only the semantic utilities, never raw gray/blue/white.
+ * A theme only redefines the --wc-* values: the light set is on :root, the dark set under
+ * :root[data-theme='dark'].
+ */
+:root {
+  color-scheme: light;
+  --wc-paper: #fbf5ec; /* page background, cream paper */
+  --wc-surface: #fffdf8; /* panels, fields, board */
+  --wc-surface-muted: #f3e8d9; /* read-only fields, hover */
+  --wc-surface-strong: #ecdfcc; /* secondary buttons, badges */
+  --wc-border: #e2d3bd;
+  --wc-dot: #bfa98f; /* idle board dots */
+  --wc-muted: #8f7963; /* hints, secondary text */
+  --wc-ink-soft: #6a5544; /* labels */
+  --wc-ink: #4a3a2e; /* cocoa text */
+  --wc-accent: #e8735a; /* coral: primary actions, start-dot highlight */
+  --wc-accent-hover: #dc5f45;
+  --wc-on-accent: #fffdf8; /* text on coral */
+  --wc-secondary: #2a9d8f; /* teal */
+  --wc-danger: #c2412d; /* validation messages */
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --wc-paper: #241c17;
+  --wc-surface: #30261f;
+  --wc-surface-muted: #3a2e26;
+  --wc-surface-strong: #45372d;
+  --wc-border: #574638;
+  --wc-dot: #8c7663;
+  --wc-muted: #b7a28d;
+  --wc-ink-soft: #dccbb7;
+  --wc-ink: #f6ebdc;
+  --wc-accent: #f08c73;
+  --wc-accent-hover: #f5a48f;
+  --wc-on-accent: #241c17;
+  --wc-secondary: #4db6a8;
+  --wc-danger: #ff9b85;
+}
+
+@theme inline {
+  --font-sans: 'Nunito Variable', ui-rounded, system-ui, sans-serif;
+  --color-paper: var(--wc-paper);
+  --color-surface: var(--wc-surface);
+  --color-surface-muted: var(--wc-surface-muted);
+  --color-surface-strong: var(--wc-surface-strong);
+  --color-border: var(--wc-border);
+  --color-dot: var(--wc-dot);
+  --color-muted: var(--wc-muted);
+  --color-ink-soft: var(--wc-ink-soft);
+  --color-ink: var(--wc-ink);
+  --color-accent: var(--wc-accent);
+  --color-accent-hover: var(--wc-accent-hover);
+  --color-on-accent: var(--wc-on-accent);
+  --color-secondary: var(--wc-secondary);
+  --color-danger: var(--wc-danger);
+}
+
+/* rounder corners across the app (VR-3) */
+@theme {
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+}
+
+html,
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}

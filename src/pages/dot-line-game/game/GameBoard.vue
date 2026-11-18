@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-full self-center overflow-x-auto sm:self-start">
     <div
-      class="relative shrink-0 overflow-hidden rounded-lg border border-gray-300 bg-white"
+      class="relative shrink-0 overflow-hidden rounded-lg border border-border bg-surface"
       :style="{ width: `${boardSize + BORDER * 2}px`, height: `${boardSize + BORDER * 2}px` }"
     >
       <div
@@ -24,7 +24,7 @@
         v-for="{ dot, state } in dots"
         :key="dot.key"
         type="button"
-        class="absolute flex items-center justify-center focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue-500 enabled:cursor-pointer"
+        class="absolute flex items-center justify-center focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent enabled:cursor-pointer"
         :style="dotStyle(dot)"
         :disabled="state === 'idle'"
         :aria-label="t('game.dotLabel', { row: dot.row + 1, col: dot.col + 1 })"
@@ -63,20 +63,20 @@ const APP_GUTTERS = 16
 // from Tailwind's sm breakpoint the widest side panel (GameResult, w-53) and gap-6 sit beside the board
 const SIDE_PANEL_WITH_GAP = 212 + 24
 const SIDE_BY_SIDE_QUERY = '(min-width: 40rem)'
-const FALLBACK_COLOR = '#101828'
+const FALLBACK_COLOR = 'var(--wc-ink)' // follows the theme, so it stays readable in dark (VR-17)
 
 const RING_CLASS: Record<DotState, string> = {
   idle: '',
-  start: 'size-5 border-2 border-blue-500 bg-blue-500/12',
+  start: 'size-5 border-2 border-accent bg-accent/12',
   selected: 'size-[26px] border-2',
   target: 'size-[22px] border-2 border-dashed',
 }
 
 const DOT_CLASS: Record<DotState, string> = {
-  idle: 'size-2 bg-gray-400',
-  start: 'size-2 bg-gray-900',
-  selected: 'size-3 border-2 border-white',
-  target: 'size-2 bg-gray-900',
+  idle: 'size-2 bg-dot',
+  start: 'size-2 bg-ink',
+  selected: 'size-3 border-2 border-surface',
+  target: 'size-2 bg-ink',
 }
 
 const props = defineProps<{

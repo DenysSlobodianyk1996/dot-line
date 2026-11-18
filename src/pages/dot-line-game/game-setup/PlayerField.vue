@@ -1,6 +1,6 @@
 <template>
-  <fieldset class="flex min-w-0 flex-1 gap-2 rounded-lg border border-gray-300 p-4">
-    <legend class="px-2 text-sm font-semibold text-gray-700">
+  <fieldset class="flex min-w-0 flex-1 flex-col gap-3 rounded-lg border border-border p-4">
+    <legend class="px-2 text-sm font-semibold text-ink-soft">
       {{ legend ?? t('setup.player', { number }) }}
     </legend>
     <Field
@@ -22,16 +22,33 @@
         <BaseFieldError :errorMessage />
       </div>
     </Field>
-    <Field :name="`${props.parentForm}.color`" v-slot="{ field }">
+    <!-- the color is one of the swatches, kept as its hex (VR-32..VR-34, VR-39) -->
+    <Field
+      :name="`${props.parentForm}.color`"
+      :label="t('setup.color')"
+      :rules="colorRules"
+      v-slot="{ value, handleChange, errorMessage }"
+    >
       <div class="flex flex-col gap-2">
-        <BaseLabel :for="field.name">{{ t('setup.color') }}</BaseLabel>
-        <BaseInput
-          v-bind="field"
-          :id="field.name"
-          :title="field.value"
-          type="color"
-          class="w-10! h-9.5! p-0!"
-        />
+        <div aria-hidden="true" class="block text-sm font-medium text-ink-soft">
+          {{ t('setup.color') }}
+        </div>
+        <div role="radiogroup" :aria-label="t('setup.color')" class="grid grid-cols-4 gap-2 p-1">
+          <button
+            v-for="swatch in SWATCHES"
+            :key="swatch.key"
+            type="button"
+            role="radio"
+            :aria-checked="value === swatch.hex"
+            :aria-label="t(`colors.${swatch.key}`)"
+            :title="t(`colors.${swatch.key}`)"
+            class="size-8 cursor-pointer justify-self-center rounded-full ring-offset-2 ring-offset-paper transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+            :class="value === swatch.hex ? 'scale-110 ring-3 ring-ink' : ''"
+            :style="{ backgroundColor: swatch.hex }"
+            @click="handleChange(swatch.hex)"
+          ></button>
+        </div>
+        <BaseFieldError :errorMessage />
       </div>
     </Field>
   </fieldset>
@@ -46,6 +63,7 @@ import { i18n, SUPPORTED_LOCALES } from '@/i18n'
 import BaseLabel from '@/shared/components/BaseLabel.vue'
 import BaseInput from '@/shared/components/BaseInput.vue'
 import BaseFieldError from '@/shared/components/BaseFieldError.vue'
+import { SWATCHES } from '@/utils'
 
 defineRule('required', required)
 defineRule('max', max)
@@ -57,6 +75,11 @@ defineRule('differentFromAll', (fieldValue: string, otherValues: string[]) => {
     ?.filter(Boolean)
     ?.map((s) => s.toLocaleLowerCase())
     ?.includes(fieldValue?.toLowerCase())
+})
+
+// the message comes from the i18n generateMessage config (colors.taken)
+defineRule('differentColor', (fieldValue: string, [otherColor]: string[]) => {
+  return !otherColor || fieldValue?.toLowerCase() !== otherColor.toLowerCase()
 })
 
 // apostrophe variants count as the same letter: Комп’ютер = Комп'ютер = Компʼютер
@@ -81,6 +104,8 @@ const props = defineProps<{
   legend?: string
   // Versus computer mode: reject the computer's name (CM-8)
   rejectComputerName?: boolean
+  // Two players mode: the other player's color, which this player can't take (VR-36)
+  otherPlayerColor?: string
 }>()
 
 const { t } = useI18n()
@@ -89,6 +114,10 @@ const nameRules = computed(() => {
   const rules = `required|max:${MAX_NAME_LENGTH}|differentFromAll:${props.otherPlayerNames}`
   return props.rejectComputerName ? `${rules}|notComputerName` : rules
 })
+
+const colorRules = computed(() =>
+  props.otherPlayerColor ? `differentColor:${props.otherPlayerColor}` : '',
+)
 </script>
 
 <style lang="scss" scoped></style>
