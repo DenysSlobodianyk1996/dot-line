@@ -2,7 +2,7 @@
 
 Terms follow [GLOSSARY.md](../../GLOSSARY.md). Related decisions: [ADR-0001](../adr/0001-players-identified-by-name.md) (players identified by name). User stories carry IDs **VR-n** for commits.
 
-**Status**: shipped in [#33](https://github.com/DenysSlobodianyk1996/dot-line/pull/33) (#23–#30); browser and device QA passed (#31); shipped behavior is in [requirements](../dot-line-game/requirements.md) (GS-4, GS-5, PS-5, PS-6, RL-2..RL-6, TH, HD, APP-1, PWA, VC-6). Issue: [#22](https://github.com/DenysSlobodianyk1996/dot-line/issues/22). Prototype: the throwaway branch `prototype/visual-refresh` (game layouts A/B/C, logo combos) was deleted once the refresh was built; its verdict was layout A (side panel), logo combo 1, Warm cream light/dark, rules panel and swatch picker, all of which now live in the code, the requirements and the design canvas. This spec changed shipped requirements RL-2..RL-4, GS-1 (color part), CM-9 (VC-6) and I18N-3; `docs/dot-line-game/requirements.md` now describes the result.
+**Status**: shipped in [#33](https://github.com/DenysSlobodianyk1996/dot-line/pull/33) (#23–#30); browser and device QA passed (#31); shipped behavior is in [requirements](../dots-and-boxes-connected/requirements.md) (GS-4, GS-5, PS-5, PS-6, RL-2..RL-6, TH, HD, APP-1, PWA, VC-6). Issue: [#22](https://github.com/DenysSlobodianyk1996/dot-line/issues/22). Prototype: the throwaway branch `prototype/visual-refresh` (game layouts A/B/C, logo combos) was deleted once the refresh was built; its verdict was layout A (side panel), logo combo 1, Warm cream light/dark, rules panel and swatch picker, all of which now live in the code, the requirements and the design canvas. This spec changed shipped requirements RL-2..RL-4, GS-1 (color part), CM-9 (VC-6) and I18N-3; `docs/dots-and-boxes-connected/requirements.md` now describes the result.
 
 ## Problem Statement
 
@@ -145,7 +145,7 @@ The game screen keeps today's structure: the board with the side panel next to i
 - Behaviors covered through that seam: rules panel open/close paths, closed by default on both screens, focus in/out, no inline rules on setup or game screen, computer waits while the panel is open; swatch selection, default two different swatches, same-swatch rejection in Two players, computer swatch most different from the person's; theme follows system, toggle overrides and survives reload (calling `mountGamePage` again), language switch swaps the manifest link; an old save with a non-swatch hex color still loads and plays.
 - Existing specs that change with this work: `RulesToggle.spec.ts` is replaced by a rules-panel spec; `game-screen.spec.ts`, `computer-game.spec.ts` and `smoke.spec.ts` keep their assertions and only go through the updated driver helpers.
 - **PWA and icons** are verified by a build check, not unit tests: after `npm run build` with `BASE_PATH=/dot-line/`, the output contains both manifests, the service worker, and every referenced icon; then a manual QA pass on `npm run preview` (Chrome DevTools Application panel / Lighthouse: installable, maskable icon, service worker precache; reload with the network offline; install on an Android phone and an iPhone).
-- Prior art: `src/pages/dot-line-game/__tests__/game-screen.spec.ts` and `computer-game.spec.ts` (page-driver specs, reload by remounting, faked timers for the computer turn), `src/pages/dot-line-game/rules/__tests__/RulesToggle.spec.ts` (what the rules spec replaces).
+- Prior art: `src/pages/dots-and-boxes-connected/__tests__/game-screen.spec.ts` and `computer-game.spec.ts` (page-driver specs, reload by remounting, faked timers for the computer turn), `src/pages/dots-and-boxes-connected/rules/__tests__/RulesToggle.spec.ts` (what the rules spec replaces).
 
 ## Out of Scope
 
@@ -161,5 +161,5 @@ The game screen keeps today's structure: the board with the side panel next to i
 
 - The prototype showed that a transparent logo with cocoa dots vanishes on dark browser tab bars; hence the scheme-aware SVG favicon (VR-41).
 - The prototype's remap of Tailwind's `gray`/`blue`/`white` scales was a shortcut to restyle everything at once; the real build should move components to semantic tokens so a future palette or theme doesn't depend on misleading class names.
-- `docs/dot-line-game/design.md` and the design canvas should get the new palette, header, rules panel and swatch picker before implementation (docs workflow step 3).
+- `docs/dots-and-boxes-connected/design.md` and the design canvas should get the new palette, header, rules panel and swatch picker before implementation (docs workflow step 3).
 - Material Symbols are Apache-2.0; keep the license note next to the inlined icon components.

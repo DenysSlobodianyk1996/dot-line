@@ -1,6 +1,6 @@
-# dot-line
+# Dots and Boxes: Connected
 
-A two-player dots-and-lines game in the browser. Players take turns connecting neighboring dots on an N×N board. Whoever closes a square owns it, and whoever owns more squares wins.
+«Крапки й квадрати: ланцюжок». The classic two-player Dots and Boxes game in the browser, with one house rule: every line after the first starts from an existing one. Players take turns connecting neighboring dots on an N×N board. Whoever closes a square owns it, and whoever owns more squares wins.
 
 ## How to play
 
@@ -64,11 +64,11 @@ Vue 3 (`<script setup>` with TypeScript), Vite, Tailwind CSS v4, vee-validate fo
 
 ```
 src/
-  models/                game state and rules (DotLineGame, Dot, Line, Square)
-  pages/dot-line-game/   setup screen, game screen, board and rules components
-  services/              localStorage wrapper
-  shared/components/     base UI components (button, input, label)
-docs/                    specs, ADRs and agent-skill config (terms in GLOSSARY.md)
+  models/                          game state and rules (DotsAndBoxesGame, Dot, Line, Square)
+  pages/dots-and-boxes-connected/  setup screen, game screen, board and rules components
+  services/                        localStorage wrapper
+  shared/components/               base UI components (button, input, label)
+docs/                              specs, ADRs and agent-skill config (terms in GLOSSARY.md)
 ```
 
 ## Specs and design
