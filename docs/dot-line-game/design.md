@@ -36,7 +36,7 @@ Spec: [computer-opponent/spec.md](../computer-opponent/spec.md) (stories CM-n), 
 
 Desktop page (second row):
 
-16. Setup, Versus computer: game mode switch (Versus computer selected), difficulty switch (Normal selected), "Ви" fieldset with name and color, and a read-only "Суперник" fieldset with the robot, "Комп’ютер" and its automatic color [CM-1, CM-2, CM-4..7, CM-9]
+16. Setup, Versus computer: game mode switch (Versus computer selected), difficulty switch (Normal selected) with the muted Normal hint below it (VC-26, added after approval, not drawn on the artboard), "Ви" fieldset with name and color, and a read-only "Суперник" fieldset with the robot, "Комп’ютер" and its automatic color [CM-1, CM-2, CM-4..7, CM-9]
 17. Setup, Versus computer, English [CM-36, I18N-1]
 18. Computer thinking: Turn shows the color swatch, robot and "Комп’ютер", with a pulsing "Думає…" (polite live region) under the name, and the hint hidden. Every dot is idle, so the board is locked, and Stop is still available [CM-13, CM-14, CM-16, CM-17, CM-37]
 19. Computer line highlighted, "Ваш хід": the computer's last line (a safe line, CM-24) has a 4 px halo in its color, valid starts are highlighted again, and Turn says "Ваш хід" [CM-18, CM-19]
@@ -55,6 +55,7 @@ Mobile page (second row, 390 px):
 Visual rules used on these screens:
 
 - **Mode and difficulty switches**: a labelled `role="radiogroup"` styled like the language toggle (`rounded-md border border-border bg-surface p-0.5 shadow-sm`), stretched to full width with equal-width options. The selected option is `bg-accent text-on-accent`. Options are `min-h-8` from `sm` up and `min-h-11` on phones. Difficulty sits right under the mode switch and is shown only in Versus computer mode [CM-6].
+- **Hint under a control**: one line of muted text (`text-sm text-muted`) right below the control it explains, tied to it with `aria-describedby`. The difficulty switch has one describing only the selected difficulty [VC-26]; `BaseHint.vue` draws it, so other setup fields reuse the same style.
 - **Robot icon**: Material Symbols `smart_toy` (outlined, `viewBox="0 -960 960 960"`) as inline SVG with `fill: currentColor` and `aria-hidden="true"`. It is 20 px in Turn, 16 px in score rows, 24 px in the result heading and 18 px in the setup Opponent field. It always sits between the color swatch and the written name, which stays the accessible text [CM-13, CM-37].
 - **Thinking**: `text-sm text-muted animate-pulse` in an `aria-live="polite"` element under the name in Turn (as on mobile artboard 24, on both layouts). The hint is hidden while the computer's move is pending.
 - **Last computer line**: the normal line plus `box-shadow: 0 0 0 4px` in the computer's color at 40%. It is shown only while the game is playing and the newest line is the computer's.
@@ -70,6 +71,8 @@ Message keys added to both locales (`src/i18n/locales`):
 | `setup.difficulty` | Difficulty | Складність |
 | `setup.easy` | Easy | Легко |
 | `setup.normal` | Normal | Нормально |
+| `setup.easyHint` | The computer picks a random line. | Комп’ютер обирає випадкову лінію. |
+| `setup.normalHint` | The computer takes squares whenever it can and tries not to give you any. | Комп’ютер забирає квадрати, коли може, і намагається не віддавати їх вам. |
 | `setup.you` | You | Ви |
 | `setup.opponent` | Opponent | Суперник |
 | `players.computer` | Computer | Комп’ютер |
@@ -238,7 +241,8 @@ src/pages/dot-line-game/
     RulesPanel.vue    # modal rules panel (side panel / full screen), rendered once in App.vue
 src/shared/
   components/AppLogo.vue              # the logo SVG (dot color, optional animation)
-  components/BaseSegmentedControl.vue # labelled radiogroup switch (game mode, difficulty)
+  components/BaseSegmentedControl.vue # labelled radiogroup switch (game mode, difficulty), optional hint
+  components/BaseHint.vue             # muted hint text under a control (aria-describedby target)
   components/LanguageToggle.vue       # UA / EN buttons in the header
   components/PlayerName.vue           # displayed name, with the robot for the computer player
   components/RobotIcon.vue            # inline-SVG smart_toy icon
@@ -283,6 +287,7 @@ Versus computer changes to these components are described in [Versus computer](#
 
 ## Player names [GS-1, GB-5]
 
+- **Required marker** [GS-1, GS-2]: `BaseLabel` takes a `required` prop that appends ` *` in an `aria-hidden="true"` `text-danger` span, and the matching `BaseInput` gets `aria-required="true"`. Used on each player's Name and on Size; the color swatches aren't marked. No "* required" legend.
 - **PlayerField.vue**: the name `<input>` has `maxlength="15"`, and the field's rules add `max:15` so a pasted or restored value is still validated, with its own message `validation.maxLength` ("Player 2 name can be at most 15 characters.").
 - **GameSetup.vue**: the size field's rules are `required|integer|min_value:2|max_value:10` [GS-2].
 - Names are never truncated. Every place that shows a name (GameStatus turn, PlayerScore, GameResult heading) drops `truncate` and uses `min-w-0 break-words`, so a long name wraps; the color swatch stays `shrink-0` and aligned to the first line.
@@ -291,11 +296,11 @@ Versus computer changes to these components are described in [Versus computer](#
 
 `Game.vue`'s `watchEffect` saves the whole reactive game (including `gameMode` and `difficulty`) with `StorageService.setItem(CURRENT_GAME, game)`. `Page.vue` restores it with `StorageService.getItem(CURRENT_GAME, { applyParse: true })` and `dotLineGame.reset(savedGame)`, and the constructors rebuild the `Line`, `Dot` and `Square` instances. A started, unfinished save without `currentPlayerName` (saved before gameplay existed) gets `start()` [PS-3]. `status` decides whether Game shows GameStatus or GameResult. The dot selection isn't saved.
 
-## Mobile [MB-1..8]
+## Mobile [MB-1..9]
 
 The phone layout is the default, and `sm:` classes (640 px and up) restore the desktop layout described above.
 
-- **Game.vue**: `flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6`. The board wrapper is centered on phones (`self-center sm:self-start`), and the panel is full width (`w-full`, with `sm:w-50 sm:shrink-0` for GameStatus and `sm:w-53 sm:shrink-0` for GameResult).
+- **Game.vue**: `flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-center sm:gap-6`. The board wrapper is centered on phones (`self-center sm:self-start`), and the panel is full width (`w-full`, with `sm:w-50 sm:shrink-0` for GameStatus and `sm:w-53 sm:shrink-0` for GameResult). From `sm` up, `justify-center` centers the board + panel group horizontally [MB-9].
 - **Board size** (GameBoard): `cell = clamp(floor((viewportWidth − 16 − sidePanel − 34) / N), 24, 48)`.
   - `viewportWidth` is `document.documentElement.clientWidth`, which excludes a desktop scrollbar.
   - The 16 px is the app's `p-2` gutters, and the 34 px is the board's padding plus border.
@@ -305,6 +310,7 @@ The phone layout is the default, and `sm:` classes (640 px and up) restore the d
 - **GameStatus** on phones: Turn and Score in a two-column grid (`grid grid-cols-2 gap-4 sm:flex sm:flex-col`), then the hint, then Stop at full width with `min-h-11` (`w-full sm:w-auto sm:min-h-0`).
 - **Stop dialog** card: `w-full max-w-75`, inside the `p-4` backdrop.
 - **GameResult** on phones: New game settings and Rematch in `grid grid-cols-2 gap-2`, each `min-h-11`; a label that does not fit wraps (no `truncate`/`whitespace-nowrap`) [MB-6]. From `sm` up they return to the wrapping row.
+- **Centering** [MB-9]: horizontal only. The setup root is `mx-auto max-w-130`; the game screen is centered by Game.vue's `sm:justify-center` (on phones it is already full width with the board `self-center`). Nothing is centered vertically (no `items-center`/`min-h-screen` on the page), so content stays top-aligned when its height changes. The board wrapper keeps `max-w-full overflow-x-auto`, a scroll container whose minimum width is 0, so a board that can't shrink scrolls inside itself rather than overflowing the page [MB-1, MB-3].
 - **GameSetup**: the player fieldsets row becomes `flex flex-col gap-2 sm:flex-row`; each fieldset is `min-w-0 flex-1`, so the two share the row equally ("You" and "Opponent" included).
 
 ## Rules [RL-1, RL-5, VR-23..VR-31, APP-1]
@@ -353,7 +359,7 @@ src/shared/components/LanguageToggle.vue
 - **vite.config.ts**: `define` sets the vue-i18n esm-bundler flags: `__VUE_I18N_FULL_INSTALL__: true`, `__VUE_I18N_LEGACY_API__: false`, `__INTLIFY_PROD_DEVTOOLS__: false`.
 - **StorageService.setItem** accepts a `string` as well as an `object`, and strings are stored as they are.
 
-## Versus computer [VC-1..25]
+## Versus computer [VC-1..26]
 
 ### Computer player identity
 
@@ -397,13 +403,14 @@ src/shared/components/LanguageToggle.vue
 
 - `GameResult.vue`: in a computer game the heading is `result.computerWon` or `result.youWon`; in Two players it's `result.wins` with the displayed name. Draw is unchanged, and the scores are sorted winner first.
 
-### Setup [VC-1..7]
+### Setup [VC-1..7, VC-26]
 
-- `GameSetup.vue` has a `BaseSegmentedControl` for the game mode, and a second one for the difficulty only when the mode is `'computer'`. The vee-validate `<Form>` has `keep-values`, so values typed in either mode survive a switch [VC-7].
+- `GameSetup.vue` has a `BaseSegmentedControl` for the game mode, and a second one for the difficulty only when the mode is `'computer'`, with `hint` set to `setup.easyHint` or `setup.normalHint` for the selected difficulty [VC-26]. The vee-validate `<Form>` has `keep-values`, so values typed in either mode survive a switch [VC-7].
   - Versus computer: a `PlayerField` with `legend="You"` (field label `setup.name`, so messages read "Name is not valid."), `reject-computer-name` and no other names to differ from, then `ComputerOpponentField` with `computerColorFor(values.player1.color)`.
   - Two players: the two `PlayerField`s as before.
   - `submit()` emits a `GameSetupForm`. In computer mode `player2 = createComputerPlayer(player1.color)`, and a second person typed earlier is ignored. `Page.vue` applies it with `setGameMode(...).setPlayer1(...).setPlayer2(...).setSize(...).start()`.
-- `BaseSegmentedControl.vue` (generic over the value type): a visible label (`aria-hidden`) plus a `role="radiogroup"` with the same `aria-label`. Each option is a `role="radio"` button with `aria-checked`, `flex-1` and `min-h-11 sm:min-h-8`; the selected one is `bg-accent text-on-accent`.
+- `BaseSegmentedControl.vue` (generic over the value type): a visible label (`aria-hidden`) plus a `role="radiogroup"` with the same `aria-label`. Each option is a `role="radio"` button with `aria-checked`, `flex-1` and `min-h-11 sm:min-h-8`; the selected one is `bg-accent text-on-accent`. An optional `hint` prop renders a `BaseHint` below the group, and the group's `aria-describedby` points at it (id from `useId()`) [VC-26].
+- `BaseHint.vue` (`src/shared/components/`): the muted hint under a control, a `<p>` with `text-sm text-muted` and the `id` the control's `aria-describedby` names. Any setup field can use it.
 - `PlayerField.vue` registers `notComputerName`: the name, trimmed, with `'`, `’` and `ʼ` unified and lower-cased, must not equal `players.computer` of any locale in `SUPPORTED_LOCALES`, normalized the same way [VC-5].
 
 ### Preferences [VC-2]

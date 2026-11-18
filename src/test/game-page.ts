@@ -356,6 +356,31 @@ export class GamePage {
     return this.wrapper.find<HTMLInputElement>(`[id="${id}"]`)
   }
 
+  // a setup field's label as it is shown, with its required marker, e.g. 'Name *'
+  fieldLabel(id: 'player1.name' | 'player2.name' | 'size') {
+    return this.label(id).text().trim()
+  }
+
+  // a setup field's label as a screen reader reads it: parts hidden from assistive technology
+  // (such as the required marker) are left out
+  fieldAccessibleLabel(id: 'player1.name' | 'player2.name' | 'size') {
+    const label = this.label(id).element.cloneNode(true) as HTMLElement
+    label.querySelectorAll('[aria-hidden="true"]').forEach((el) => el.remove())
+    return label.textContent?.trim() ?? ''
+  }
+
+  // whether a setup field is announced as required
+  isRequired(id: 'player1.name' | 'player2.name' | 'size') {
+    const input = this.input(id)
+    return (
+      input.attributes('aria-required') === 'true' || input.attributes('required') !== undefined
+    )
+  }
+
+  private label(id: 'player1.name' | 'player2.name' | 'size') {
+    return this.wrapper.get(`label[for="${id}"]`)
+  }
+
   // the options of a labelled switch (radiogroup), e.g. 'Game mode'
   private switchOptions(label: string) {
     const group = this.wrapper.find(`[role="radiogroup"][aria-label="${label}"]`)
@@ -395,6 +420,21 @@ export class GamePage {
   // the checked difficulty, or null when the switch isn't shown
   selectedDifficulty(): TestDifficulty | null {
     return this.selectedOption('Difficulty', DIFFICULTY_LABELS)
+  }
+
+  // the hint that describes the difficulty switch for assistive technology (aria-describedby), as
+  // shown below the switch, or null when there is none (VC-26)
+  difficultyHint() {
+    const group = this.wrapper.find('[role="radiogroup"][aria-label="Difficulty"]')
+    const id = group.exists() ? group.attributes('aria-describedby') : undefined
+    if (!id) return null
+    const hint = document.getElementById(id)
+    if (!hint) return null
+    const followsSwitch = Boolean(
+      group.element.compareDocumentPosition(hint) & Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+    if (!followsSwitch) throw new Error('The difficulty hint must sit below the switch')
+    return hint.textContent!.trim()
   }
 
   // the fieldsets of the setup form by legend, e.g. ['You', 'Opponent'] or ['Player 1', 'Player 2']

@@ -14,12 +14,19 @@ async function openTwoPlayersSetup(storage: MountGamePageOptions['storage'] = {}
   return page
 }
 
-// finds an input through its visible label, the way a player would (label `for` → input `id`)
+// a label's text as a screen reader reads it: the required marker `*` is hidden (GS-1, GS-2)
+function accessibleText(label: Element) {
+  const copy = label.cloneNode(true) as Element
+  copy.querySelectorAll('[aria-hidden="true"]').forEach((el) => el.remove())
+  return copy.textContent?.trim() ?? ''
+}
+
+// finds an input through its label, the way a player would (label `for` → input `id`)
 function inputLabelled(page: VueWrapper, fieldset: string | null, label: string) {
   const scope = fieldset
     ? page.findAll('fieldset').find((f) => f.find('legend').text() === fieldset)
     : page.find('form')
-  const labelEl = scope?.findAll('label').find((l) => l.text() === label)
+  const labelEl = scope?.findAll('label').find((l) => accessibleText(l.element) === label)
   const id = labelEl?.attributes('for')
   if (!id) throw new Error(`No label "${label}" in ${fieldset ?? 'form'}`)
   return page.get<HTMLInputElement>(`[id="${id}"]`)
