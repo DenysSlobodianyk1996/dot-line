@@ -18,6 +18,7 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@fontsource-variable/nunito": "^5.3.0",
     "@tailwindcss/vite": "^4.3.3",
     "@vee-validate/rules": "^4.15.1",
     "pinia": "^4.0.2",

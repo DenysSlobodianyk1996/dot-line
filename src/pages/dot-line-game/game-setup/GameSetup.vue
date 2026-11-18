@@ -71,12 +71,7 @@ import { useI18n } from 'vue-i18n'
 import PlayerField from './PlayerField.vue'
 import ComputerOpponentField from './ComputerOpponentField.vue'
 import RulesToggle from '../rules/RulesToggle.vue'
-import {
-  createComputerPlayer,
-  type Difficulty,
-  type GameMode,
-  type GameSetupForm,
-} from '@/models'
+import { createComputerPlayer, type Difficulty, type GameMode, type GameSetupForm } from '@/models'
 
 import BaseLabel from '@/shared/components/BaseLabel.vue'
 import BaseInput from '@/shared/components/BaseInput.vue'
