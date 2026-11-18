@@ -32,8 +32,8 @@ Rules:
 
 | Feature | Status | Docs |
 | --- | --- | --- |
-| Dot-line game (gameplay, mobile, rules, languages) | Shipped | [requirements](dot-line-game/requirements.md) · [design](dot-line-game/design.md) |
-| Visual refresh and installable app (PWA) | Shipped (#33, device QA #31 passed) | [spec](visual-refresh/spec.md) · [requirements TH, HD, PWA, RL](dot-line-game/requirements.md#th-look-and-theme) · [design](dot-line-game/design.md#visual-refresh-vr-152) |
-| Versus computer game mode | Shipped (#21, browser QA #19 passed) | [spec](computer-opponent/spec.md) · [requirements VC](dot-line-game/requirements.md#vc-versus-computer) · [design](dot-line-game/design.md#versus-computer-vc-125) |
+| Dots and Boxes: Connected (gameplay, mobile, rules, languages) | Shipped | [requirements](dots-and-boxes-connected/requirements.md) · [design](dots-and-boxes-connected/design.md) |
+| Visual refresh and installable app (PWA) | Shipped (#33, device QA #31 passed) | [spec](visual-refresh/spec.md) · [requirements TH, HD, PWA, RL](dots-and-boxes-connected/requirements.md#th-look-and-theme) · [design](dots-and-boxes-connected/design.md#visual-refresh-vr-152) |
+| Versus computer game mode | Shipped (#21, browser QA #19 passed) | [spec](computer-opponent/spec.md) · [requirements VC](dots-and-boxes-connected/requirements.md#vc-versus-computer) · [design](dots-and-boxes-connected/design.md#versus-computer-vc-125) |
 | UI polish and rename to Dots and Boxes: Connected | Spec agreed | [spec](ui-polish/spec.md) |
 | Android release on Google Play | Spec agreed (blocked by UI polish) | [spec](android-release/spec.md) |

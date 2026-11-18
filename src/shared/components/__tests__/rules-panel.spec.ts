@@ -122,6 +122,72 @@ describe('rules panel for keyboard and screen reader (VR-29)', () => {
   )
 })
 
+describe('info button next to the setup title (UP-1, UP-2)', () => {
+  it.each([
+    ['en', 'Rules'],
+    ['uk', 'Правила'],
+  ] as const)('shows in %s with the same label as the header button', async (locale, label) => {
+    const page = await openGamePage({ storage: { LOCALE: locale } })
+
+    expect(page.setupRulesButtonState()).toEqual({
+      label,
+      haspopup: 'dialog',
+      expanded: 'false',
+    })
+  })
+
+  it('opens the rules panel and reports it as open', async () => {
+    const page = await openGamePage()
+
+    await page.openRules({ from: 'setup' })
+
+    expect(page.isRulesOpen()).toBe(true)
+    expect(page.setupRulesButtonState()?.expanded).toBe('true')
+  })
+
+  it('reports open only on the info button that opened the panel', async () => {
+    const page = await openGamePage()
+
+    await page.openRules({ from: 'setup' })
+    expect(page.setupRulesButtonState()?.expanded).toBe('true')
+    expect(page.rulesButtonState().expanded).toBe('false')
+    await page.closeRules('escape')
+
+    await page.openRules({ from: 'header' })
+    expect(page.rulesButtonState().expanded).toBe('true')
+    expect(page.setupRulesButtonState()?.expanded).toBe('false')
+  })
+
+  it.each(['button', 'backdrop', 'escape'] as const)(
+    'returns focus to the setup info button after closing with %s',
+    async (how) => {
+      const page = await openGamePage()
+      await page.openRules({ from: 'setup' })
+
+      await page.closeRules(how)
+
+      expect(page.focus()).toBe('setup info button')
+    },
+  )
+
+  it('still returns focus to the header button when that one opened the panel', async () => {
+    const page = await openGamePage()
+    await page.openRules({ from: 'setup' })
+    await page.closeRules('escape')
+
+    await page.openRules({ from: 'header' })
+    await page.closeRules('escape')
+
+    expect(page.focus()).toBe('info button')
+  })
+
+  it('is not on the game screen', async () => {
+    const page = await startGame()
+
+    expect(page.setupRulesButtonState()).toBeNull()
+  })
+})
+
 describe('rules panel on the computer turn (VR-31)', () => {
   afterEach(() => {
     vi.useRealTimers()

@@ -1,7 +1,9 @@
 // Source of message keys; uk.ts must have exactly the same shape (I18N-1)
 const en = {
   app: {
-    title: 'Dots & Lines',
+    title: 'Dots and Boxes: Connected',
+    // install manifest short_name: launchers truncate the full name (UP-15)
+    shortName: 'Dots & Boxes',
   },
   language: {
     label: 'Language',

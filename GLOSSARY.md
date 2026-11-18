@@ -1,4 +1,4 @@
-# Dot-line game
+# Dots and Boxes: Connected
 
 A turn-based game on a square grid of dots: players draw lines between neighboring dots and claim the squares they close. Played by two people on one device, or by one person against the computer.
 

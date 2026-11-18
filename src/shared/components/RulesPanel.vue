@@ -56,20 +56,21 @@ import CloseIcon from '@/shared/icons/CloseIcon.vue'
 import { useRulesPanel } from '@/shared/composables/useRulesPanel'
 import GameRules from './GameRules.vue'
 
-// the info button that opened the panel; focus goes back to it on close (VR-29)
+// where focus goes on close when the opener is unknown or gone: the header's info button (VR-29, UP-2)
 const props = defineProps<{ returnFocusTo: HTMLElement | null }>()
 
 const { t } = useI18n()
-const { isOpen, close } = useRulesPanel()
+const { isOpen, close, returnFocus } = useRulesPanel()
 const titleId = useId()
 const panel = useTemplateRef<HTMLElement>('panel')
 const closeButton = useTemplateRef<HTMLButtonElement>('closeButton')
 
-// a modal dialog: focus moves in on open and back to the info button on close (VR-29)
+// a modal dialog: focus moves in on open and back to the info button that opened it on close
+// (VR-29, UP-2)
 watch(isOpen, async (open) => {
   await nextTick()
-  if (open) closeButton.value?.focus()
-  else props.returnFocusTo?.focus()
+  if (open) return closeButton.value?.focus()
+  returnFocus(props.returnFocusTo)
 })
 
 const FOCUSABLE =

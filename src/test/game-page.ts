@@ -249,8 +249,28 @@ export class GamePage {
     }
   }
 
-  async openRules() {
-    await this.rulesButton.trigger('click')
+  // the info button next to the setup title (UP-1)
+  private get setupRulesButton() {
+    return this.wrapper.find<HTMLButtonElement>('button[data-setup-rules-button]')
+  }
+
+  // what the setup's info button tells assistive technology, or null when setup shows none (UP-1)
+  setupRulesButtonState() {
+    const button = this.setupRulesButton
+    if (!button.exists()) return null
+    return {
+      label: button.attributes('aria-label'),
+      haspopup: button.attributes('aria-haspopup'),
+      expanded: button.attributes('aria-expanded'),
+    }
+  }
+
+  // Opens the panel with the header's info button or the one next to the setup title (UP-1).
+  // The button doesn't get focus first: Safari and touch screens don't focus a clicked button (UP-2).
+  async openRules({ from = 'header' }: { from?: 'header' | 'setup' } = {}) {
+    const button = from === 'setup' ? this.setupRulesButton : this.rulesButton
+    ;(document.activeElement as HTMLElement | null)?.blur()
+    await button.trigger('click')
     await flushPromises()
   }
 
@@ -351,12 +371,15 @@ export class GamePage {
   }
 
   // where keyboard focus is
-  focus(): 'rules panel' | 'info button' | 'elsewhere' {
+  focus(): 'rules panel' | 'info button' | 'setup info button' | 'elsewhere' {
     const active = document.activeElement
     if (active && this.rulesPanel.exists() && this.rulesPanel.element.contains(active)) {
       return 'rules panel'
     }
     if (active === this.rulesButton.element) return 'info button'
+    if (this.setupRulesButton.exists() && active === this.setupRulesButton.element) {
+      return 'setup info button'
+    }
     return 'elsewhere'
   }
 
@@ -813,8 +836,11 @@ export class GamePage {
     return !!this.panelSection('Turn').querySelector('[aria-live="polite"].animate-pulse')
   }
 
-  hasHint() {
-    return this.wrapper.find('p[data-hint]').exists()
+  // 'hidden' keeps the hint's room in the layout (CSS `invisible`), 'absent' removes it (UP-5)
+  hintState(): 'shown' | 'hidden' | 'absent' {
+    const hint = this.wrapper.find('p[data-hint]')
+    if (!hint.exists()) return 'absent'
+    return hint.classes('invisible') ? 'hidden' : 'shown'
   }
 
   // The text shown beside each robot icon in a part of the screen (a panel section by its label, or
@@ -844,6 +870,27 @@ export class GamePage {
     return button
   }
 
+  // the icon a button shows before its label (UP-9): which one (its data-icon), and whether it is
+  // decorative inline SVG painted in the button's text color, placed before the label text.
+  // null when the button has no icon.
+  buttonIcon(label: string) {
+    const button = this.button(label).element
+    const icon = button.querySelector('svg')
+    if (!icon) return null
+    const firstContent = [...button.childNodes].find(
+      (node) =>
+        node.nodeType === Node.ELEMENT_NODE ||
+        (node.nodeType === Node.TEXT_NODE && node.textContent!.trim() !== ''),
+    )
+    return {
+      name: icon.getAttribute('data-icon'),
+      decorative: icon.getAttribute('aria-hidden') === 'true',
+      followsTextColor: icon.getAttribute('fill') === 'currentColor',
+      beforeLabel: firstContent === icon,
+      accessibleName: accessibleText(button),
+    }
+  }
+
   hasButton(label: string) {
     return this.wrapper.findAll('button').some((el) => el.text() === label)
   }
@@ -851,6 +898,24 @@ export class GamePage {
   async click(label: string) {
     await this.button(label).trigger('click')
     await flushPromises()
+  }
+
+  // the side panel's parts, top to bottom in DOM order: action buttons by label, sections by their
+  // heading ('Turn', 'Score', 'Result'), and 'hint' (UP-4)
+  sidePanelOrder() {
+    const panel = this.wrapper.get('[data-side-panel]').element
+    return [...panel.children].flatMap((part) => {
+      if (part.matches('[data-panel-actions]')) return buttonLabelsIn(part)
+      if (part.matches('[data-hint]') || part.querySelector('[data-hint]')) return ['hint']
+      return [...part.querySelectorAll('div.text-sm.font-medium')].map((h) => h.textContent!.trim())
+    })
+  }
+
+  // the labels of the buttons in the side panel's top slot, where Stop and later the result
+  // buttons sit (UP-6)
+  sidePanelActions() {
+    const first = this.wrapper.get('[data-side-panel]').element.firstElementChild
+    return first?.matches('[data-panel-actions]') ? buttonLabelsIn(first) : []
   }
 
   // ---- Stop dialog ----
@@ -874,6 +939,29 @@ export class GamePage {
   // "Anna wins" or "Draw"
   resultHeadline() {
     return this.panelSection('Result').querySelector('h3')!.textContent!.trim()
+  }
+
+  // the result card (UP-10..UP-13): its icon ('trophy', 'robot' when the computer won, null on a
+  // draw), the score as shown ("5 : 3", winner first), and whether its entrance animation runs only
+  // when the device allows motion ('motion-safe'), always ('always'), or not at all ('none')
+  resultCard() {
+    const card = this.wrapper.find('[data-result-card]')
+    if (!card.exists()) throw new Error('No result card')
+    const el = card.element
+    const icon = el.querySelector('svg[data-icon="trophy"]')
+      ? 'trophy'
+      : el.querySelector(ROBOT)
+        ? 'robot'
+        : null
+    const score = el.querySelector('[data-result-score]')!.textContent!.replace(/\s+/g, ' ').trim()
+    const animations = [...el.classList].filter((c) => /(^|:)animate-/.test(c))
+    const entrance =
+      animations.length === 0
+        ? 'none'
+        : animations.every((c) => c.startsWith('motion-safe:'))
+          ? 'motion-safe'
+          : 'always'
+    return { icon, score, entrance }
   }
 
   // the result panel's buttons in order, each with its label and whether the whole label is shown:
@@ -929,6 +1017,10 @@ export class GamePage {
 function swatchKeyOf(name: string | undefined): SwatchKey | null {
   const entry = Object.entries(SWATCHES).find(([, swatch]) => swatch.name === name)
   return (entry?.[0] as SwatchKey) ?? null
+}
+
+function buttonLabelsIn(el: Element) {
+  return [...el.querySelectorAll('button')].map((button) => button.textContent!.trim())
 }
 
 function ancestry(el: Element): Element[] {

@@ -1,6 +1,6 @@
 # UI polish and rename to Dots and Boxes: Connected: spec
 
-Terms follow [GLOSSARY.md](../../GLOSSARY.md). User stories carry IDs **UP-n** for commits. Shipped rules this touches: GS-1..GS-5, END-4..END-6, MB-6, MB-8, MB-9, RL-1, VC-18, VC-19, PWA-1..PWA-6, APP-1 and I18N in [requirements](../dot-line-game/requirements.md).
+Terms follow [GLOSSARY.md](../../GLOSSARY.md). User stories carry IDs **UP-n** for commits. Shipped rules this touches: GS-1..GS-5, END-4..END-6, MB-6, MB-8, MB-9, RL-1, VC-18, VC-19, PWA-1..PWA-6, APP-1 and I18N in [requirements](../dots-and-boxes-connected/requirements.md).
 
 **Status**: agreed in a grilling session on 2026-11-18, not started. Issue: see the parent issue "UI polish and rename to Dots and Boxes: Connected". The Android release ([spec](../android-release/spec.md)) waits for this one, because its store screenshots show the new result card and the new name.
 
@@ -62,7 +62,7 @@ The app is also called "Dots & Lines" / «Точки й лінії», a made-up 
 ### Info button on setup (UP-1, UP-2)
 
 - The setup title row becomes `flex items-center justify-center gap-2`: the `<h3>` plus a `BaseIconButton` with `InfoIcon`, the same `aria-label` (`rules.open`), `aria-haspopup="dialog"` and `aria-expanded` as the header button.
-- `useRulesPanel().open()` remembers the opener (`document.activeElement` at open time). `RulesPanel` returns focus to the remembered opener, falling back to the header button. The `returnFocusTo` prop either becomes the fallback or goes away.
+- Each info button passes itself to `useRulesPanel().open(button)` (`$event.currentTarget`), which remembers it as the opener. `document.activeElement` can't be used: Safari and touch screens don't focus a clicked button. `RulesPanel` returns focus to the remembered opener, falling back to the header button (`returnFocusTo`), then forgets it. Each button's `aria-expanded` is true only while the panel is open and it is the opener.
 - No new strings.
 
 ### Setup spacing (UP-3)
@@ -73,7 +73,7 @@ The app is also called "Dots & Lines" / «Точки й лінії», a made-up 
 
 - **GameStatus**: the order becomes Stop, then turn and score, then the hint. The Stop row stays full width on phones (`min-h-11`, MB-8) and auto width on `sm+`.
 - **Stable height**: the announcement `<p>` always takes one line (`min-h-[1lh]`, or a non-breaking space when empty). The hint is always rendered and is hidden with `invisible` while the computer thinks, not removed with `v-if`. The hint area reserves the height of its longest text in the current language (two lines at the panel width). Long player names may still wrap; that's accepted.
-- **GameResult**: the button row moves to the top. Classes: `grid grid-cols-2 gap-2 sm:flex sm:flex-col`. On phones the order is New game settings then Rematch (left to right). On `sm+` Rematch comes first (`sm:order-first`), so it sits on top. Both are `w-full`, `min-h-11 sm:min-h-0`.
+- **GameResult**: the button row moves to the top. Classes: `grid grid-cols-2 gap-2 sm:flex sm:flex-col`. Rematch comes first in the DOM, so on `sm+` it sits on top and Tab order matches the stack. On phones the order is New game settings then Rematch (left to right), through `order-last sm:order-none` on Rematch. Both are `w-full`, `min-h-11 sm:min-h-0`.
 - **Icons**: new `StopHandIcon` (Material Symbols Rounded `back_hand`), `SettingsIcon` (`settings`) and `RefreshIcon` (`refresh`) in `src/shared/icons/`, same shape as `InfoIcon` (`size` prop, `fill="currentColor"`, `aria-hidden`). The button labels stay, and the icon sits before the label (`inline-flex items-center gap-2`). Add them to the icons README.
 - The Stop confirm dialog's buttons are unchanged.
 

@@ -1,11 +1,11 @@
-import type { Difficulty, DotLineGame } from './dot-line-game.model'
+import type { Difficulty, DotsAndBoxesGame } from './dots-and-boxes-game.model'
 import type { Line } from './line.model'
 
 /** Returns a number in [0, 1), like Math.random. Tests pass a fixed one. */
 export type RandomSource = () => number
 
 /** Picks a line out of the current legal moves; must not change the game. */
-type Strategy = (game: DotLineGame, moves: Line[], random: RandomSource) => Line
+type Strategy = (game: DotsAndBoxesGame, moves: Line[], random: RandomSource) => Line
 
 function pickRandom<T>(items: T[], random: RandomSource): T {
   const index = Math.min(items.length - 1, Math.floor(random() * items.length))
@@ -16,7 +16,7 @@ function pickRandom<T>(items: T[], random: RandomSource): T {
 const easy: Strategy = (_game, moves, random) => pickRandom(moves, random)
 
 // how many sides are drawn now on each square beside a line
-function sideCountsBeside(game: DotLineGame, line: Line): number[] {
+function sideCountsBeside(game: DotsAndBoxesGame, line: Line): number[] {
   return game.squaresNextTo(line).map(({ row, col }) => game.drawnSideCount(row, col))
 }
 
@@ -55,7 +55,7 @@ const STRATEGIES: Record<Difficulty, Strategy> = { easy, normal }
  * the normal `drawLine`, so the computer goes through the same rules as a person (CM-20).
  */
 export function chooseComputerLine(
-  game: DotLineGame,
+  game: DotsAndBoxesGame,
   difficulty: Difficulty,
   random: RandomSource = Math.random,
 ): Line | null {

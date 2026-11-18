@@ -12,8 +12,8 @@
         data-rules-button
         :aria-label="t('rules.open')"
         aria-haspopup="dialog"
-        :aria-expanded="rulesPanel.isOpen.value"
-        @click="rulesPanel.open"
+        :aria-expanded="rulesPanel.isOpenedBy(rulesButton?.element)"
+        @click="rulesPanel.open($event.currentTarget)"
       >
         <InfoIcon :size="20" />
       </BaseIconButton>
