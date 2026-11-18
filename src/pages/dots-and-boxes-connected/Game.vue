@@ -34,6 +34,7 @@ import { useI18n } from 'vue-i18n'
 import GameBoard from './game/GameBoard.vue'
 import GameResult from './game/GameResult.vue'
 import GameStatus from './game/GameStatus.vue'
+import { HINT_KEYS } from './game/hint-keys'
 import { useRulesPanel } from '@/shared/composables/useRulesPanel'
 import { useComputerTurn } from './useComputerTurn'
 
@@ -47,12 +48,12 @@ const { t } = useI18n()
 
 const hint = computed(() => {
   if (selectedDot.value) {
-    return t('game.hintSelected')
+    return t(HINT_KEYS.selected)
   }
   if (props.dotsAndBoxesGame.lines.length === 0) {
-    return t('game.hintFirstLine')
+    return t(HINT_KEYS.firstLine)
   }
-  return t('game.hintStart')
+  return t(HINT_KEYS.start)
 })
 
 // the Stop dialog is open: the computer waits for the answer (VC-13); it waits while the rules

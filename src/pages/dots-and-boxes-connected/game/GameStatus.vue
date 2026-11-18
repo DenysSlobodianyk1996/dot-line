@@ -61,7 +61,7 @@
          cell), so nothing jumps (UP-5) -->
     <div class="grid text-sm text-muted">
       <span
-        v-for="key in HINT_KEYS"
+        v-for="key in hintKeys"
         :key
         aria-hidden="true"
         class="invisible col-start-1 row-start-1"
@@ -116,6 +116,7 @@ import BaseButton from '@/shared/components/BaseButton.vue'
 import PlayerName from '@/shared/components/PlayerName.vue'
 import PlayerScore from './PlayerScore.vue'
 import StopHandIcon from '@/shared/icons/StopHandIcon.vue'
+import { HINT_KEYS } from './hint-keys'
 
 const props = defineProps<{
   dotsAndBoxesGame: DotsAndBoxesGame
@@ -131,7 +132,7 @@ const isPersonTurn = computed(
 const { t } = useI18n()
 
 // every hint Game can show; the hint area reserves the tallest (UP-5)
-const HINT_KEYS = ['game.hintFirstLine', 'game.hintStart', 'game.hintSelected'] as const
+const hintKeys = Object.values(HINT_KEYS)
 
 // what the live region says: "Thinking…" while the computer's move is pending, then what its line
 // did until the next line is drawn (CM-37)
