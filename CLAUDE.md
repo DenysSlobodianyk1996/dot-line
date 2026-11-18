@@ -20,6 +20,7 @@ Specs live in `docs/` (layout and workflow in `docs/README.md`). Domain terms ar
 - `npm run lint`: oxlint, then ESLint. **Both run with `--fix` and modify files.**
 - `npm run lint-check`: oxlint, then ESLint, without `--fix` (what CI runs)
 - `npm test`: Vitest run once (jsdom + Vue Test Utils); `npm run test:watch` for watch mode
+- `npm run store:screenshots`: builds, serves the build and regenerates the Play Store images in `docs/store/` with Playwright (fixture games seeded into localStorage); review and commit them. Not part of `npm test` (AR-16, AR-17)
 - `npm run format`: Prettier on `src/` only (no semicolons, single quotes, width 100)
 - `npm run build:capacitor`: the Android app's web build (`vite build --mode capacitor`, base `/`, no PWA plugin)
 - `npm run android:build`: `build:capacitor`, then `cap sync android`, then `gradlew bundleRelease` → `android/app/build/outputs/bundle/release/app-release.aab`. Needs JDK 21 and `ANDROID_HOME` (the Android SDK). Gradle reads `ANDROID_VERSION_NAME`/`ANDROID_VERSION_CODE` (defaults `0.0.0`/`1`) and signs only when `ANDROID_KEYSTORE_FILE` (plus `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`) is set; otherwise the AAB is unsigned.
