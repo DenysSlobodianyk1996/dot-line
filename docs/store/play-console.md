@@ -34,7 +34,7 @@ The facts every answer rests on:
 - Texts: [en.md](en.md) (default language en-US) and [uk.md](uk.md) (translation, uk).
 - App icon (512×512): [`icon-512.png`](icon-512.png).
 - Feature graphic (1024×500): [`feature-graphic-en.png`](feature-graphic-en.png) and, in the Ukrainian translation, [`feature-graphic-uk.png`](feature-graphic-uk.png).
-- Screenshots: `screenshots/<lang>/<device>/` with `<device>` = `phone`, `tablet-7`, `tablet-10` (made by `npm run store:screenshots`, #55; if #55 names the device folders differently, its names win): [en phone](screenshots/en/phone/), [en 7"](screenshots/en/tablet-7/), [en 10"](screenshots/en/tablet-10/), [uk phone](screenshots/uk/phone/), [uk 7"](screenshots/uk/tablet-7/), [uk 10"](screenshots/uk/tablet-10/).
+- Screenshots: `screenshots/<lang>/<device>/` with `<device>` = `phone`, `tablet7`, `tablet10` (made by `npm run store:screenshots`): [en phone](screenshots/en/phone/), [en 7"](screenshots/en/tablet7/), [en 10"](screenshots/en/tablet10/), [uk phone](screenshots/uk/phone/), [uk 7"](screenshots/uk/tablet7/), [uk 10"](screenshots/uk/tablet10/).
 - Video: none.
 
 ## Privacy policy
