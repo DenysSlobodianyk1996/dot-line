@@ -356,6 +356,31 @@ export class GamePage {
     return this.wrapper.find<HTMLInputElement>(`[id="${id}"]`)
   }
 
+  // a setup field's label as it is shown, with its required marker, e.g. 'Name *'
+  fieldLabel(id: 'player1.name' | 'player2.name' | 'size') {
+    return this.label(id).text().trim()
+  }
+
+  // a setup field's label as a screen reader reads it: parts hidden from assistive technology
+  // (such as the required marker) are left out
+  fieldAccessibleLabel(id: 'player1.name' | 'player2.name' | 'size') {
+    const label = this.label(id).element.cloneNode(true) as HTMLElement
+    label.querySelectorAll('[aria-hidden="true"]').forEach((el) => el.remove())
+    return label.textContent?.trim() ?? ''
+  }
+
+  // whether a setup field is announced as required
+  isRequired(id: 'player1.name' | 'player2.name' | 'size') {
+    const input = this.input(id)
+    return (
+      input.attributes('aria-required') === 'true' || input.attributes('required') !== undefined
+    )
+  }
+
+  private label(id: 'player1.name' | 'player2.name' | 'size') {
+    return this.wrapper.get(`label[for="${id}"]`)
+  }
+
   // the options of a labelled switch (radiogroup), e.g. 'Game mode'
   private switchOptions(label: string) {
     const group = this.wrapper.find(`[role="radiogroup"][aria-label="${label}"]`)
