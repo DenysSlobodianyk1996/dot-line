@@ -384,10 +384,22 @@ pause
 # ── 6 ─────────────────────────────────────────────────────────────────────
 stage "GitHub secrets"
 say "Saving the values the Android release workflow reads. Values are never printed."
-put_secret ANDROID_KEYSTORE_BASE64 "$(base64 < "$ANDROID_KEYSTORE_FILE" | tr -d '\n')"
-put_secret ANDROID_KEYSTORE_PASSWORD "$ANDROID_KEYSTORE_PASSWORD"
-put_secret ANDROID_KEY_ALIAS "$ANDROID_KEY_ALIAS"
-put_secret ANDROID_KEY_PASSWORD "$ANDROID_KEY_PASSWORD"
+# the four signing secrets describe one keystore, so they are kept or replaced together: replacing
+# only some would leave CI with a password or alias that doesn't open the keystore
+SIGNING_SECRETS=(ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD)
+existing_signing=()
+for name in "${SIGNING_SECRETS[@]}"; do
+  if secret_exists "$name"; then existing_signing+=("$name"); fi
+done
+if (( ${#existing_signing[@]} )) \
+  && ! confirm "Signing secrets already set (${existing_signing[*]}). Replace all four with this keystore?"; then
+  note "kept the existing signing secrets"
+else
+  set_secret ANDROID_KEYSTORE_BASE64 "$(base64 < "$ANDROID_KEYSTORE_FILE" | tr -d '\n')"
+  set_secret ANDROID_KEYSTORE_PASSWORD "$ANDROID_KEYSTORE_PASSWORD"
+  set_secret ANDROID_KEY_ALIAS "$ANDROID_KEY_ALIAS"
+  set_secret ANDROID_KEY_PASSWORD "$ANDROID_KEY_PASSWORD"
+fi
 if [[ -n "$PLAY_SERVICE_ACCOUNT_JSON" ]]; then
   put_secret PLAY_SERVICE_ACCOUNT_JSON "$PLAY_SERVICE_ACCOUNT_JSON"
 elif ! secret_exists PLAY_SERVICE_ACCOUNT_JSON; then

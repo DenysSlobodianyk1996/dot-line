@@ -74,7 +74,7 @@
 
     <div
       v-if="isConfirmOpen"
-      class="fixed inset-0 z-10 flex items-center justify-center bg-ink/40 p-4"
+      class="fixed inset-0 z-10 flex items-center justify-center bg-ink/40 p-safe-4"
       @click.self="isConfirmOpen = false"
     >
       <div

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen overflow-y-auto p-2">
+  <div class="min-h-screen overflow-y-auto p-safe-2">
     <!-- every screen: game name on the left; theme, rules and language on the right (VR-18, VR-21, VR-23) -->
     <header class="mb-4 flex items-center gap-2">
       <AppLogo />

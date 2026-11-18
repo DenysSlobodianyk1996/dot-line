@@ -70,13 +70,13 @@ The developer account is a personal one, so Play requires a closed test with at 
 - Use the current stable Capacitor with `@capacitor/android`, `@capacitor/app`, `@capacitor/status-bar` and `@capacitor/splash-screen`.
 - `capacitor.config.ts`: `appId: 'app.dotsandboxes.connected'`, `appName: 'Dots and Boxes: Connected'`, `webDir: 'dist'`.
 - The `android/` folder is committed, minus build output and secrets.
-- **Native build mode**: `vite build --mode capacitor` with `BASE_PATH=/` and the PWA plugin disabled (no service worker, no manifests). Capacitor bundles the files, which covers offline play (AR-2). `npm run android:build` runs the web build, then `cap sync android`, then `gradlew bundleRelease`.
-- **Back button**: one `App.addListener('backButton')` in a small native-only module (`src/native/`), loaded only when `Capacitor.isNativePlatform()`. Order of handling:
+- **Native build mode**: `vite build --mode capacitor`: base `/` (the mode forces it, so no `BASE_PATH` is needed) and the PWA plugin disabled (no service worker, no manifests). Capacitor bundles the files, which covers offline play (AR-2). `npm run android:build` runs the web build, then `cap sync android`, then `gradlew bundleRelease`.
+- **Back button**: one `App.addListener('backButton')` in a small native-only module (`src/native/`), loaded only in the capacitor-mode build (a compile-time flag, so the web build has no Capacitor code) and only when `Capacitor.isNativePlatform()`. Order of handling:
   1. close the rules panel (`useRulesPanel().close()`);
   2. otherwise close the Stop dialog (`useStopDialog().close()`, its open state shared like the rules panel's);
   3. otherwise `App.exitApp()`.
-- **Status bar**: the native module watches `useTheme().theme` and sets the status bar style and background to `--wc-paper` (read from the tokens) whenever the theme changes, so `useTheme` stays web-only.
-- **Icons and splash**: `@capacitor/assets` generates them from the logo source (`src/shared/logo.ts`, through `scripts/generate-icons.ts` output). That gives an adaptive icon (logo foreground on a cream background) and a splash screen on cream in both themes.
+- **Status bar**: the native module watches `useTheme().theme` and sets the status bar style and background to `--wc-paper` (read from the tokens) whenever the theme changes, so `useTheme` stays web-only. targetSdk 36 makes the app edge-to-edge on Android 15+, where the background call does nothing, so the page runs under the system bars (`viewport-fit=cover`) and pads the app shell and full-screen layers by the safe-area insets (`p-safe-*` in `styles.css`, from Capacitor's `--safe-area-inset-*` or `env(safe-area-inset-*)`); the page's `--wc-paper` then shows behind the status bar. Harmless on the web, where the insets are 0 or the notch's.
+- **Icons and splash**: `@capacitor/assets` generates them from the logo source (`src/shared/logo.ts`, through `scripts/generate-icons.ts` output). That gives an adaptive icon (logo foreground on a cream background) and a splash screen on cream in both themes (the launch theme's `windowSplashScreenBackground` and `windowSplashScreenAnimatedIcon` for Android 12+, the bitmap splash below).
 - **SDK**: targetSdk is whatever API level Play requires at release time; minSdk is Capacitor's default. Orientation is unspecified (any).
 - Web deploys (GitHub Pages) don't change.
 
