@@ -5,16 +5,18 @@
     <div data-panel-actions class="grid grid-cols-2 gap-2 sm:flex sm:flex-col">
       <BaseButton
         color="secondary"
-        class="min-h-11 w-full sm:min-h-0"
+        class="min-h-11 w-full gap-2 sm:min-h-0"
         @click="emit('newGameSettings')"
       >
+        <SettingsIcon :size="20" class="shrink-0" />
         {{ t('result.newGameSettings') }}
       </BaseButton>
       <BaseButton
         color="primary"
-        class="min-h-11 w-full sm:order-first sm:min-h-0"
+        class="min-h-11 w-full gap-2 sm:order-first sm:min-h-0"
         @click="emit('rematch')"
       >
+        <RefreshIcon :size="20" class="shrink-0" />
         {{ t('result.rematch') }}
       </BaseButton>
     </div>
@@ -56,6 +58,8 @@ import { useI18n } from 'vue-i18n'
 import BaseButton from '@/shared/components/BaseButton.vue'
 import RobotIcon from '@/shared/components/RobotIcon.vue'
 import PlayerScore from './PlayerScore.vue'
+import RefreshIcon from '@/shared/icons/RefreshIcon.vue'
+import SettingsIcon from '@/shared/icons/SettingsIcon.vue'
 import { useDisplayName } from '@/shared/composables/useDisplayName'
 
 const props = defineProps<{
