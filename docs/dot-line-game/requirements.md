@@ -75,7 +75,9 @@ Acceptance:
 - **END-1**: The game ends automatically when all N² squares are owned.
 - **END-2**: A **Stop** button ends the game early, after the player confirms.
 - **END-3**: The winner is the player with more owned squares. Equal scores (including 0–0) are a **Draw**.
-- **END-4**: When the game ends, the final board stays visible and a result panel shows the winner (name and color), or "Draw", plus both scores.
+- **END-4**: When the game ends, the final board stays visible and a result panel shows the winner (name and color), or "Draw", plus both scores. Its New game settings and Rematch buttons sit at the top of the panel, exactly where Stop was during the game (UP-6).
+- **END-8**: During the game, Stop sits at the top of the side panel, above the turn, the score and the hint. The text below it keeps its height: the line under the turn ("Thinking…" or the computer's last line) always takes one line even when empty, and the hint area is as tall as the longest hint in the current language and is only hidden, not removed, while the computer thinks. So Stop never moves while you play (UP-4, UP-5).
+- **END-9**: From 640 px wide, the result buttons stack at the panel's full width with Rematch on top, so a label never wraps raggedly (UP-8). Below 640 px see MB-6.
 - **END-5**: **New game settings** in the result panel clears the saved game and opens the setup screen.
 - **END-6**: **Rematch** in the result panel keeps both players, the size, the game mode and the difficulty, clears all lines and owned squares, and picks a new random first player (VC-18).
 - **END-7**: No moves are possible after the game ends.
@@ -101,11 +103,11 @@ Acceptance:
 ## MB: Mobile
 
 - **MB-1**: Every screen works from 320 px wide without horizontal page scrolling. The only exception is a board that can't shrink any further (MB-3), which scrolls inside its own area.
-- **MB-2**: Below 640 px wide, the game screen stacks: the board on top, centered, and the panel below it at full width. In the panel, Turn and Score sit side by side, followed by the hint and a full-width Stop button.
+- **MB-2**: Below 640 px wide, the game screen stacks: the board on top, centered, and the panel below it at full width. In the panel, a full-width Stop button comes first, then Turn and Score side by side, then the hint (END-8).
 - **MB-3**: Squares are 48 px when the board fits the screen. On narrower screens they shrink so the board fits the available width, down to 24 px.
 - **MB-4**: Each dot's tap area is a square the size of one board square (at most 44 px), centered on the dot, so neighboring dots never share a tap area.
 - **MB-5**: The Stop confirmation dialog fits the screen with at least 16 px on each side.
-- **MB-6**: Below 640 px wide, the result panel sits below the board at full width, with New game settings and Rematch side by side at equal width. A label that does not fit wraps onto more lines; it is never cut off.
+- **MB-6**: Below 640 px wide, the result panel sits below the board at full width, with New game settings and Rematch side by side at equal width at the top of the panel (New game settings on the left, UP-7). A label that does not fit wraps onto more lines; it is never cut off.
 - **MB-7**: Below 640 px wide, the setup form shows Player 1 above Player 2.
 - **MB-8**: Below 640 px wide, buttons on the game screen are at least 44 px tall.
 - **MB-9**: On every screen width, the setup form and the game screen (the board with its panel, in progress or finished, side by side or stacked) are centered horizontally below the header, which keeps its full width. They stay top-aligned: nothing is centered vertically, so validation messages, the mode switch or the result replacing the status never move the content up or down.

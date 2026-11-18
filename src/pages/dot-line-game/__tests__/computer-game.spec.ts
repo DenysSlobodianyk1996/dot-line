@@ -456,19 +456,19 @@ describe('saving and reloading', () => {
 })
 
 describe("the computer's turn on screen", () => {
-  it('shows a pulsing "Thinking…" in a polite live region in place of the hint (CM-14, CM-37)', async () => {
+  it('shows a pulsing "Thinking…" in a polite live region and hides the hint, keeping its place (CM-14, CM-37, UP-5)', async () => {
     const page = await startComputerGame({ first: 2 })
 
     expect(page.turn()).toBe(COMPUTER)
     expect(page.thinking()).toBe(THINKING)
     expect(page.isThinkingPulsing()).toBe(true)
-    expect(page.hasHint()).toBe(false)
+    expect(page.hintState()).toBe('hidden')
 
     await page.waitForComputer()
 
     expect(page.thinking()).toBe(COMPUTER_DREW)
     expect(page.isThinkingPulsing()).toBe(false)
-    expect(page.hasHint()).toBe(true)
+    expect(page.hintState()).toBe('shown')
   })
 
   it('announces its line politely until its next turn (CM-37)', async () => {

@@ -185,6 +185,23 @@ describe('game screen: lines and squares (GB-2..4, SQ-1)', () => {
   })
 })
 
+describe('game screen: side panel layout (UP-4..UP-6)', () => {
+  it('puts Stop first, above the turn, score and hint (UP-4)', async () => {
+    const page = await startGame()
+
+    expect(page.sidePanelOrder()).toEqual(['Stop', 'Turn', 'Score', 'hint'])
+  })
+
+  it('shows New game settings and Rematch in the slot Stop used (UP-6)', async () => {
+    const page = await startGame()
+    expect(page.sidePanelActions()).toEqual(['Stop'])
+
+    await page.stopGame()
+
+    expect(page.sidePanelActions()).toEqual(['New game settings', 'Rematch'])
+  })
+})
+
 describe('game screen: stopping (END-2, END-4)', () => {
   it('Stop asks for confirmation and Cancel keeps playing (END-2)', async () => {
     const page = await startGame()

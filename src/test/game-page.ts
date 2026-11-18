@@ -813,8 +813,11 @@ export class GamePage {
     return !!this.panelSection('Turn').querySelector('[aria-live="polite"].animate-pulse')
   }
 
-  hasHint() {
-    return this.wrapper.find('p[data-hint]').exists()
+  // 'hidden' keeps the hint's room in the layout (CSS `invisible`), 'absent' removes it (UP-5)
+  hintState(): 'shown' | 'hidden' | 'absent' {
+    const hint = this.wrapper.find('p[data-hint]')
+    if (!hint.exists()) return 'absent'
+    return hint.classes('invisible') ? 'hidden' : 'shown'
   }
 
   // The text shown beside each robot icon in a part of the screen (a panel section by its label, or
@@ -851,6 +854,24 @@ export class GamePage {
   async click(label: string) {
     await this.button(label).trigger('click')
     await flushPromises()
+  }
+
+  // the side panel's parts, top to bottom in DOM order: action buttons by label, sections by their
+  // heading ('Turn', 'Score', 'Result'), and 'hint' (UP-4)
+  sidePanelOrder() {
+    const panel = this.wrapper.get('[data-side-panel]').element
+    return [...panel.children].flatMap((part) => {
+      if (part.matches('[data-panel-actions]')) return buttonLabelsIn(part)
+      if (part.matches('[data-hint]') || part.querySelector('[data-hint]')) return ['hint']
+      return [...part.querySelectorAll('div.text-sm.font-medium')].map((h) => h.textContent!.trim())
+    })
+  }
+
+  // the labels of the buttons in the side panel's top slot, where Stop and later the result
+  // buttons sit (UP-6)
+  sidePanelActions() {
+    const first = this.wrapper.get('[data-side-panel]').element.firstElementChild
+    return first?.matches('[data-panel-actions]') ? buttonLabelsIn(first) : []
   }
 
   // ---- Stop dialog ----
@@ -929,6 +950,10 @@ export class GamePage {
 function swatchKeyOf(name: string | undefined): SwatchKey | null {
   const entry = Object.entries(SWATCHES).find(([, swatch]) => swatch.name === name)
   return (entry?.[0] as SwatchKey) ?? null
+}
+
+function buttonLabelsIn(el: Element) {
+  return [...el.querySelectorAll('button')].map((button) => button.textContent!.trim())
 }
 
 function ancestry(el: Element): Element[] {

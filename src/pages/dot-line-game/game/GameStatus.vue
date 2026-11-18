@@ -1,5 +1,16 @@
 <template>
-  <div class="flex w-full flex-col gap-4 sm:w-53 sm:shrink-0">
+  <div data-side-panel class="flex w-full flex-col gap-4 sm:w-53 sm:shrink-0">
+    <!-- Stop sits on top so the changing text below never moves it (UP-4) -->
+    <div data-panel-actions class="flex">
+      <BaseButton
+        color="secondary"
+        class="min-h-11 w-full sm:min-h-0 sm:w-auto"
+        @click="isConfirmOpen = true"
+      >
+        {{ t('status.stop') }}
+      </BaseButton>
+    </div>
+
     <!-- phones: Turn and Score side by side (MB-2) -->
     <div class="grid grid-cols-2 gap-4 sm:flex sm:flex-col">
       <div class="flex min-w-0 flex-col gap-1">
@@ -22,8 +33,12 @@
           />
         </div>
         <!-- always rendered, so screen readers announce "Thinking…" and then the computer's line
-             (CM-14, CM-37) -->
-        <p aria-live="polite" class="text-sm text-muted" :class="{ 'animate-pulse': thinking }">
+             (CM-14, CM-37); keeps one line even when empty (UP-5) -->
+        <p
+          aria-live="polite"
+          class="min-h-[1lh] text-sm text-muted"
+          :class="{ 'animate-pulse': thinking }"
+        >
           {{ announcement }}
         </p>
       </div>
@@ -39,17 +54,20 @@
       </div>
     </div>
 
-    <!-- "Thinking…" takes the hint's place on the computer's turn (CM-14) -->
-    <p v-if="!thinking" data-hint class="text-sm text-muted">{{ hint }}</p>
-
-    <div class="flex">
-      <BaseButton
-        color="secondary"
-        class="min-h-11 w-full sm:min-h-0 sm:w-auto"
-        @click="isConfirmOpen = true"
+    <!-- "Thinking…" replaces the hint on the computer's turn (CM-14). The hint is only hidden, and
+         the area is as tall as the longest hint in this language (invisible copies share its grid
+         cell), so nothing jumps (UP-5) -->
+    <div class="grid text-sm text-muted">
+      <span
+        v-for="key in HINT_KEYS"
+        :key
+        aria-hidden="true"
+        class="invisible col-start-1 row-start-1"
+        >{{ t(key) }}</span
       >
-        {{ t('status.stop') }}
-      </BaseButton>
+      <p data-hint class="col-start-1 row-start-1" :class="{ invisible: thinking }">
+        {{ hint }}
+      </p>
     </div>
 
     <div
@@ -108,6 +126,9 @@ const isPersonTurn = computed(
 )
 
 const { t } = useI18n()
+
+// every hint Game can show; the hint area reserves the tallest (UP-5)
+const HINT_KEYS = ['game.hintFirstLine', 'game.hintStart', 'game.hintSelected'] as const
 
 // what the live region says: "Thinking…" while the computer's move is pending, then what its line
 // did until the next line is drawn (CM-37)
