@@ -87,8 +87,8 @@ const en = {
   },
   rules: {
     title: 'How to play',
-    show: 'Show rules',
-    hide: 'Hide rules',
+    open: 'Rules',
+    close: 'Close rules',
     step1: 'Take turns drawing a line between two neighboring dots: left, right, up or down.',
     step2: 'The first line can go anywhere. After that, start from a dot that already has a line.',
     step3: 'Draw the fourth side of a square to claim it. One line can claim two squares.',
