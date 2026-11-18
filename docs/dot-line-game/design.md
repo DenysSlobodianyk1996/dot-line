@@ -71,8 +71,8 @@ Message keys added to both locales (`src/i18n/locales`):
 | `setup.difficulty` | Difficulty | Складність |
 | `setup.easy` | Easy | Легко |
 | `setup.normal` | Normal | Нормально |
-| `setup.easyHint` | The computer picks a random line. | Комп'ютер обирає випадкову лінію. |
-| `setup.normalHint` | The computer takes squares whenever it can and tries not to give you any. | Комп'ютер забирає квадрати, коли може, і намагається не віддавати їх вам. |
+| `setup.easyHint` | The computer picks a random line. | Комп’ютер обирає випадкову лінію. |
+| `setup.normalHint` | The computer takes squares whenever it can and tries not to give you any. | Комп’ютер забирає квадрати, коли може, і намагається не віддавати їх вам. |
 | `setup.you` | You | Ви |
 | `setup.opponent` | Opponent | Суперник |
 | `players.computer` | Computer | Комп’ютер |

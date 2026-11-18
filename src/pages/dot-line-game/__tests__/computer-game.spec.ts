@@ -70,6 +70,38 @@ describe('setup in Versus computer mode', () => {
     expect(page.input('size').element.value).toBe('5')
   })
 
+  it('describes only the selected difficulty below the switch (VC-26)', async () => {
+    const page = await openGamePage()
+
+    await page.chooseDifficulty('easy')
+    expect(page.difficultyHint()).toBe('The computer picks a random line.')
+
+    await page.chooseDifficulty('normal')
+    expect(page.difficultyHint()).toBe(
+      'The computer takes squares whenever it can and tries not to give you any.',
+    )
+  })
+
+  it('shows no difficulty hint in Two players mode (VC-26)', async () => {
+    const page = await openGamePage()
+
+    await page.chooseMode('twoPlayers')
+
+    expect(page.difficultyHint()).toBeNull()
+    expect(page.text()).not.toContain('The computer')
+  })
+
+  it('shows the difficulty hint in the chosen language (VC-26)', async () => {
+    const page = await openGamePage()
+    await page.chooseDifficulty('easy')
+
+    await page.switchLanguage('uk')
+
+    expect(page.text()).toContain("Комп’ютер обирає випадкову лінію.")
+    await page.switchLanguage('en')
+    expect(page.difficultyHint()).toBe('The computer picks a random line.')
+  })
+
   it('does not compare my name with a hidden second player (CM-4)', async () => {
     const page = await openGamePage()
     await page.chooseMode('twoPlayers')
