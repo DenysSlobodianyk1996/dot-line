@@ -1,7 +1,7 @@
 import { configure } from 'vee-validate'
 import { createI18n } from 'vue-i18n'
 import { StorageService } from '@/services'
-import { LOCALE, MANIFEST_FILES } from '@/static'
+import { CAPACITOR_MODE, LOCALE, MANIFEST_FILES } from '@/static'
 import en from './locales/en'
 import uk from './locales/uk'
 
@@ -30,7 +30,7 @@ export const i18n = createI18n({
 // the manifest link decides the installed app's name, so it follows the language (VR-50, VR-51)
 // The Android app's build has no install manifest, so it links none (AR-1)
 function linkManifest(locale: AppLocale) {
-  if (import.meta.env.MODE === 'capacitor') return
+  if (import.meta.env.MODE === CAPACITOR_MODE) return
   let link = document.head.querySelector<HTMLLinkElement>('link[rel="manifest"]')
   if (!link) {
     link = document.createElement('link')

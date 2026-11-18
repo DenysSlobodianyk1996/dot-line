@@ -6,13 +6,10 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA, type ManifestOptions } from 'vite-plugin-pwa'
 import { MANIFEST_FILES } from './src/static/manifests'
+import { CAPACITOR_MODE, NOT_THE_APP_PAGES } from './src/static/build'
 import en from './src/i18n/locales/en'
 import uk from './src/i18n/locales/uk'
 
-// The Android app's build (`vite build --mode capacitor`): Capacitor serves the bundled files from
-// the root and they ship inside the app, so there is no service worker and no install manifest
-// (AR-1, AR-2)
-const CAPACITOR_MODE = 'capacitor'
 
 // GitHub Pages serves the app under /<repo>/; the deploy workflow sets BASE_PATH
 const base = process.env.BASE_PATH ?? '/'
@@ -88,7 +85,7 @@ function pwaPlugins() {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}', MANIFEST_FILES.en],
         navigateFallback: 'index.html',
         // the privacy policy is its own page (precached through privacy/index.html), not the app (AR-15)
-        navigateFallbackDenylist: [/\/privacy\/?$/],
+        navigateFallbackDenylist: NOT_THE_APP_PAGES,
       },
     }),
     extraPwaFiles(),
