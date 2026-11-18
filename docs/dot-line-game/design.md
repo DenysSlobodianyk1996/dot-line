@@ -292,11 +292,11 @@ Versus computer changes to these components are described in [Versus computer](#
 
 `Game.vue`'s `watchEffect` saves the whole reactive game (including `gameMode` and `difficulty`) with `StorageService.setItem(CURRENT_GAME, game)`. `Page.vue` restores it with `StorageService.getItem(CURRENT_GAME, { applyParse: true })` and `dotLineGame.reset(savedGame)`, and the constructors rebuild the `Line`, `Dot` and `Square` instances. A started, unfinished save without `currentPlayerName` (saved before gameplay existed) gets `start()` [PS-3]. `status` decides whether Game shows GameStatus or GameResult. The dot selection isn't saved.
 
-## Mobile [MB-1..8]
+## Mobile [MB-1..9]
 
 The phone layout is the default, and `sm:` classes (640 px and up) restore the desktop layout described above.
 
-- **Game.vue**: `flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6`. The board wrapper is centered on phones (`self-center sm:self-start`), and the panel is full width (`w-full`, with `sm:w-50 sm:shrink-0` for GameStatus and `sm:w-53 sm:shrink-0` for GameResult).
+- **Game.vue**: `flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-center sm:gap-6`. The board wrapper is centered on phones (`self-center sm:self-start`), and the panel is full width (`w-full`, with `sm:w-50 sm:shrink-0` for GameStatus and `sm:w-53 sm:shrink-0` for GameResult). From `sm` up, `justify-center` centers the board + panel group horizontally [MB-9].
 - **Board size** (GameBoard): `cell = clamp(floor((viewportWidth − 16 − sidePanel − 34) / N), 24, 48)`.
   - `viewportWidth` is `document.documentElement.clientWidth`, which excludes a desktop scrollbar.
   - The 16 px is the app's `p-2` gutters, and the 34 px is the board's padding plus border.
@@ -306,6 +306,7 @@ The phone layout is the default, and `sm:` classes (640 px and up) restore the d
 - **GameStatus** on phones: Turn and Score in a two-column grid (`grid grid-cols-2 gap-4 sm:flex sm:flex-col`), then the hint, then Stop at full width with `min-h-11` (`w-full sm:w-auto sm:min-h-0`).
 - **Stop dialog** card: `w-full max-w-75`, inside the `p-4` backdrop.
 - **GameResult** on phones: New game and Rematch in `grid grid-cols-2 gap-2`, each `min-h-11`. From `sm` up they return to the wrapping row.
+- **Centering** [MB-9]: horizontal only. The setup root is `mx-auto max-w-130`; the game screen is centered by Game.vue's `sm:justify-center` (on phones it is already full width with the board `self-center`). Nothing is centered vertically (no `items-center`/`min-h-screen` on the page), so content stays top-aligned when its height changes. The board wrapper keeps `max-w-full overflow-x-auto`, a scroll container whose minimum width is 0, so a board that can't shrink scrolls inside itself rather than overflowing the page [MB-1, MB-3].
 - **GameSetup**: the player fieldsets row becomes `flex flex-col gap-2 sm:flex-row`; each fieldset is `min-w-0 flex-1`, so the two share the row equally ("You" and "Opponent" included).
 
 ## Rules [RL-1, RL-5, VR-23..VR-31, APP-1]

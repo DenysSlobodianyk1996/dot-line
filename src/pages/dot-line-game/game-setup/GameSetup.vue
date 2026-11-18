@@ -1,5 +1,6 @@
 <template>
-  <div class="max-w-130">
+  <!-- centered horizontally, top-aligned (MB-9) -->
+  <div class="mx-auto max-w-130">
     <h3 class="w-full text-center font-bold text-xl mb-4">{{ t('setup.title') }}</h3>
     <!-- keep-values: what's typed survives a game mode switch (CM-10) -->
     <Form
