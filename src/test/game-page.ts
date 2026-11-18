@@ -152,6 +152,19 @@ export class GamePage {
     return this.header.get('[data-app-title]').text()
   }
 
+  // the logo in the header: decorative (hidden from screen readers) and placed before the game name (VR-18)
+  headerLogo() {
+    const logo = this.header.find('[data-app-logo]')
+    if (!logo.exists()) return null
+    const title = this.header.get('[data-app-title]').element
+    return {
+      decorative: logo.attributes('aria-hidden') === 'true',
+      beforeTitle: Boolean(
+        logo.element.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ),
+    }
+  }
+
   private get themeButton() {
     return this.header.get('button[data-theme-toggle]')
   }
