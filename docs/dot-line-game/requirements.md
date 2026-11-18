@@ -2,13 +2,15 @@
 
 Two players take turns drawing lines between neighboring dots on a square grid. Closing a square makes the player who closed it its owner. Whoever owns more squares wins. The two players are either two people on one device (**Two players**) or one person and the computer player (**Versus computer**, see [VC](#vc-versus-computer)).
 
-Domain terms (Dot, Line, Square, Owned square, Dot1/Dot2, Turn, …) are defined in [GLOSSARY.md](../../GLOSSARY.md). Decisions behind the rules are in [docs/adr/](../adr/).
+Domain terms (Dot, Line, Square, Owned square, Dot1/Dot2, Turn, Swatch, Rules panel, Theme, …) are defined in [GLOSSARY.md](../../GLOSSARY.md). Decisions behind the rules are in [docs/adr/](../adr/). The look, the header, the rules panel, the swatches and the installable app came with the visual refresh ([visual-refresh/spec.md](../visual-refresh/spec.md), stories VR-n); each rule names the stories it covers.
 
 ## GS: Game setup (existing screen)
 
-- **GS-1**: Each player enters a name and a color. Names are required, at most 15 characters, and must differ case-insensitively. The field doesn't accept more than 15 characters, and a longer value that gets in anyway (pasted or restored) fails validation with "<field> can be at most 15 characters." The color is used for that player's lines and owned squares. Validation messages use readable, translated field names ("Ім’я гравця 1" / "Player 1 name", "Розмір поля" / "Size"), never internal names like `player1.name` (I18N-1). In Versus computer mode only the person's name and color are entered (VC-3), and the name must not be the computer's (VC-5).
+- **GS-1**: Each player enters a name and picks a color from the swatches (GS-4). Names are required, at most 15 characters, and must differ case-insensitively. The field doesn't accept more than 15 characters, and a longer value that gets in anyway (pasted or restored) fails validation with "<field> can be at most 15 characters." The color is used for that player's lines and owned squares, and in Two players mode the two players' colors must differ (GS-5). Validation messages use readable, translated field names ("Ім’я гравця 1" / "Player 1 name", "Розмір поля" / "Size"), never internal names like `player1.name` (I18N-1). In Versus computer mode only the person's name and color are entered (VC-3), and the name must not be the computer's (VC-5).
 - **GS-2**: Size N is required, a whole number, 2 ≤ N ≤ 10. A fractional size such as 2.5 is rejected.
 - **GS-3**: Submitting a valid form starts the game in the chosen game mode (VC-1). The first player is chosen at random (see TR-2).
+- **GS-4**: A player's color is one of 8 round **swatches**: coral, teal, sunflower, sky, lavender, leaf, berry and tangerine, the same in the light and the dark theme. They form a radio group labelled "Колір" / "Color", and each swatch is announced by its name in the current language ("Кораловий" / "Coral", …). The picked swatch has a ring and is slightly larger (VR-32..VR-34, VR-38).
+- **GS-5**: Setup opens with two different random swatches for Player 1 and Player 2. In Two players mode a player can't keep the other player's swatch: the form shows "Цей колір уже зайнятий" / "This color is already taken" and the game doesn't start. In Versus computer mode the computer player's color follows VC-6 (VR-35..VR-37).
 
 Acceptance:
 - Given the language is English and both names are "Ann" and "ann", when I submit, then I see "Values must be different" and the game doesn't start.
@@ -17,13 +19,15 @@ Acceptance:
 - Given a valid form, when I submit, then the game screen opens with an empty board of size N.
 - Given I type a 20-character name, then the field keeps only the first 15 characters.
 - Given the language is English and the size is 2.5, when I submit, then I see "Size is not valid." and the game doesn't start.
+- Given I open setup in Two players mode, then Player 1 and Player 2 each have 8 swatches, with two different ones picked.
+- Given Two players mode and both players pick "Berry", when I submit, then I see "This color is already taken" and the game doesn't start.
 
 ## GB: Game board
 
 - **GB-1**: The board shows (N+1)×(N+1) dots. Each square is 48×48 px.
 - **GB-2**: Every drawn line uses its owner's color.
 - **GB-3**: An owned square is filled with the owner's color at about 30% opacity, with the first letter of the owner's displayed name in the middle ("К" / "C" for the computer player, VC-8).
-- **GB-4**: The screen always shows the current player (name and color swatch) and both players' scores (owned squares).
+- **GB-4**: The screen always shows the current player (name and a mark in their color) and both players' scores (owned squares).
 - **GB-5**: Player names are always shown in full, never cut with "…": in the turn, the scores, the Stop dialog and the result panel. A name too long for its space wraps onto the next line. The computer player's name is shown as described in VC-8.
 
 Acceptance:
@@ -87,9 +91,12 @@ Acceptance:
 - **PS-2**: On reload, a saved game is restored as it was: an in-progress game continues with the same current player, and a finished game shows the result panel. The current Dot1 selection isn't saved. For a reload during the computer player's turn, see VC-21.
 - **PS-3**: A game saved before gameplay existed (players and size set, but no current player) starts on load with a random first player.
 - **PS-4**: A game saved before game modes existed loads as a Two players game (VC-22).
+- **PS-5**: A game saved before the swatches, with any other player colors, loads and plays with its old colors (VR-39).
+- **PS-6**: An app update never loses the saved game (VR-49, PWA-5).
 
 Acceptance:
 - Given a game in progress with 5 lines, when I reload, then the same 5 lines, owners and current player are shown.
+- Given a saved game where Anna is #ff0000, when I reload, then Anna's lines are still #ff0000 and the game goes on.
 
 ## MB: Mobile
 
@@ -111,27 +118,75 @@ Acceptance:
 ## RL: Rules
 
 - **RL-1**: A short "How to play" rules section explains the game in five points: how lines are drawn, where a line can start, how squares are claimed, that turns alternate, and how the game ends and who wins. The wording is neutral ("Take turns…" / "Гравці по черзі…", "the other player"), so the same rules read correctly in both game modes (VC-23).
-- **RL-2**: The setup screen and the game screen both end with a rules toggle button, with the rules shown below it when open. Both screens use the same rules component.
-- **RL-3**: The rules are shown by default on the setup screen ("Hide rules") and hidden by default on the game screen ("Show rules"). Pressing the button switches them, and the open/closed state isn't saved.
-- **RL-4**: The toggle button tells assistive technology whether the rules are shown (`aria-expanded`). Below 640 px wide it is full width and at least 44 px tall.
+- **RL-2**: The rules live only in the **rules panel**, opened by the info button ("Правила" / "Rules") in the header of every screen (HD-1), mid-game included. The setup and game screens show no rules inline and have no Show/Hide rules button (VR-23, VR-28).
+- **RL-3**: From 640 px wide the panel slides in from the right, 384 px wide, over a dimmed backdrop; below 640 px it covers the whole screen. It closes with its ✕ button ("Закрити правила" / "Close rules"), a tap on the backdrop or Esc. It is closed whenever the app loads, on both screens, and its open state isn't saved (VR-24..VR-27).
+- **RL-4**: The panel is a modal dialog labelled by its "How to play" heading. When it opens, focus moves to ✕; Tab and Shift+Tab stay inside it; when it closes, focus returns to the info button. The info button reports the panel with `aria-haspopup="dialog"` and `aria-expanded` (VR-29).
 - **RL-5**: The rules text matches the game rules (MV-1..3, SQ-1..2, TR-1, END-1..3). When a rule changes, its text changes with it. The computer player follows the same rules (VC-11), so computer mode adds no rules text.
+- **RL-6**: While the rules panel is open during the computer player's turn, the computer waits; once the panel closes it gets its usual pause before moving, as with the Stop dialog (VC-13, VR-31).
+
+Acceptance:
+- Given I open the setup screen, then no rules are shown and the info button in the header reports the panel as closed.
+- Given I press the info button, on setup or during a game, then the panel opens with "How to play" and the same five rules, and focus is on ✕.
+- Given the panel is open, when I press ✕, tap the backdrop or press Esc, then it closes and focus is back on the info button.
+- Given the panel is open, when I press Tab or Shift+Tab, then focus stays inside it.
+- Given it's the computer player's turn and the panel is open, then the computer doesn't move however long I wait; when I close the panel, it moves after about one second.
+- Given a 390 px wide phone, then the open panel covers the screen.
+
+## TH: Look and theme
+
+- **TH-1**: The app uses the **Warm cream** look: a cream "paper" background, cocoa-brown text, coral for the primary actions (Start, Rematch, Stop game) and teal as the secondary accent, the rounded Nunito font (Latin and Cyrillic, shipped with the app), rounded corners and soft shadows on buttons, fields, panels, dialogs and the board. The board sits on a lighter surface with clearly visible idle dots, and the start, selected and target dot highlights use the accent colors. Lines and owned squares keep their owner's color (GB-2, GB-3) (VR-1..VR-8).
+- **TH-2**: The refresh changes the look, not the layout: the game screen keeps the board with the side panel, and every MB rule still holds (VR-9, VR-10).
+- **TH-3**: There is a light and a dark **theme**. The dark theme has a warm cocoa background and light cream text. Text, dots and player colors stay readable in both (VR-12, VR-17).
+- **TH-4**: Until the player presses the theme button, the theme follows the device's light or dark setting, also when that setting changes while the app is open (VR-11, VR-15).
+- **TH-5**: The theme button in the header switches between light and dark. It shows a moon in the light theme and a sun in the dark one, and tells assistive technology what it switches to: "Темна тема" / "Dark theme" or "Світла тема" / "Light theme" (VR-13, VR-16).
+- **TH-6**: The chosen theme is saved in localStorage and restored on reload, over the device setting, without a flash of the other theme (VR-14).
+
+Acceptance:
+- Given a first visit on a device in dark mode, then the app is dark; when the device switches to light, the app follows.
+- Given the light theme, when I press the theme button ("Dark theme"), then the app turns dark and the button reads "Light theme".
+- Given I chose the dark theme on a light device, when I reload, then the app is still dark.
+
+## HD: Header and logo
+
+- **HD-1**: Every screen has a header: the logo and the game's name on the left; the theme button (TH-5), the info button (RL-2) and the language toggle (I18N-3) on the right (VR-18, VR-23).
+- **HD-2**: The game's name follows the language: "Точки й лінії" in Ukrainian and "Dots & Lines" in English, in the header and the browser tab (APP-1) (VR-22).
+- **HD-3**: The logo shows the game in one picture: four dots in a square, a coral line on top, a teal line on the left and a dashed sunflower line on the right "waiting" to close the square, with a soft halo on the dot it starts from. Its dots take the text color (cocoa in light, cream in dark). It is decorative; the game's name is the accessible text (VR-18).
+- **HD-4**: In the header, the dashed line moves gently. When the device asks for reduced motion, it stays still (VR-19, VR-20).
+- **HD-5**: Below 640 px wide, the theme and info buttons are at least 44×44 px (the language toggle follows I18N-5) (VR-21).
+- **HD-6**: The favicon is the logo on a transparent background, with cocoa dots on light tab bars and cream dots on dark ones; browsers without SVG favicons get an `.ico` version (VR-40, VR-41).
+
+Acceptance:
+- Given any screen, then the header shows the logo, the game's name, the theme button, the info button and the UA / EN toggle.
+- Given the language is English, then the header and the browser tab read "Dots & Lines".
+- Given a 390 px wide phone, then the theme and info buttons are at least 44×44 px.
 
 ## APP: App
 
-- **APP-1**: The browser tab title follows the language: "Точки й лінії" in Ukrainian and "Dot Line Game" in English (I18N-3).
+- **APP-1**: The browser tab title follows the language: "Точки й лінії" in Ukrainian and "Dots & Lines" in English (I18N-3, HD-2).
 
 Acceptance:
-- Given I open the setup screen, then "How to play" is shown below the form, and the button above it reads "Hide rules".
-- Given the rules are shown on setup, when I press "Hide rules", then they disappear and the button reads "Show rules".
-- Given a game in progress, then the rules are hidden and the button at the bottom reads "Show rules". When I press it, the same five rules appear.
-- Given a 390 px wide phone, then the rules button spans the screen width and is at least 44 px tall.
-- Given the app is open in English, then the browser tab reads "Dot Line Game".
+- Given the app is open in English, then the browser tab reads "Dots & Lines".
+
+## PWA: Installable app
+
+- **PWA-1**: The game can be installed to the home screen from the published site (under `/dot-line/`) as well as locally. The installed app opens full screen without browser bars (standalone), in portrait or landscape (VR-44, VR-45, VR-52).
+- **PWA-2**: The install icon is the logo on a cream tile: 192 and 512 px icons on a rounded tile, and a 512 px maskable icon and a 180 px Apple touch icon on a full square that the launcher shapes itself, with the logo inside the central 80% safe zone so a circle or squircle mask never cuts it (VR-42, VR-43).
+- **PWA-3**: The splash screen and status bar use the cream background; the status bar turns cocoa when the device is in dark mode (VR-46).
+- **PWA-4**: After the first visit everything works offline: setup, playing, the computer player, the rules, both languages, the font and the icons. Reloading any app address offline opens the game (VR-47).
+- **PWA-5**: A new version installs quietly and takes effect the next time the game is opened, with no update prompt; the saved game is kept (PS-6) (VR-48, VR-49).
+- **PWA-6**: The installed app's name follows the language chosen before installing: "Точки й лінії" by default, "Dots & Lines" with English. There is no short name, so launchers show the full name (VR-50, VR-51).
+
+Acceptance (checked on a build with `BASE_PATH=/dot-line/` and by hand, not by unit tests):
+- Given the build, then it contains the Ukrainian and English manifests, the service worker and every icon the manifests and `index.html` reference.
+- Given I switch the language to English, then the page links the English manifest.
+- Given I visited the game once, when I reload with the network off, then the game opens and plays, computer player included.
+- Given an Android phone, when I install the game, then its icon fits the launcher mask and it opens full screen.
 
 ## I18N: Languages
 
-- **I18N-1**: Every text the UI shows is available in Ukrainian and English: labels, buttons, hints, the Stop dialog, the result panel, the rules, validation messages, dot `aria-label`s and the browser tab title, plus the Versus computer texts (VC-24). Player names are shown exactly as typed; only the computer player's name is translated (VC-8).
+- **I18N-1**: Every text the UI shows is available in Ukrainian and English: labels, buttons, hints, the Stop dialog, the result panel, the rules, validation messages, dot `aria-label`s, the browser tab title, the header buttons and the swatch names, plus the Versus computer texts (VC-24). Player names are shown exactly as typed; only the computer player's name is translated (VC-8).
 - **I18N-2**: Ukrainian is the default language on the first visit.
-- **I18N-3**: A language toggle ("UA" / "EN") sits in the header of every screen (VR-18). Switching changes all text at once, along with the page's `lang` attribute and the tab title.
+- **I18N-3**: A language toggle ("UA" / "EN") sits in the header of every screen (HD-1, VR-18). Switching changes all text at once, along with the page's `lang` attribute, the tab title and the linked install manifest (PWA-6).
 - **I18N-4**: The chosen language is saved in localStorage and restored on reload.
 - **I18N-5**: The toggle is a labelled button group. Each button has `aria-pressed` and the full language name for assistive technology, and below 640 px wide each button is at least 44×44 px.
 - **I18N-6**: A validation message that's already on screen switches language the next time its field is validated.
@@ -139,8 +194,8 @@ Acceptance:
 Acceptance criteria elsewhere in this document quote the English text; the Ukrainian UI shows the matching translations from `src/i18n/locales/uk.ts`.
 
 Acceptance:
-- Given a first visit, then the setup screen shows "Налаштування гри" and "Як грати", and "UA" is pressed in the toggle.
-- Given I press "EN", then the setup screen shows "Game Setup", the tab reads "Dot Line Game", and the page has `lang="en"`.
+- Given a first visit, then the setup screen shows "Налаштування гри", the header shows "Точки й лінії", and "UA" is pressed in the toggle.
+- Given I press "EN", then the setup screen shows "Game Setup", the tab reads "Dots & Lines", and the page has `lang="en"`.
 - Given I chose English, when I reload, then the app is still in English.
 - Given a game in progress in Ukrainian, then the panel shows "Хід", "Рахунок" and "Зупинити", and player names are unchanged.
 - Given a 390 px wide phone, then each toggle button is at least 44×44 px.
@@ -156,7 +211,7 @@ Setup:
 - **VC-3**: In Versus computer mode the form asks only for the person's name and color (a "You" fieldset) and the size. A read-only "Opponent" fieldset shows the robot icon, "Computer" and the computer player's color (CM-4).
 - **VC-4**: A **Difficulty** switch (**Easy** / **Normal**) sits right under the game mode switch and is shown only in Versus computer mode (CM-5, CM-6).
 - **VC-5**: In Versus computer mode the person's name is rejected with "This name belongs to the computer" when it matches the computer player's name in any supported language ("Комп’ютер", "Computer"), ignoring case, surrounding spaces and the apostrophe variant (', ’ or ʼ). Two players mode has no such check (CM-8).
-- **VC-6**: The computer player's color is chosen automatically from a fixed palette as the color that looks most different from the person's color, and follows the person's color while it's being picked. It can't be edited (CM-9).
+- **VC-6**: The computer player's color is chosen automatically from the same swatches as the person's (GS-4): the swatch that looks most different from the person's color. It follows the person's color while it's being picked and can't be edited (CM-9, VR-37).
 - **VC-7**: Switching the game mode keeps everything already typed: names, colors and size (CM-10).
 
 Playing:
@@ -192,7 +247,7 @@ Acceptance (English UI):
 - Given I last started a Two players game, when I open setup again, then "Two players" is selected, and switching to "Versus computer" shows the difficulty I last chose.
 - Given I switch the mode but don't start a game, when I reload, then setup opens with the mode of the last game started.
 - Given Versus computer mode and my name is "computer", "Комп'ютер" or " КОМП’ЮТЕР ", when I submit, then I see "This name belongs to the computer" and the game doesn't start.
-- Given my color is pure red (#ff0000), then the computer player gets the palette's teal (#1f9bb0).
+- Given I pick "Coral", then the computer player gets "Teal"; given I pick "Sunflower", it gets "Sky".
 - Given it's the computer player's turn, then the turn shows the robot, "Computer" and "Thinking…", every dot is idle, and after about one second a new line appears and the turn reads "Your turn".
 - Given the computer player has just drawn a line, then that line has a halo until I draw mine.
 - Given it's the computer player's turn and I press Stop and confirm, then no line is drawn and the result panel appears.
