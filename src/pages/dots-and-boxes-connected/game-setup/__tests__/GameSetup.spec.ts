@@ -7,7 +7,8 @@ const TWO_PLAYERS = ['Двоє гравців', 'Two players']
 
 // opens setup and switches to Two players: these tests cover that mode, unchanged (CM-34)
 async function openTwoPlayersSetup(storage: MountGamePageOptions['storage'] = {}) {
-  const page = await mountGamePage({ storage })
+  // these tests read the Ukrainian texts
+  const page = await mountGamePage({ storage, deviceLanguage: 'uk-UA' })
   const option = page.findAll('[role="radio"]').find((el) => TWO_PLAYERS.includes(el.text()))
   if (!option) throw new Error('No Two players game mode')
   await option.trigger('click')
