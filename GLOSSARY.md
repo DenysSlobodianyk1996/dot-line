@@ -85,8 +85,13 @@ _Avoid_: tie
 **Rematch**:
 A new game with the same players, size, game mode and difficulty, on an empty board.
 
-**New game**:
-Leaving the current game for the setup screen, where everything can be chosen again.
+**Setup**:
+Choosing the game mode, difficulty, players and size before a game starts. It opens with the game mode and difficulty of the last game started.
+_Avoid_: settings screen, config
+
+**New game settings**:
+Leaving a finished game for setup, where everything can be chosen again.
+_Avoid_: new game, change settings, config
 
 ## App
 
