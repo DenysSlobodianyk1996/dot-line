@@ -117,7 +117,7 @@ Spec: [short-name-and-goal/spec.md](../short-name-and-goal/spec.md) (stories NG-
 - **Setup boards**: the screen opens with the goal sentence (centered, 16 px `ink-soft`, the name bold in `ink`) ending with the "Як грати →" / "How to play →" link (`accent`, underlined, 44 px tall on phones), then the **Settings** / «Налаштування» title at 24 px / 800, 24 px below. There is no info button on the setup screen [NG-5, NG-6, NG-8, NG-9].
 - **Rules panel boards**: the same goal sentence (14 px, `ink`) is the first paragraph under "Як грати", above the five steps [NG-7].
 - **Result boards** (5, 6, 11, 20, 21, 26, 27, D5, D11): the secondary button reads «Налаштування» / "Settings" [NG-10].
-- **Game-only boards keep the old header** (the long name «Крапки й квадрати: ланцюжок» / "Dots and Boxes: Connected" and the UA | EN toggle): 2–4, 8–10, 18, 19, 24, 25, D3, D4, D8, D10, and the result boards above. They are there for the board and the panels beside it; the header in the app is the one on B1.
+- **Every board shows the new header**: the short name «Крапки й квадрати» / "Dots and Boxes" and the single round language button (UA or EN), as on B1.
 
 ## Data model (`src/models/`)
 
