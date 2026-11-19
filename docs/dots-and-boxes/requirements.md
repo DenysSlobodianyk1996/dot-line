@@ -168,6 +168,18 @@ Acceptance:
 - Given the language is English, then the header and the browser tab read "Dots and Boxes".
 - Given a 390 px wide phone, then the theme, info and language buttons are 44×44 px circles.
 
+## FT: Footer
+
+- **FT-1**: The setup screen ends with a footer holding two links and nothing else, as in teach-clock: Privacy, which opens the privacy policy (AR-15), and Contact, which opens an email to the developer with the subject "Contact support from Dots and Boxes".
+- **FT-2**: The footer belongs to the setup screen only. The game screen, in progress or finished, has none.
+- **FT-3**: The links follow the language ("Конфіденційність" and "Зв’язатися" in Ukrainian). Below 640 px wide each link is at least 44 px tall.
+- **FT-4**: Privacy opens the page that ships with the app, so it works offline and in the Android app (AR-2).
+
+Acceptance:
+- Given the setup screen, then a footer shows Privacy and Contact.
+- Given a game in progress or finished, then there is no footer.
+- Given the language is Ukrainian, then the links read "Конфіденційність" and "Зв’язатися".
+
 ## APP: App
 
 - **APP-1**: The browser tab title follows the language: "Крапки й квадрати" in Ukrainian and "Dots and Boxes" in English (I18N-3, HD-2, UP-15, NG-11).

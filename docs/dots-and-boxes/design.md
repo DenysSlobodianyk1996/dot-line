@@ -119,6 +119,13 @@ Spec: [short-name-and-goal/spec.md](../short-name-and-goal/spec.md) (stories NG-
 - **Result boards** (5, 6, 11, 20, 21, 26, 27, D5, D11): the secondary button reads «Налаштування» / "Settings" [NG-10].
 - **Every board shows the new header**: the short name «Крапки й квадрати» / "Dots and Boxes" and the single round language button (UA or EN), as on B1.
 
+### Footer (2026-11-19) [FT-1..FT-4]
+
+- `src/shared/components/AppFooter.vue`, rendered by `Page.vue` after the setup form only while no game is started, so the game screen has none [FT-2]. It is a `<footer>` (`mx-auto mt-6 max-w-130 border-t border-border pt-1`) with a centered `<nav>` of two links, `gap-x-5`, in `text-sm font-bold text-muted underline underline-offset-3`, `hover:text-ink`, `min-h-11 sm:min-h-10` [FT-3]. Same pattern as teach-clock's footer.
+- **Privacy**: `${BASE_URL}privacy/index.html` (`PRIVACY_PAGE` in `src/static/contact.ts`), the same tab. The full file name matters: in the Android app Capacitor serves the app's `index.html` for a bare folder path. The page is bundled and precached, so it opens offline [FT-4]; the device's back button or the browser's back returns to the game.
+- **Contact**: `mailto:CONTACT_EMAIL?subject=Contact support from Dots and Boxes` (`src/static/contact.ts`; the subject stays in English).
+- Message keys: `footer.privacy`, `footer.contact`.
+
 ## Data model (`src/models/`)
 
 Lines used to live inside each `Square` (`Square.lines` with `LinePosition`), so every shared edge existed twice. The model keeps one game-level list of lines as the single source of truth instead. `dirtySquares` holds only owned squares.
