@@ -3,8 +3,8 @@ apply plugin: 'com.android.application'
 // Version and signing come from env vars, so releasing never edits this file (AR-11, AR-12).
 // Locally the defaults apply, and without ANDROID_KEYSTORE_FILE the release bundle is unsigned.
 def env = System.getenv()
-def appVersionName = env.ANDROID_VERSION_NAME ?: "0.0.0"
-def appVersionCode = (env.ANDROID_VERSION_CODE ?: "1") as Integer
+def appVersionName = env.ANDROID_VERSION_NAME ?: "1.0.0"
+def appVersionCode = (env.ANDROID_VERSION_CODE ?: "10000") as Integer
 def keystoreFile = env.ANDROID_KEYSTORE_FILE
 
 android {
