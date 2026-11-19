@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fillPrivacyPage, formatPrivacyDate, privacyUpdated } from '../privacy-updated'
+import { privacyUpdated } from '../privacy-updated'
 
 describe('privacyUpdated: the privacy policy date a build prints (AR-15)', () => {
   const today = new Date('2026-11-20T23:30:00Z')
@@ -25,22 +25,3 @@ describe('privacyUpdated: the privacy policy date a build prints (AR-15)', () =>
   })
 })
 
-describe('the privacy page with its date filled in', () => {
-  it('prints the date in English and in Ukrainian', () => {
-    expect(formatPrivacyDate('2026-11-19', 'en')).toBe('19 November 2026')
-    expect(formatPrivacyDate('2026-11-19', 'uk')).toBe('19 листопада 2026 року')
-    expect(formatPrivacyDate('2027-01-05', 'uk')).toBe('5 січня 2027 року')
-  })
-
-  it('fills every placeholder', () => {
-    const page = fillPrivacyPage(
-      '<time datetime="%PRIVACY_UPDATED%">%PRIVACY_UPDATED_EN%</time>' +
-        '<time datetime="%PRIVACY_UPDATED%">%PRIVACY_UPDATED_UK%</time>',
-      '2026-11-19',
-    )
-    expect(page).toBe(
-      '<time datetime="2026-11-19">19 November 2026</time>' +
-        '<time datetime="2026-11-19">19 листопада 2026 року</time>',
-    )
-  })
-})

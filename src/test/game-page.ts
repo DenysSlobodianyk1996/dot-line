@@ -232,6 +232,36 @@ export class GamePage {
     }))
   }
 
+  // ---- privacy screen ----
+
+  // the footer's Privacy link: opens the in-app privacy screen (FT-4, PV-2)
+  async openPrivacy() {
+    await this.wrapper.get('footer[data-app-footer] [data-footer-privacy]').trigger('click')
+    await flushPromises()
+  }
+
+  // what the privacy screen shows, or null when it isn't open (PV-1, PV-2)
+  privacyScreen() {
+    const screen = this.wrapper.find('[data-privacy-screen]')
+    if (!screen.exists()) return null
+    const content = screen.get('[data-privacy-content]')
+    return {
+      lang: content.attributes('lang'),
+      title: content.get('h1').text(),
+      updated: content.get('[data-privacy-updated]').text(),
+      author: content.get('[data-privacy-author]').text(),
+      links: content.findAll('a').map((link) => link.attributes('href')),
+      back: screen.get('[data-privacy-back]').text(),
+    }
+  }
+
+  // Back: history back to the setup screen, which jsdom delivers (popstate) in a later task
+  async closePrivacy() {
+    await this.wrapper.get('[data-privacy-back]').trigger('click')
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await flushPromises()
+  }
+
   // ---- document ----
 
   private get languageButton() {

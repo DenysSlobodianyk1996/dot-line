@@ -173,12 +173,24 @@ Acceptance:
 - **FT-1**: The setup screen ends with a footer holding two links and nothing else, as in teach-clock: Privacy, which opens the privacy policy (AR-15), and Contact, which opens an email to the developer with the subject "Contact support from Dots and Boxes".
 - **FT-2**: The footer belongs to the setup screen only. The game screen, in progress or finished, has none.
 - **FT-3**: The links follow the language ("Конфіденційність" and "Зв’язатися" in Ukrainian). Below 640 px wide each link is at least 44 px tall.
-- **FT-4**: Privacy opens the page that ships with the app, so it works offline and in the Android app (AR-2).
+- **FT-4**: Privacy opens the in-app privacy screen (PV-2), so it works offline and in the Android app (AR-2).
 
 Acceptance:
 - Given the setup screen, then a footer shows Privacy and Contact.
 - Given a game in progress or finished, then there is no footer.
 - Given the language is Ukrainian, then the links read "Конфіденційність" and "Зв’язатися".
+
+## PV: Privacy policy
+
+- **PV-1**: The privacy policy's text exists once and both places show it: the in-app privacy screen and the static page that Google Play links to (AR-15). Same sections, same "Updated" date (the date of the build's commit), same contact and developer lines.
+- **PV-2**: The in-app privacy screen (opened from the footer, FT-4) shows the policy in the interface language under the usual header, and follows a language switch.
+- **PV-3**: Leaving the privacy screen: its "Back to the game" button and the Android back button both return to the game; neither closes the app.
+- **PV-4**: The static page at `<pages>/dots-and-boxes/privacy/` works without JavaScript: English and Ukrainian on one page, the app's look, light or dark from the device, and a link to open the game.
+
+Acceptance:
+- Given the setup screen, when the player taps Privacy, then the privacy screen shows "Privacy policy" (or "Політика конфіденційності") with the date, the email, the GitHub link and "Created by Denys Slobodianyk".
+- Given the privacy screen, when the player taps "Back to the game" or the Android back button, then the setup screen is back.
+- Given the static page with JavaScript off, then both languages show, styled, in the device's theme.
 
 ## APP: App
 

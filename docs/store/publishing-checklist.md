@@ -9,7 +9,7 @@ What you'll need, all in this folder or linked from it:
 | Signing and Play service account wizard | [`scripts/android-release-wizard.sh`](../../scripts/android-release-wizard.sh) |
 | Listing texts | [en.md](en.md), [uk.md](uk.md) |
 | Form answers | [play-console.md](play-console.md) |
-| Privacy policy URL | https://denysslobodianyk1996.github.io/dots-and-boxes/privacy/ (source: [`src/static/privacy.html`](../../src/static/privacy.html)) |
+| Privacy policy URL | https://denysslobodianyk1996.github.io/dots-and-boxes/privacy/ (source: [`PrivacyContent.vue`](../../src/shared/components/PrivacyContent.vue), rendered by [`src/privacy-static.ts`](../../src/privacy-static.ts)) |
 | App icon 512×512 | [icon-512.png](icon-512.png) |
 | Feature graphic 1024×500 | [feature-graphic-en.png](feature-graphic-en.png), [feature-graphic-uk.png](feature-graphic-uk.png) |
 | Screenshots (phone, 7" and 10" tablet; en and uk) | [screenshots/](screenshots/) (regenerate with `npm run store:screenshots`) |
