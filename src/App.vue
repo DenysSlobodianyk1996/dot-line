@@ -4,7 +4,7 @@
     <header class="mb-4 flex items-center gap-2">
       <AppLogo />
       <span data-app-title class="mr-auto text-lg font-extrabold text-ink">{{
-        t('app.title')
+        t('app.shortName')
       }}</span>
       <ThemeToggle />
       <BaseIconButton

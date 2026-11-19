@@ -5,10 +5,10 @@ const en = {
     // install manifest short_name: launchers truncate the full name (UP-15)
     shortName: 'Dots and Boxes',
   },
+  // the language button's label, read in the language it switches to: each locale names the
+  // switch to itself (NG-4)
   language: {
-    label: 'Language',
-    uk: 'Українська',
-    en: 'English',
+    switchTo: 'Switch to English',
   },
   // the theme button names the theme it switches to (VR-16)
   theme: {

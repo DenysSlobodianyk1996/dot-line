@@ -1,30 +1,23 @@
 <template>
-  <div
-    role="group"
-    :aria-label="t('language.label')"
-    class="inline-flex rounded-md border border-border bg-surface p-0.5 shadow-sm"
+  <!-- one round button: shows the current language, a tap switches to the other one (I18N-3, I18N-5).
+       Its accessible name is the switch, in the target language and marked with it (NG-3, NG-4) -->
+  <BaseIconButton
+    data-language-toggle
+    :lang="target"
+    :aria-label="t('language.switchTo', {}, { locale: target })"
+    @click="setLocale(target)"
   >
-    <button
-      v-for="option in SUPPORTED_LOCALES"
-      :key="option"
-      type="button"
-      :lang="option"
-      :aria-label="t(`language.${option}`)"
-      :aria-pressed="locale === option"
-      class="min-h-11 min-w-11 cursor-pointer rounded px-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-accent sm:min-h-8 sm:min-w-0"
-      :class="
-        locale === option ? 'bg-accent text-on-accent' : 'text-ink-soft hover:bg-surface-muted'
-      "
-      @click="setLocale(option)"
-    >
-      {{ SHORT_LABELS[option] }}
-    </button>
-  </div>
+    <span aria-hidden="true" :lang="current" class="text-sm font-bold">{{
+      SHORT_LABELS[current]
+    }}</span>
+  </BaseIconButton>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { SUPPORTED_LOCALES, setLocale, type AppLocale } from '@/i18n'
+import { setLocale, type AppLocale } from '@/i18n'
+import BaseIconButton from './BaseIconButton.vue'
 
 const { t, locale } = useI18n()
 
@@ -33,4 +26,8 @@ const SHORT_LABELS: Record<AppLocale, string> = {
   uk: 'UA',
   en: 'EN',
 }
+
+// two languages only: the button always offers the other one (a third would need a menu)
+const current = computed<AppLocale>(() => (locale.value === 'uk' ? 'uk' : 'en'))
+const target = computed<AppLocale>(() => (current.value === 'uk' ? 'en' : 'uk'))
 </script>
