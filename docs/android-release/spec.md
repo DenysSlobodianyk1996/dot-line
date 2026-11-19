@@ -140,7 +140,7 @@ The developer account is a personal one, so Play requires a closed test with at 
   - Ads: none.
   - App access: none required.
   - **Target audience**: the game is meant for children. Ticking an under-13 age group puts the app under Google Play's Families policy. The app qualifies (no ads, no data, no external links). The developer confirms the age groups when filling the form; `play-console.md` lists the Families requirements and how the app meets each.
-- **Privacy policy**: `public/privacy/index.html` (en and uk on one page, linked from the store listing), served at `<pages>/dots-and-boxes-connected/privacy/`. It matches the precache patterns and isn't linked from the game UI.
+- **Privacy policy**: `public/privacy/index.html` (en and uk on one page, linked from the store listing), served at `<pages>/dots-and-boxes/privacy/`. It matches the precache patterns and isn't linked from the game UI.
 - **Screenshots**: `scripts/store-screenshots.ts` (Playwright as a dev dependency, run with `npm run store:screenshots`).
   - Seeds localStorage with fixture games, then captures 5 screens: setup vs computer, a mid-game vs computer, the hero result card, the rules panel, and dark-theme play.
   - Captures them for phone (1080×1920 CSS×DPR), 7" tablet (1200×1920) and 10" tablet (1600×2560), in en and uk. That's 30 PNGs, within Play's limit of 8 per device type.
