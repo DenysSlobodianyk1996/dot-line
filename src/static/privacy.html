@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<!-- Privacy policy for the store listing (AR-15): static, copied as-is into dist/privacy/,
-     served at <pages>/dots-and-boxes/privacy/ and not linked from the game UI.
+<!-- Privacy policy for the store listing (AR-15): a static page that vite.config.ts writes to
+     dist/privacy/index.html in every build (and serves at /privacy/ in dev), filling the
+     %PRIVACY_UPDATED*% placeholders with the built commit's date (scripts/privacy-updated.ts).
+     Served at <pages>/dots-and-boxes/privacy/ and not linked from the game UI.
      Colors repeat the Warm cream --wc-* values from src/assets/styles.css; keep them in sync. -->
 <html lang="en">
   <head>
@@ -102,7 +104,7 @@
       <section id="en" lang="en">
         <h1>Privacy policy</h1>
         <p>Dots and Boxes</p>
-        <p class="date">Updated: 19 November 2026</p>
+        <p class="date">Updated: <time datetime="%PRIVACY_UPDATED%">%PRIVACY_UPDATED_EN%</time></p>
 
         <h2>No personal data</h2>
         <p>
@@ -151,7 +153,7 @@
       <section id="uk" lang="uk">
         <h1>Політика конфіденційності</h1>
         <p>Крапки й квадрати</p>
-        <p class="date">Оновлено: 19 листопада 2026 року</p>
+        <p class="date">Оновлено: <time datetime="%PRIVACY_UPDATED%">%PRIVACY_UPDATED_UK%</time></p>
 
         <h2>Жодних персональних даних</h2>
         <p>
