@@ -12,6 +12,6 @@ Each component names the symbol it was copied from.
 | `CloseIcon`                      | `close`                    | rules panel close button                                        |
 | `LightModeIcon` / `DarkModeIcon` | `light_mode` / `dark_mode` | theme toggle                                                    |
 | `StopHandIcon`                   | `back_hand`                | Stop (UP-9)                                                     |
-| `SettingsIcon`                   | `settings`                 | New game settings (UP-9)                                        |
+| `SettingsIcon`                   | `settings`                 | Settings on the result panel (UP-9, NG-10)                      |
 | `RefreshIcon`                    | `refresh`                  | Rematch (UP-9)                                                  |
 | `TrophyIcon`                     | `emoji_events`             | result card, when a person wins (UP-10)                         |

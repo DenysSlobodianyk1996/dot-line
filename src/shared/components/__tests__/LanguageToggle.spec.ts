@@ -17,7 +17,7 @@ describe('language toggle', () => {
 
     await page.get('button[lang="en"]').trigger('click')
 
-    expect(page.text()).toContain('Game Setup')
+    expect(page.text()).toContain('Settings')
     expect(page.get('button[type="submit"]').text()).toBe('Save')
     expect(page.get('button[lang="en"]').attributes('aria-pressed')).toBe('true')
     expect(document.documentElement.lang).toBe('en')
@@ -31,7 +31,7 @@ describe('language toggle', () => {
 
     const reloaded = await mountGamePage({ deviceLanguage: 'uk-UA' })
 
-    expect(reloaded.text()).toContain('Game Setup')
+    expect(reloaded.text()).toContain('Settings')
     expect(document.documentElement.lang).toBe('en')
   })
 })
@@ -49,7 +49,7 @@ describe('first launch follows the device language', () => {
   it.each(['en-US', 'de-DE'])('picks English on a %s device (I18N-2, AR-6)', async (language) => {
     const page = await mountGamePage({ deviceLanguage: language })
 
-    expect(page.text()).toContain('Game Setup')
+    expect(page.text()).toContain('Settings')
     expect(page.get('button[lang="en"]').attributes('aria-pressed')).toBe('true')
     expect(document.documentElement.lang).toBe('en')
     expect(document.title).toBe('Dots and Boxes')

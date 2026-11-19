@@ -41,7 +41,7 @@ describe('rules panel', () => {
     expect(page.isRulesOpen()).toBe(false)
     expect(page.hasInlineRules()).toBe(false)
     expect(page.hasButton('Show rules')).toBe(false)
-    expect(page.text()).not.toContain('How to play')
+    expect(page.text()).not.toContain(RULES_EN[0])
 
     await page.submitSetup({
       mode: 'twoPlayers',
@@ -122,57 +122,62 @@ describe('rules panel for keyboard and screen reader (VR-29)', () => {
   )
 })
 
-describe('info button next to the setup title (UP-1, UP-2)', () => {
-  it.each([
-    ['en', 'Rules'],
-    ['uk', 'Правила'],
-  ] as const)('shows in %s with the same label as the header button', async (locale, label) => {
-    const page = await openGamePage({ storage: { LOCALE: locale } })
+const GOAL = {
+  en: {
+    sentence: 'Dots and Boxes — whoever owns more squares when the board is full wins.',
+    name: 'Dots and Boxes',
+    link: 'How to play →',
+    title: 'Settings',
+  },
+  uk: {
+    sentence: 'Крапки й квадрати — перемагає той, у кого більше квадратів, коли поле заповниться.',
+    name: 'Крапки й квадрати',
+    link: 'Як грати →',
+    title: 'Налаштування',
+  },
+} as const
 
-    expect(page.setupRulesButtonState()).toEqual({
-      label,
-      haspopup: 'dialog',
-      expanded: 'false',
-    })
-  })
+describe('game goal on setup (NG-5, NG-6, NG-8)', () => {
+  it.each(['en', 'uk'] as const)(
+    'opens with the goal, the game name in bold, then How to play, then Settings (%s)',
+    async (locale) => {
+      const page = await openGamePage({ storage: { LOCALE: locale } })
 
-  it('opens the rules panel and reports it as open', async () => {
-    const page = await openGamePage()
-
-    await page.openRules({ from: 'setup' })
-
-    expect(page.isRulesOpen()).toBe(true)
-    expect(page.setupRulesButtonState()?.expanded).toBe('true')
-  })
-
-  it('reports open only on the info button that opened the panel', async () => {
-    const page = await openGamePage()
-
-    await page.openRules({ from: 'setup' })
-    expect(page.setupRulesButtonState()?.expanded).toBe('true')
-    expect(page.rulesButtonState().expanded).toBe('false')
-    await page.closeRules('escape')
-
-    await page.openRules({ from: 'header' })
-    expect(page.rulesButtonState().expanded).toBe('true')
-    expect(page.setupRulesButtonState()?.expanded).toBe('false')
-  })
-
-  it.each(['button', 'backdrop', 'escape'] as const)(
-    'returns focus to the setup info button after closing with %s',
-    async (how) => {
-      const page = await openGamePage()
-      await page.openRules({ from: 'setup' })
-
-      await page.closeRules(how)
-
-      expect(page.focus()).toBe('setup info button')
+      expect(page.setupIntro()).toEqual({
+        sentence: GOAL[locale].sentence,
+        boldName: GOAL[locale].name,
+        link: { text: GOAL[locale].link, atEnd: true, tapHeight44BelowSm: true },
+        title: GOAL[locale].title,
+        titleAfterGoal: true,
+        titleAboveForm: true,
+      })
     },
   )
 
-  it('still returns focus to the header button when that one opened the panel', async () => {
+  it('opens the rules panel from the How to play link', async () => {
     const page = await openGamePage()
-    await page.openRules({ from: 'setup' })
+
+    await page.openRules({ from: 'how to play' })
+
+    expect(page.isRulesOpen()).toBe(true)
+    expect(page.rulesPanelName()).toBe('How to play')
+  })
+
+  it.each(['button', 'backdrop', 'escape'] as const)(
+    'returns focus to the How to play link after closing with %s (UP-2)',
+    async (how) => {
+      const page = await openGamePage()
+      await page.openRules({ from: 'how to play' })
+
+      await page.closeRules(how)
+
+      expect(page.focus()).toBe('how to play link')
+    },
+  )
+
+  it('still returns focus to the header button when that one opened the panel (UP-2)', async () => {
+    const page = await openGamePage()
+    await page.openRules({ from: 'how to play' })
     await page.closeRules('escape')
 
     await page.openRules({ from: 'header' })
@@ -181,11 +186,34 @@ describe('info button next to the setup title (UP-1, UP-2)', () => {
     expect(page.focus()).toBe('info button')
   })
 
+  it('has no info button of its own: only the header one opens the rules (NG-9)', async () => {
+    const page = await openGamePage()
+
+    expect(page.rulesInfoButtons()).toEqual(['header'])
+  })
+
   it('is not on the game screen', async () => {
     const page = await startGame()
 
-    expect(page.setupRulesButtonState()).toBeNull()
+    expect(page.setupIntro()).toBeNull()
   })
+})
+
+describe('game goal in the rules panel (NG-7)', () => {
+  it.each(['en', 'uk'] as const)(
+    'starts with the same sentence, before the steps (%s)',
+    async (locale) => {
+      const page = await openGamePage({ storage: { LOCALE: locale } })
+
+      await page.openRules()
+
+      expect(page.rulesGoal()).toEqual({
+        sentence: GOAL[locale].sentence,
+        boldName: GOAL[locale].name,
+        firstBeforeSteps: true,
+      })
+    },
+  )
 })
 
 describe('rules panel on the computer turn (VR-31)', () => {
