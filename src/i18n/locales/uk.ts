@@ -13,6 +13,11 @@ const uk: typeof en = {
     light: 'Світла тема',
     dark: 'Темна тема',
   },
+  // the setup screen's footer (FT-1, FT-3)
+  footer: {
+    privacy: 'Конфіденційність',
+    contact: 'Зв’язатися',
+  },
   setup: {
     title: 'Налаштування',
     player: 'Гравець {number}',

@@ -15,6 +15,11 @@ const en = {
     light: 'Light theme',
     dark: 'Dark theme',
   },
+  // the setup screen's footer (FT-1, FT-3)
+  footer: {
+    privacy: 'Privacy',
+    contact: 'Contact',
+  },
   setup: {
     title: 'Settings',
     player: 'Player {number}',
