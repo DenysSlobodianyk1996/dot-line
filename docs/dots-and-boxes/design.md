@@ -26,7 +26,7 @@ The artboards use the Warm cream palette of the visual refresh (see [Visual refr
 
 Rules: since the visual refresh, no screen shows the rules inline. Desktop artboard 13 shows the rules panel slid in from the right over the game, and mobile artboard 12 shows it full screen [RL-1, RL-5, VR-23..VR-28]. (Before the refresh, setup ended with "Hide rules" and the rules card, and game screens with "Show rules".)
 
-Languages: every screen has the UA / EN toggle in the header (top right). Screens 1–13 show the default Ukrainian UI, with sample players Оля and Богдан and "UA" pressed. Screens 14, "Mobile setup, English", and 15, "Game setup, English", show the English UI with "EN" pressed [I18N-1..5]. The generator reads all text from `src/i18n/locales`, so the canvas uses exactly the app's strings.
+Languages: every screen has the language control in the header (top right). Screens 1–13 show the default Ukrainian UI, with sample players Оля and Богдан. Screens 14, "Mobile setup, English", and 15, "Game setup, English", show the English UI [I18N-1..5]. Since the short name (see below), the setup, rules panel and header boards show the single round language button with the current language ("UA" / "EN"); game-only boards still show the older UA | EN toggle. The generator reads all text from `src/i18n/locales`, so the canvas uses exactly the app's strings.
 
 Source files for the artboards are in [design-canvas/](design-canvas/) (`*.dc.html` plus `canvas.json`). They were generated from the board data, so board state and highlights are consistent with the rules below. Each artboard defines the palette tokens as `--wc-<token>` custom properties in its `<helmet>`, so a dark artboard differs from its light one only in that block (and the theme button's icon).
 
@@ -108,6 +108,16 @@ Mobile page, D row (dark):
 - B3 Logo set: the logo at 16–128 px on cream and cocoa, the SVG favicon on light and dark tab bars, the install icons on a cream tile with the maskable safe zone, and circle and squircle launcher masks [VR-19, VR-40..VR-43]
 
 The remote Claude Design canvas is synced from these files separately.
+
+### Short name, goal and lighter header (2026-11-19, #67)
+
+Spec: [short-name-and-goal/spec.md](../short-name-and-goal/spec.md) (stories NG-n), folded into HD, APP, PWA, RL, I18N and END in [requirements](requirements.md). The local boards were updated to the shipped UI (#71), with text from `src/i18n/locales`:
+
+- **Header** on the setup boards (1, 7, 14–17, 22, 23, D1, D7), the rules panel boards (12, 13, D12, D13), B1 and the B3 tab bars: the short name «Крапки й квадрати» / "Dots and Boxes", and the language as a third round button like theme and info (44 px on phones, 36 px from 640 px) showing the current language. B1 adds the language button to its Buttons row and notes its label, the switch in the target language [NG-1..NG-4, NG-11].
+- **Setup boards**: the screen opens with the goal sentence (centered, 16 px `ink-soft`, the name bold in `ink`) ending with the "Як грати →" / "How to play →" link (`accent`, underlined, 44 px tall on phones), then the **Settings** / «Налаштування» title at 24 px / 800, 24 px below. There is no info button on the setup screen [NG-5, NG-6, NG-8, NG-9].
+- **Rules panel boards**: the same goal sentence (14 px, `ink`) is the first paragraph under "Як грати", above the five steps [NG-7].
+- **Result boards** (5, 6, 11, 20, 21, 26, 27, D5, D11): the secondary button reads «Налаштування» / "Settings" [NG-10].
+- **Game-only boards keep the old header** (the long name «Крапки й квадрати: ланцюжок» / "Dots and Boxes: Connected" and the UA | EN toggle): 2–4, 8–10, 18, 19, 24, 25, D3, D4, D8, D10, and the result boards above. They are there for the board and the panels beside it; the header in the app is the one on B1.
 
 ## Data model (`src/models/`)
 
@@ -323,7 +333,7 @@ The phone layout is the default, and `sm:` classes (640 px and up) restore the d
 
 ## Rules [RL-1, RL-5, RL-7, VR-23..VR-31, APP-1]
 
-- **GameRules.vue** [RL-1, RL-5]: a `section` (gap 12 px) labelled by its "How to play" heading (`text-sm font-semibold text-ink`). Below it, an ordered list of five rules (`text-sm text-ink-soft`, gap 8 px), each with a 20 px round `bg-surface-strong` number. It has no card styling of its own any more: it sits directly on the rules panel. The rules text comes from `rules.step1`–`step5` in `src/i18n/locales` (see Languages). The English wording is:
+- **GameRules.vue** [RL-1, RL-5]: a `section` (gap 12 px) labelled by its "How to play" heading (`text-lg font-bold text-ink`). Below it, the goal sentence (`GameGoal` in a `<p data-rules-goal>`, `text-sm text-ink`, NG-7), then an ordered list of five rules (`text-sm text-ink-soft`, gap 8 px), each with a 20 px round `bg-surface-strong` number. It has no card styling of its own any more: it sits directly on the rules panel. The rules text comes from `rules.step1`–`step5` in `src/i18n/locales` (see Languages). The English wording is:
   1. Take turns drawing a line between two neighboring dots: left, right, up or down.
   2. The first line can go anywhere. After that, start from a dot that already has a line.
   3. Draw the fourth side of a square to claim it. One line can claim two squares.
@@ -416,6 +426,7 @@ src/shared/components/LanguageToggle.vue
 
 ### Setup [VC-1..7, VC-26]
 
+- **Top of the setup screen** [NG-5, NG-6, NG-8, NG-9]: a `<p data-setup-goal>` (`text-center text-ink-soft`) with `GameGoal` (the `rules.goal` sentence through `<i18n-t>`, the short name in a bold `text-ink` `<strong>`, shared with the rules panel) and the "How to play →" link button (`rules.howToPlay`, `text-accent underline`, `min-h-11 sm:min-h-0`, `whitespace-nowrap`), which opens the rules panel through `useRulesPanel().open(...)`. Then the `h3` title `setup.title`, "Settings" / «Налаштування», `mt-6 mb-4 text-center text-2xl font-extrabold`. The setup info button is gone; the header's info button is the only one.
 - `GameSetup.vue` has a `BaseSegmentedControl` for the game mode, and a second one for the difficulty only when the mode is `'computer'`, with `hint` set to `setup.easyHint` or `setup.normalHint` for the selected difficulty [VC-26]. The vee-validate `<Form>` has `keep-values`, so values typed in either mode survive a switch [VC-7].
   - Versus computer: a `PlayerField` with `legend="You"` (field label `setup.name`, so messages read "Name is not valid."), `reject-computer-name` and no other names to differ from, then `ComputerOpponentField` with `computerColorFor(values.player1.color)`.
   - Two players: the two `PlayerField`s as before.
@@ -471,12 +482,12 @@ The palette values are the prototype's (spec token table); `on-accent` and `dang
 `App.vue`: `<header class="mb-4 flex items-center gap-2">` above `RouterView`, inside the existing `p-2` wrapper:
 
 1. `AppLogo` at 32 px (`size-8`), animated, dots in `currentColor` = `ink` of the current theme.
-2. The game name, `t('app.title')`, `mr-auto text-lg font-extrabold text-ink` (18 px, 800). It wraps on very narrow phones (320 px); the buttons never shrink [VR-22].
+2. The game's short name, `t('app.shortName')` («Крапки й квадрати» / "Dots and Boxes"), `mr-auto text-lg font-extrabold text-ink` (18 px, 800). It fits on one line at 390 px and wraps to at most two on narrower phones; the buttons never shrink [VR-22, NG-1, NG-2].
 3. Theme button (`ThemeToggle.vue`): shows `DarkModeIcon` (moon) in light and `LightModeIcon` (sun) in dark; `aria-label` says what it switches to, `theme.dark` / `theme.light` [VR-13, VR-16].
 4. Info button: `InfoIcon`, `aria-label` `rules.open`, `aria-expanded` bound to the rules panel, `aria-haspopup="dialog"`; opens the rules panel [VR-23].
-5. `LanguageToggle` (unchanged behavior).
+5. `LanguageToggle`: one round button showing the current language, "UA" / "EN"; see [Languages](#languages-i18n-16-app-1) [NG-3, NG-4].
 
-The two icon buttons are `flex size-11 sm:size-9 items-center justify-center rounded-full border border-border bg-surface text-ink-soft shadow-sm hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-accent`, with 20 px icons: 44 px tap targets on phones, 36 px from `sm` up [VR-21].
+All three are `BaseIconButton`: `flex size-11 shrink-0 sm:size-9 items-center justify-center rounded-full border border-border bg-surface text-ink-soft shadow-sm hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-accent`, with 20 px icons: 44 px circles on phones, 36 px from `sm` up. `shrink-0` keeps them round however long the name is (before it they shrank into ovals) [VR-21, NG-2].
 
 **Icons** (`src/shared/icons/`): `InfoIcon`, `CloseIcon`, `LightModeIcon`, `DarkModeIcon`, `TrophyIcon` (`emoji_events`, marked `data-icon="trophy"`), copied from Material Symbols Rounded (Apache-2.0, license note in the folder's README) as inline SVG components: `viewBox="0 -960 960 960"`, `fill="currentColor"`, `aria-hidden="true"`, a `size` prop (default 24). No icon font. `RobotIcon` keeps its place in `src/shared/components/`.
 

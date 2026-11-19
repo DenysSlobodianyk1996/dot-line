@@ -1,8 +1,8 @@
 # Short name, game goal and a lighter header: spec
 
-Terms follow [GLOSSARY.md](../../GLOSSARY.md). User stories carry IDs **NG-n** for commits. Shipped rules this touches: HD-1, HD-2, HD-5, APP-1, PWA-6, RL-1..RL-4, I18N-3, I18N-5, END-5, END-9, MB-6, UP-1, UP-2, UP-15, UP-17 and AR-* app id mentions in [requirements](../dots-and-boxes-connected/requirements.md).
+Terms follow [GLOSSARY.md](../../GLOSSARY.md). User stories carry IDs **NG-n** for commits. Shipped rules this touches: HD-1, HD-2, HD-5, APP-1, PWA-6, RL-1..RL-4, I18N-3, I18N-5, END-5, END-9, MB-6, UP-1, UP-2, UP-15, UP-17 and AR-* app id mentions in [requirements](../dots-and-boxes/requirements.md).
 
-**Status**: agreed in a grilling session on 2026-11-19, not started. Issue #67. Branch `feat/short-name-and-goal`.
+**Status**: agreed in a grilling session on 2026-11-19, shipped (#68–#71); NG-n folded into [requirements](../dots-and-boxes/requirements.md). Issue #67. Branch `feat/short-name-and-goal`.
 
 ## Problem Statement
 
