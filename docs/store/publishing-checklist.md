@@ -1,6 +1,6 @@
 # Publishing checklist: Google Play
 
-Everything from "no app in Play Console" to "a release is a tag push", in order ([AR-18](../android-release/spec.md#store-package-ar-13ar-19)). Tick the boxes as you go. Package name: **`app.dotsandboxes.connected`**. Account type: personal, so Play requires the closed test in step 5.
+Everything from "no app in Play Console" to "a release is a tag push", in order ([AR-18](../android-release/spec.md#store-package-ar-13ar-19)). Tick the boxes as you go. Package name: **`app.dotsandboxes`**. Account type: personal, so Play requires the closed test in step 5.
 
 What you'll need, all in this folder or linked from it:
 
@@ -9,7 +9,7 @@ What you'll need, all in this folder or linked from it:
 | Signing and Play service account wizard | [`scripts/android-release-wizard.sh`](../../scripts/android-release-wizard.sh) |
 | Listing texts | [en.md](en.md), [uk.md](uk.md) |
 | Form answers | [play-console.md](play-console.md) |
-| Privacy policy URL | https://denysslobodianyk1996.github.io/dots-and-boxes-connected/privacy/ (source: [`public/privacy/index.html`](../../public/privacy/index.html)) |
+| Privacy policy URL | https://denysslobodianyk1996.github.io/dots-and-boxes/privacy/ (source: [`public/privacy/index.html`](../../public/privacy/index.html)) |
 | App icon 512×512 | [icon-512.png](icon-512.png) |
 | Feature graphic 1024×500 | [feature-graphic-en.png](feature-graphic-en.png), [feature-graphic-uk.png](feature-graphic-uk.png) |
 | Screenshots (phone, 7" and 10" tablet; en and uk) | [screenshots/](screenshots/) (regenerate with `npm run store:screenshots`) |
@@ -17,20 +17,20 @@ What you'll need, all in this folder or linked from it:
 
 ## 0. One-time setup: signing
 
-- [ ] Run [`bash scripts/android-release-wizard.sh`](../../scripts/android-release-wizard.sh) and finish at least the keystore steps: it creates the upload keystore outside the repo (default `~/.android-keys/dots-and-boxes-connected-upload.jks`) and saves `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD` as GitHub secrets. It never prints secrets and is safe to re-run: it reuses the keystore and asks before replacing a secret that already exists. Check with `gh secret list`.
+- [ ] Run [`bash scripts/android-release-wizard.sh`](../../scripts/android-release-wizard.sh) and finish at least the keystore steps: it creates the upload keystore outside the repo (default `~/.android-keys/dots-and-boxes-upload.jks`) and saves `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD` as GitHub secrets. It never prints secrets and is safe to re-run: it reuses the keystore and asks before replacing a secret that already exists. Check with `gh secret list`.
 - [ ] **Back up the keystore** right away; the wizard asks you to confirm it:
   - attach the `.jks` file to a password-manager entry and save its password and alias (`upload` by default) in the same entry;
   - optionally keep a second copy on an encrypted drive or in an encrypted cloud folder;
   - never commit it or send it by email or chat (`.gitignore` covers `*.jks`, `*.keystore` and `.env.android`).
 
   With Play App Signing on, Google holds the app signing key, so a lost upload key can be replaced, but only through a support request (Play Console → App integrity → "Request upload key reset") that takes days. The base64 copy in the GitHub secret can't be read back.
-- [ ] The service account steps (`PLAY_SERVICE_ACCOUNT_JSON`) can be done now or after step 1: the Play Console part needs your developer account, and the account-level permission covers the app once it exists. Make sure the account gets release rights for `app.dotsandboxes.connected` before step 8. Re-run the wizard to do them later.
+- [ ] The service account steps (`PLAY_SERVICE_ACCOUNT_JSON`) can be done now or after step 1: the Play Console part needs your developer account, and the account-level permission covers the app once it exists. Make sure the account gets release rights for `app.dotsandboxes` before step 8. Re-run the wizard to do them later.
 - [ ] Optional, for local signed builds: let the wizard write the gitignored `.env.android` (`ANDROID_KEYSTORE_FILE` is the keystore path, plus the password and alias), then run `set -a; . ./.env.android; set +a; npm run android:build`.
 
 ## 1. Create the app
 
 - [ ] Play Console → **Create app**.
-- [ ] App name **Dots and Boxes: Connected**, default language **English (United States) – en-US**, **Game**, **Free**.
+- [ ] App name **Dots and Boxes**, default language **English (United States) – en-US**, **Game**, **Free**.
 - [ ] Accept the Developer Program Policies and US export laws declarations.
 
 ## 2. Fill the listing
@@ -43,7 +43,7 @@ What you'll need, all in this folder or linked from it:
 
 Answers: [play-console.md](play-console.md). **Policy and programs → App content**:
 
-- [ ] Privacy policy: https://denysslobodianyk1996.github.io/dots-and-boxes-connected/privacy/ (open it first and check it loads).
+- [ ] Privacy policy: https://denysslobodianyk1996.github.io/dots-and-boxes/privacy/ (open it first and check it loads).
 - [ ] App access: no restrictions.
 - [ ] Ads: no ads.
 - [ ] Content rating: IARC questionnaire, all "No", then submit.

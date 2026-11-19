@@ -1,4 +1,4 @@
-# Dots and Boxes: Connected: requirements
+# Dots and Boxes: requirements
 
 Two players take turns drawing lines between neighboring dots on a square grid. Closing a square makes the player who closed it its owner. Whoever owns more squares wins. The two players are either two people on one device (**Two players**) or one person and the computer player (**Versus computer**, see [VC](#vc-versus-computer)).
 
@@ -156,7 +156,7 @@ Acceptance:
 ## HD: Header and logo
 
 - **HD-1**: Every screen has a header: the logo and the game's name on the left; the theme button (TH-5), the info button (RL-2) and the language toggle (I18N-3) on the right (VR-18, VR-23).
-- **HD-2**: The game's name follows the language: "Крапки й квадрати: ланцюжок" in Ukrainian and "Dots and Boxes: Connected" in English, in the header and the browser tab (APP-1) (VR-22, UP-15).
+- **HD-2**: The game's name follows the language: "Крапки й квадрати" in Ukrainian and "Dots and Boxes" in English, in the header and the browser tab (APP-1) (VR-22, UP-15, NG-11).
 - **HD-3**: The logo shows the game in one picture: four dots in a square, a coral line on top, a teal line on the left and a dashed sunflower line on the right "waiting" to close the square, with a soft halo on the dot it starts from. Its dots take the text color (cocoa in light, cream in dark). It is decorative; the game's name is the accessible text (VR-18).
 - **HD-4**: In the header, the dashed line moves gently. When the device asks for reduced motion, it stays still (VR-19, VR-20).
 - **HD-5**: Below 640 px wide, the theme and info buttons are at least 44×44 px (the language toggle follows I18N-5) (VR-21).
@@ -164,26 +164,26 @@ Acceptance:
 
 Acceptance:
 - Given any screen, then the header shows the logo, the game's name, the theme button, the info button and the UA / EN toggle.
-- Given the language is English, then the header and the browser tab read "Dots and Boxes: Connected".
+- Given the language is English, then the header and the browser tab read "Dots and Boxes".
 - Given a 390 px wide phone, then the theme and info buttons are at least 44×44 px.
 
 ## APP: App
 
-- **APP-1**: The browser tab title follows the language: "Крапки й квадрати: ланцюжок" in Ukrainian and "Dots and Boxes: Connected" in English (I18N-3, HD-2, UP-15).
+- **APP-1**: The browser tab title follows the language: "Крапки й квадрати" in Ukrainian and "Dots and Boxes" in English (I18N-3, HD-2, UP-15, NG-11).
 
 Acceptance:
-- Given the app is open in English, then the browser tab reads "Dots and Boxes: Connected".
+- Given the app is open in English, then the browser tab reads "Dots and Boxes".
 
 ## PWA: Installable app
 
-- **PWA-1**: The game can be installed to the home screen from the published site (under `/dots-and-boxes-connected/`) as well as locally. The installed app opens full screen without browser bars (standalone), in portrait or landscape (VR-44, VR-45, VR-52).
+- **PWA-1**: The game can be installed to the home screen from the published site (under `/dots-and-boxes/`) as well as locally. The installed app opens full screen without browser bars (standalone), in portrait or landscape (VR-44, VR-45, VR-52).
 - **PWA-2**: The install icon is the logo on a cream tile: 192 and 512 px icons on a rounded tile, and a 512 px maskable icon and a 180 px Apple touch icon on a full square that the launcher shapes itself, with the logo inside the central 80% safe zone so a circle or squircle mask never cuts it (VR-42, VR-43).
 - **PWA-3**: The splash screen and status bar use the cream background; the status bar turns cocoa when the device is in dark mode (VR-46).
 - **PWA-4**: After the first visit everything works offline: setup, playing, the computer player, the rules, both languages, the font and the icons. Reloading any app address offline opens the game (VR-47).
 - **PWA-5**: A new version installs quietly and takes effect the next time the game is opened, with no update prompt; the saved game is kept (PS-6) (VR-48, VR-49).
-- **PWA-6**: The installed app's name follows the language chosen before installing: "Крапки й квадрати: ланцюжок" by default, "Dots and Boxes: Connected" with English. The short name launchers fall back to is «Крапки й квадрати» / "Dots & Boxes" (VR-50, VR-51, UP-15).
+- **PWA-6**: The installed app's name follows the language chosen before installing: "Крапки й квадрати" by default, "Dots and Boxes" with English. The short name launchers fall back to is the same, «Крапки й квадрати» / "Dots and Boxes" (VR-50, VR-51, UP-15, NG-11).
 
-Acceptance (checked on a build with `BASE_PATH=/dots-and-boxes-connected/` and by hand, not by unit tests):
+Acceptance (checked on a build with `BASE_PATH=/dots-and-boxes/` and by hand, not by unit tests):
 - Given the build, then it contains the Ukrainian and English manifests, the service worker and every icon the manifests and `index.html` reference.
 - Given I switch the language to English, then the page links the English manifest.
 - Given I visited the game once, when I reload with the network off, then the game opens and plays, computer player included.
@@ -201,8 +201,8 @@ Acceptance (checked on a build with `BASE_PATH=/dots-and-boxes-connected/` and b
 Acceptance criteria elsewhere in this document quote the English text; the Ukrainian UI shows the matching translations from `src/i18n/locales/uk.ts`.
 
 Acceptance:
-- Given a first visit, then the setup screen shows "Налаштування гри", the header shows "Крапки й квадрати: ланцюжок", and "UA" is pressed in the toggle.
-- Given I press "EN", then the setup screen shows "Game Setup", the tab reads "Dots and Boxes: Connected", and the page has `lang="en"`.
+- Given a first visit, then the setup screen shows "Налаштування гри", the header shows "Крапки й квадрати", and "UA" is pressed in the toggle.
+- Given I press "EN", then the setup screen shows "Game Setup", the tab reads "Dots and Boxes", and the page has `lang="en"`.
 - Given I chose English, when I reload, then the app is still in English.
 - Given a game in progress in Ukrainian, then the panel shows "Хід", "Рахунок" and "Зупинити", and player names are unchanged.
 - Given a 390 px wide phone, then each toggle button is at least 44×44 px.

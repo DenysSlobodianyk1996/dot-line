@@ -8,10 +8,10 @@ def appVersionCode = (env.ANDROID_VERSION_CODE ?: "1") as Integer
 def keystoreFile = env.ANDROID_KEYSTORE_FILE
 
 android {
-    namespace = "app.dotsandboxes.connected"
+    namespace = "app.dotsandboxes"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "app.dotsandboxes.connected"
+        applicationId "app.dotsandboxes"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode appVersionCode

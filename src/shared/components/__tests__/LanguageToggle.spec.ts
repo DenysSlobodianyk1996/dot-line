@@ -9,7 +9,7 @@ describe('language toggle', () => {
     expect(page.get('button[lang="uk"]').attributes('aria-pressed')).toBe('true')
     expect(page.get('button[lang="en"]').attributes('aria-pressed')).toBe('false')
     expect(page.get('button[lang="en"]').attributes('aria-label')).toBe('English')
-    expect(document.title).toBe('Крапки й квадрати: ланцюжок')
+    expect(document.title).toBe('Крапки й квадрати')
   })
 
   it('switches the text, page language and tab title when EN is pressed (I18N-3, APP-1, UP-15)', async () => {
@@ -21,7 +21,7 @@ describe('language toggle', () => {
     expect(page.get('button[type="submit"]').text()).toBe('Save')
     expect(page.get('button[lang="en"]').attributes('aria-pressed')).toBe('true')
     expect(document.documentElement.lang).toBe('en')
-    expect(document.title).toBe('Dots and Boxes: Connected')
+    expect(document.title).toBe('Dots and Boxes')
   })
 
   it('keeps the chosen language after a reload (I18N-4)', async () => {
@@ -42,7 +42,7 @@ describe('first launch follows the device language', () => {
 
     expect(page.get('button[lang="uk"]').attributes('aria-pressed')).toBe('true')
     expect(document.documentElement.lang).toBe('uk')
-    expect(document.title).toBe('Крапки й квадрати: ланцюжок')
+    expect(document.title).toBe('Крапки й квадрати')
     expect(new GamePage(page).manifestHref()).toBe('/manifest.uk.webmanifest')
   })
 
@@ -52,7 +52,7 @@ describe('first launch follows the device language', () => {
     expect(page.text()).toContain('Game Setup')
     expect(page.get('button[lang="en"]').attributes('aria-pressed')).toBe('true')
     expect(document.documentElement.lang).toBe('en')
-    expect(document.title).toBe('Dots and Boxes: Connected')
+    expect(document.title).toBe('Dots and Boxes')
     expect(new GamePage(page).manifestHref()).toBe('/manifest.en.webmanifest')
   })
 
@@ -61,7 +61,7 @@ describe('first launch follows the device language', () => {
 
     expect(page.get('button[lang="uk"]').attributes('aria-pressed')).toBe('true')
     expect(document.documentElement.lang).toBe('uk')
-    expect(document.title).toBe('Крапки й квадрати: ланцюжок')
+    expect(document.title).toBe('Крапки й квадрати')
   })
 })
 

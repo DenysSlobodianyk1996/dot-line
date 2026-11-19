@@ -5,7 +5,7 @@ Paste each block into Play Console → **Grow users → Store presence → Main 
 ## Title (25 / 30)
 
 ```text
-Dots and Boxes: Connected
+Dots and Boxes
 ```
 
 ## Short description (78 / 80)
@@ -17,7 +17,7 @@ The classic dots and boxes game: draw lines, close squares, beat the computer.
 ## Full description (1375 / 4000)
 
 ```text
-Dots and Boxes: Connected is the classic pencil-and-paper game, made for a phone or tablet.
+Dots and Boxes is the classic pencil-and-paper game, made for a phone or tablet.
 
 HOW TO PLAY
 Take turns drawing a line between two neighboring dots. Draw the fourth side of a square and the square is yours. One line can close two squares. When every square is taken, whoever owns the most squares wins. Equal scores make a draw.
@@ -48,7 +48,7 @@ No ads, no in-app purchases, no accounts and no tracking. The app collects no da
 Play Console → the release → **Release notes**, inside `<en-US>` … `</en-US>`.
 
 ```text
-First release of Dots and Boxes: Connected.
+First release of Dots and Boxes.
 • Play versus the computer (Easy or Normal) or two players on one device.
 • Boards from 2×2 to 10×10 squares.
 • Light and dark themes, English and Ukrainian.

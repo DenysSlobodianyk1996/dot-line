@@ -204,7 +204,7 @@ finish() {
 # unless you choose to replace them, and values saved in .env.android are offered
 # as defaults. Secrets are read with hidden input and never printed.
 
-KEYSTORE_DEFAULT="$HOME/.android-keys/dots-and-boxes-connected-upload.jks"
+KEYSTORE_DEFAULT="$HOME/.android-keys/dots-and-boxes-upload.jks"
 SECRET_NAMES=(ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD PLAY_SERVICE_ACCOUNT_JSON)
 EXISTING_SECRETS=" "
 
@@ -373,7 +373,7 @@ if [[ -n "$SA_EMAIL" ]]; then step "Email to invite: $SA_EMAIL"
 else step "Email to invite: the service account's email (IAM → Service accounts, ends in .iam.gserviceaccount.com)."; fi
 open_url "https://play.google.com/console/developers/users-and-permissions"
 step "Invite new users → paste the email."
-step "App permissions → Add app → Dots and Boxes: Connected → tick 'Release to testing tracks'"
+step "App permissions → Add app → Dots and Boxes → tick 'Release to testing tracks'"
 step "  (and 'Release apps to production' if CI should ever do that) → Apply."
 step "Invite user → Send invitation. Service accounts don't need to accept it."
 pause "Invited? Press Enter"

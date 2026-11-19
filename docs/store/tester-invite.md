@@ -4,15 +4,15 @@ Text to send to closed-test testers ([AR-19](../android-release/spec.md#store-pa
 
 Before sending, replace the placeholders:
 
-- `<OPT_IN_LINK>`: Play Console → **Test and release → Testing → Closed testing** → your track → **Testers** → "Join on the web" link (`https://play.google.com/apps/testing/app.dotsandboxes.connected`).
-- `<PLAY_LINK>`: `https://play.google.com/store/apps/details?id=app.dotsandboxes.connected` (works for testers once they've opted in).
+- `<OPT_IN_LINK>`: Play Console → **Test and release → Testing → Closed testing** → your track → **Testers** → "Join on the web" link (`https://play.google.com/apps/testing/app.dotsandboxes`).
+- `<PLAY_LINK>`: `https://play.google.com/store/apps/details?id=app.dotsandboxes` (works for testers once they've opted in).
 - `<GOOGLE_GROUP>`: only if you manage testers through a Google Group; otherwise delete that line and add testers' Gmail addresses to the track's email list.
 - `<YOUR_NAME>`, `<END_DATE>` (14 days after the last tester opts in, plus a day of margin).
 
 ## English
 
 ```text
-Hi! I've made a small game for Android: Dots and Boxes: Connected, the classic pencil-and-paper game where you draw lines and close squares. Before it can go public on Google Play, Google needs at least 12 people to test it for 14 days. Could you help?
+Hi! I've made a small game for Android: Dots and Boxes, the classic pencil-and-paper game where you draw lines and close squares. Before it can go public on Google Play, Google needs at least 12 people to test it for 14 days. Could you help?
 
 How to join (2 minutes):
 1. On your Android phone or tablet, sign in to Google Play with the Gmail address you sent me.
@@ -43,7 +43,7 @@ Thank you!
 ## Українською
 
 ```text
-Привіт! Я зробив невелику гру для Android — «Крапки й квадрати: ланцюжок». Це та сама гра з зошита в клітинку: проводиш лінії й займаєш квадрати. Щоб опублікувати її в Google Play, Google вимагає, щоб щонайменше 12 людей потестували її протягом 14 днів. Допоможеш?
+Привіт! Я зробив невелику гру для Android — «Крапки й квадрати». Це та сама гра з зошита в клітинку: проводиш лінії й займаєш квадрати. Щоб опублікувати її в Google Play, Google вимагає, щоб щонайменше 12 людей потестували її протягом 14 днів. Допоможеш?
 
 Як долучитися (2 хвилини):
 1. На телефоні чи планшеті з Android увійди в Google Play з тією Gmail-адресою, яку ти мені надіслав(-ла).

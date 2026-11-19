@@ -3,7 +3,7 @@ import type en from './en'
 // Typed as the English messages, so a missing or extra key fails type-check (I18N-1)
 const uk: typeof en = {
   app: {
-    title: 'Крапки й квадрати: ланцюжок',
+    title: 'Крапки й квадрати',
     shortName: 'Крапки й квадрати',
   },
   language: {
