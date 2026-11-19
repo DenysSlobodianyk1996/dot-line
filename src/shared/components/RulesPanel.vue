@@ -9,14 +9,14 @@
     <div
       v-if="isOpen"
       data-rules-backdrop
-      class="fixed inset-0 z-20 bg-ink/40"
+      class="fixed inset-0 z-20 bg-backdrop"
       aria-hidden="true"
       @click="close"
     ></div>
   </Transition>
   <Transition
-    enter-from-class="translate-x-full"
-    leave-to-class="translate-x-full"
+    enter-from-class="[transform:translateX(100%)]"
+    leave-to-class="[transform:translateX(100%)]"
     enter-active-class="transition-transform duration-250 ease-out motion-reduce:transition-none"
     leave-active-class="transition-transform duration-200 ease-in motion-reduce:transition-none"
   >

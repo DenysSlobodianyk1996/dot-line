@@ -5,7 +5,9 @@ import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA, type ManifestOptions } from 'vite-plugin-pwa'
+import { lowerForOldWebView } from './scripts/css-floor'
 import { MANIFEST_FILES } from './src/static/manifests'
+import { OLDEST_CHROME } from './src/static/oldest-chrome'
 import { NOT_THE_APP_PAGES } from './src/static/service-worker'
 import en from './src/i18n/locales/en'
 import uk from './src/i18n/locales/uk'
@@ -75,6 +77,25 @@ function extraPwaFiles(): Plugin {
   }
 }
 
+// An old system WebView, such as a never-updated Samsung S8's (AR-21). Tailwind v4 puts its CSS in
+// @layer (Chrome 99), which an older browser drops whole, leaving the app unstyled; and its
+// var(--x,) empty fallbacks void the ring before Chrome ~105. This runs on the final, minified CSS
+// files (so the minifier can't undo it), before Workbox hashes them for the precache.
+function oldWebViewCss(): Plugin {
+  return {
+    name: 'dots-and-boxes:old-webview-css',
+    apply: 'build',
+    enforce: 'post',
+    async generateBundle(_options, bundle) {
+      for (const file of Object.values(bundle)) {
+        if (file.type === 'asset' && file.fileName.endsWith('.css')) {
+          file.source = await lowerForOldWebView(String(file.source))
+        }
+      }
+    },
+  }
+}
+
 // installable and offline (VR-44..VR-52): updates install silently and apply on the next
 // launch; the game lives in localStorage, so an update never loses it (VR-48, VR-49)
 function pwaPlugins() {
@@ -110,11 +131,23 @@ export default defineConfig(({ mode }) => {
       // true only in the Android app's build (see CAPACITOR_MODE)
       __CAPACITOR_BUILD__: isCapacitor,
     },
-    plugins: [vue(), vueDevTools(), tailwindcss(), ...(isCapacitor ? [] : pwaPlugins())],
+    plugins: [
+      vue(),
+      vueDevTools(),
+      tailwindcss(),
+      oldWebViewCss(),
+      ...(isCapacitor ? [] : pwaPlugins()),
+    ],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
+    },
+    // An old system WebView (AR-21): build the JS and CSS for OLDEST_CHROME; oldWebViewCss() then
+    // lowers what the CSS minifier leaves too new
+    build: {
+      target: [`chrome${OLDEST_CHROME}`, 'edge107', 'firefox104', 'safari16'],
+      cssTarget: [`chrome${OLDEST_CHROME}`, 'edge107', 'firefox104', 'safari16'],
     },
     server: {
       port: 4200,

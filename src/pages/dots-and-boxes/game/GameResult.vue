@@ -79,6 +79,7 @@ import PlayerScore from './PlayerScore.vue'
 import RefreshIcon from '@/shared/icons/RefreshIcon.vue'
 import SettingsIcon from '@/shared/icons/SettingsIcon.vue'
 import { useDisplayName } from '@/shared/composables/useDisplayName'
+import { tint } from '@/utils'
 
 const props = defineProps<{
   dotsAndBoxesGame: DotsAndBoxesGame
@@ -107,11 +108,14 @@ const reason = computed(() =>
   props.dotsAndBoxesGame.finishReason === 'stopped' ? t('result.stopped') : t('result.completed'),
 )
 
-// a tint of the player's color under the ink number, edged in the full color (UP-10, VR-17)
+// a tint of the player's color under the ink number, edged in the full color (UP-10, VR-17):
+// 30% of the color over the surface, layered rather than color-mix() for an old WebView (AR-21)
 function chipStyle(color: string) {
+  const layer = tint(color, 0.3)
   return {
     borderColor: color,
-    backgroundColor: `color-mix(in srgb, ${color} 30%, var(--color-surface))`,
+    backgroundColor: 'var(--color-surface)',
+    backgroundImage: `linear-gradient(${layer}, ${layer})`,
   }
 }
 

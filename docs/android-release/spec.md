@@ -46,6 +46,7 @@ The developer account is a personal one, so Play requires a closed test with at 
 7. **AR-7**: As a returning player, I want my language choice to win over the device language once I've used the toggle, so that my choice sticks.
 8. **AR-8**: As a player, I want the app to work in portrait and landscape on phones and tablets, so that I can hold the device any way.
 20. **AR-20**: As a player, I want the Android app to tell me when a newer version is on Google Play and let me update without leaving the game, so that I always play the latest version.
+21. **AR-21**: As a player on an older phone whose system WebView was never updated (Chrome 88 and up, such as a Samsung S8), I want the app to look and work the same as on a new phone, so that I can play it at all.
 
 ### Release pipeline
 
@@ -91,6 +92,13 @@ The developer account is a personal one, so Play requires a closed test with at 
 - When a flexible download finishes (`onFlexibleUpdateStateChange` → `DOWNLOADED`), the app calls `completeFlexibleUpdate()`: Play installs and restarts the app. The current game is saved after every move and restored on launch, so nothing is lost.
 - Any plugin failure (no Play Store, a sideloaded debug APK, no network) is reported with `console.warn` and the app plays on.
 - Only builds installed from Google Play see updates; test it through internal app sharing or the internal track.
+
+### Old system WebViews (AR-21)
+
+- The Android app draws with the phone's system WebView, which a never-updated phone keeps at the version it shipped with. On Chromium 92 the app was unstyled: Tailwind v4 puts its CSS in `@layer` (Chrome 99), and an older browser drops a whole `@layer` block. On Chromium 104 the chosen color had no ring (Tailwind's `var(--x,)` empty fallbacks void the declaration), and on both the board lost its tints (`color-mix()`, Chrome 111).
+- **The floor is Chrome 88** (`OLDEST_CHROME`, `src/static/oldest-chrome.ts`): Tailwind's base styles need `:where()`/`:is()` (Chrome 88). Vite's `build.target` and `build.cssTarget` follow it.
+- `oldWebViewCss()` in `vite.config.ts` runs `lowerForOldWebView` (`scripts/css-floor.ts`) on the final CSS files, after the minifier and before Workbox hashes them: `@csstools/postcss-cascade-layers` flattens `@layer` into specificity that keeps the layer order, and `var(--x,)` becomes `var(--x, )`.
+- App code avoids what Tailwind can't lower: no `color-mix()` in inline styles (`tint()` in `src/utils/tint.ts` gives `rgba()`), no opacity modifier on a theme color (its fallback is the opaque color; use an alpha-hex token such as `bg-accent-tint` or `bg-backdrop`), and `transform` rather than the `scale`/`translate` properties (Chrome 104). Tailwind doesn't scan `docs/` (`@source not` in `styles.css`).
 
 ### Device language (AR-6, AR-7)
 
@@ -160,6 +168,7 @@ The developer account is a personal one, so Play requires a closed test with at 
   - device-language default: `uk-UA` → uk, `en-US` and `de` → en, a saved `LOCALE` wins;
   - back-button order, with the Capacitor `App` plugin faked at the module boundary: rules panel open → closes it; Stop dialog open → closes it; neither → exit;
   - the version-code formula;
+  - old WebViews (AR-21): `scripts/__tests__/css-floor.spec.ts` builds the Android CSS and fails on anything newer than `OLDEST_CHROME` without a fallback, and on `color-mix()` or a theme-color opacity modifier in app code. A real old browser is a manual check: `npx @puppeteer/browsers install chromium@882387 --platform mac_arm` (Chromium 92; 1012729 is 104), then load the `build:capacitor` output (`npx vite preview`) in it with Playwright's `executablePath`. Playwright's locators need Chrome 105, so drive the page with plain DOM calls.
   - in-app update (AR-20), with the plugin faked: update available → flexible update starts; none → nothing; only immediate allowed → immediate update; already downloaded or download finishing → install; a failing plugin doesn't break the other native touches.
 - **Build checks**:
   - `npm run android:build` produces an AAB locally;
