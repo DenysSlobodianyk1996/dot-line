@@ -34,6 +34,11 @@ android {
         }
     }
     buildTypes {
+        // The test APK (npm run android:apk) installs next to the Play Store app instead of clashing with its signature.
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+        }
         release {
             if (keystoreFile) {
                 signingConfig signingConfigs.release
