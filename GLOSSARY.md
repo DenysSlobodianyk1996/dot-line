@@ -101,7 +101,7 @@ _Avoid_: game over screen, result screen, popup
 
 **App name**:
 "Dots and Boxes" (uk «Крапки й квадрати»), the classic game's name; this app adds the house rule that every line after the first starts from an existing one (see Valid start). A product name only: inside the game the term stays Square.
-_Avoid_: Dot-line game, Dots & Lines, Точки й лінії, box (for a square)
+_Avoid_: Dots & Lines, Точки й лінії, box (for a square)
 
 **Swatch**:
 One of the 8 fixed, named player colors (coral, teal, sunflower, sky, lavender, leaf, berry, tangerine). A person picks one on the setup screen; the computer player gets the one that looks most different from the person's.

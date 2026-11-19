@@ -97,18 +97,18 @@ The app is also called "Dots & Lines" / «Точки й лінії», a made-up 
   - `app.title`: en "Dots and Boxes: Connected", uk «Крапки й квадрати: ланцюжок». This drives the header, `document.title` and both manifest `name`s.
   - Manifest `short_name`: "Dots & Boxes" / «Крапки й квадрати», because launchers truncate long names.
 - **Code**:
-  - `DotLineGame` → `DotsAndBoxesGame`; `dot-line-game.model.ts` → `dots-and-boxes-game.model.ts`.
-  - `src/pages/dot-line-game/` → `src/pages/dots-and-boxes-connected/`.
+  - The game model class and its file take the new name: `DotsAndBoxesGame` in `dots-and-boxes-game.model.ts`.
+  - The page folder moves to `src/pages/dots-and-boxes-connected/`.
   - Tests and helpers follow.
   - `package.json` `name` → `dots-and-boxes-connected`.
   - The route stays `/game`.
-- **Docs**: `docs/dot-line-game/` → `docs/dots-and-boxes-connected/`, with links updated in every doc. The glossary title, `CLAUDE.md`, `README.md` and `docs/README.md` change, and so do the visible app name and logo alt text in the design canvas artboards.
+- **Docs**: the gameplay docs folder moves to `docs/dots-and-boxes-connected/`, with links updated in every doc. The glossary title, `CLAUDE.md`, `README.md` and `docs/README.md` change, and so do the visible app name and logo alt text in the design canvas artboards.
 - **Storage**: the keys (`CURRENT_GAME`, `LOCALE`, `GAME_MODE`, `DIFFICULTY`, `THEME`) have no app prefix, and localStorage is per origin (`<user>.github.io`), not per path. So saved data survives the URL change and needs no migration. A test asserts the key names stay as they are.
 - **Repo and URL**:
   - `gh repo rename dots-and-boxes-connected`, then update the local remote.
   - `deploy.yml` builds with `BASE_PATH=/dots-and-boxes-connected/`.
-  - GitHub redirects the old repo URLs; Pages doesn't redirect `/dot-line/`. No redirect page, because nobody uses the old URL (decided).
-  - Update absolute links in docs (`github.com/.../dot-line` → `.../dots-and-boxes-connected`).
+  - GitHub redirects the old repo URLs; Pages doesn't redirect the old path. No redirect page, because nobody uses the old URL (decided).
+  - Update absolute links in docs to `github.com/.../dots-and-boxes-connected`.
 - **Glossary**: inside the game the term stays **Square** ("box" remains an _Avoid_ word). "Dots and Boxes: Connected" is only the **App name**.
 
 ## Testing Decisions
@@ -124,7 +124,7 @@ The app is also called "Dots & Lines" / «Точки й лінії», a made-up 
 
 - Board changes at the end of the game (dimming, winner glow). Considered as a prototype variant and not chosen.
 - Confetti or sounds.
-- A redirect from the old `/dot-line/` URL.
+- A redirect from the old Pages URL.
 - Renaming the `/game` route or the storage keys.
 - Anything Android (see the [Android release spec](../android-release/spec.md)).
 

@@ -6,7 +6,7 @@ Terms follow [GLOSSARY.md](../../GLOSSARY.md). Related decisions: [ADR-0001](../
 
 ## Problem Statement
 
-The dot-line game can only be played by two people sharing one device. Someone on their own can't play at all, and there's no way to practise against an opponent that always has time for a game.
+The game can only be played by two people sharing one device. Someone on their own can't play at all, and there's no way to practise against an opponent that always has time for a game.
 
 ## Solution
 
