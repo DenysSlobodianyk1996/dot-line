@@ -221,9 +221,31 @@ export class GamePage {
 
   // ---- document ----
 
-  async switchLanguage(locale: 'uk' | 'en') {
-    await this.header.get(`button[lang="${locale}"]`).trigger('click')
+  private get languageButton() {
+    return this.header.get('button[data-language-toggle]')
+  }
+
+  // the header's one language button (I18N-3, I18N-5): what it shows (the current language),
+  // what it tells assistive technology (the switch, in the target language's own words) and
+  // the language that label is marked with
+  languageButtonState() {
+    const button = this.languageButton
+    return {
+      text: button.text(),
+      label: button.attributes('aria-label'),
+      labelLang: button.attributes('lang'),
+    }
+  }
+
+  // one tap on the language button: switches to the other language
+  async clickLanguageButton() {
+    await this.languageButton.trigger('click')
     await flushPromises()
+  }
+
+  // ends in the given language, tapping the language button only if it's not on already
+  async switchLanguage(locale: 'uk' | 'en') {
+    if (document.documentElement.lang !== locale) await this.clickLanguageButton()
   }
 
   // the install manifest the page links to; it names the installed app (VR-50, VR-51)

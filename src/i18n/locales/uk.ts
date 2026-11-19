@@ -7,9 +7,7 @@ const uk: typeof en = {
     shortName: 'Крапки й квадрати',
   },
   language: {
-    label: 'Мова',
-    uk: 'Українська',
-    en: 'English',
+    switchTo: 'Перейти на українську',
   },
   theme: {
     light: 'Світла тема',
