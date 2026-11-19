@@ -37,3 +37,4 @@ Rules:
 | Versus computer game mode | Shipped (#21, browser QA #19 passed) | [spec](computer-opponent/spec.md) · [requirements VC](dots-and-boxes-connected/requirements.md#vc-versus-computer) · [design](dots-and-boxes-connected/design.md#versus-computer-vc-125) |
 | UI polish and rename to Dots and Boxes: Connected | Spec agreed | [spec](ui-polish/spec.md) |
 | Android release on Google Play | Spec agreed (blocked by UI polish) | [spec](android-release/spec.md) |
+| Short name, game goal and a lighter header | Spec agreed | [spec](short-name-and-goal/spec.md) |
