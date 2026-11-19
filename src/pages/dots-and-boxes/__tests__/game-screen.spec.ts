@@ -192,14 +192,14 @@ describe('game screen: side panel layout (UP-4..UP-6)', () => {
     expect(page.sidePanelOrder()).toEqual(['Stop', 'Turn', 'Score', 'hint'])
   })
 
-  it('shows New game settings and Rematch in the slot Stop used (UP-6)', async () => {
+  it('shows Settings and Rematch in the slot Stop used (UP-6)', async () => {
     const page = await startGame()
     expect(page.sidePanelActions()).toEqual(['Stop'])
 
     await page.stopGame()
 
     // DOM (and Tab) order matches the stack from 640 px up: Rematch on top (UP-8)
-    expect(page.sidePanelActions()).toEqual(['Rematch', 'New game settings'])
+    expect(page.sidePanelActions()).toEqual(['Rematch', 'Settings'])
   })
 })
 
@@ -220,16 +220,14 @@ describe('game screen: button icons (UP-9)', () => {
     expect(page.buttonIcon('Зупинити')).toEqual(icon('stop-hand', 'Зупинити'))
   })
 
-  it('New game settings shows a gear and Rematch a refresh arrow, in both languages (UP-9)', async () => {
+  it('Settings shows a gear and Rematch a refresh arrow, in both languages (UP-9)', async () => {
     const page = await startGame()
     await page.stopGame()
 
-    expect(page.buttonIcon('New game settings')).toEqual(icon('settings', 'New game settings'))
+    expect(page.buttonIcon('Settings')).toEqual(icon('settings', 'Settings'))
     expect(page.buttonIcon('Rematch')).toEqual(icon('refresh', 'Rematch'))
     await page.switchLanguage('uk')
-    expect(page.buttonIcon('Налаштування гри')).toEqual(
-      icon('settings', 'Налаштування гри'),
-    )
+    expect(page.buttonIcon('Налаштування')).toEqual(icon('settings', 'Налаштування'))
     expect(page.buttonIcon('Реванш')).toEqual(icon('refresh', 'Реванш'))
   })
 
@@ -331,27 +329,27 @@ describe('game screen: result (END-3..6)', () => {
     expect(page.scores()).toEqual({ [ANNA.name]: 0, [BOHDAN.name]: 0 })
   })
 
-  it('offers New game settings and Rematch, shown in full in both languages (END-5, MB-6)', async () => {
+  it('offers Settings and Rematch, shown in full in both languages (END-5, MB-6)', async () => {
     const page = await startGame()
     await page.stopGame()
 
     expect(page.resultButtons()).toEqual([
       { label: 'Rematch', shownInFull: true },
-      { label: 'New game settings', shownInFull: true },
+      { label: 'Settings', shownInFull: true },
     ])
     await page.switchLanguage('uk')
     expect(page.resultButtons()).toEqual([
       { label: 'Реванш', shownInFull: true },
-      { label: 'Налаштування гри', shownInFull: true },
+      { label: 'Налаштування', shownInFull: true },
     ])
   })
 
-  it('New game settings opens the setup screen and clears the saved game (END-5)', async () => {
+  it('Settings opens the setup screen and clears the saved game (END-5, NG-10)', async () => {
     const page = await startGame()
     await page.drawLine([0, 0], [0, 1])
     await page.stopGame()
 
-    await page.newGameSettings()
+    await page.openSettings()
 
     expect(page.isSetupShown).toBe(true)
     expect(localStorage.getItem(CURRENT_GAME)).toBeNull()

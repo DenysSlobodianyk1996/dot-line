@@ -1,20 +1,26 @@
 <template>
   <!-- centered horizontally, top-aligned (MB-9) -->
   <div class="mx-auto max-w-130">
-    <!-- the title with an info button that opens the rules panel, like the header's (UP-1) -->
-    <div class="mb-4 flex items-center justify-center gap-2">
-      <h3 class="text-center font-bold text-xl">{{ t('setup.title') }}</h3>
-      <BaseIconButton
-        ref="rulesButton"
-        data-setup-rules-button
-        :aria-label="t('rules.open')"
+    <!-- what the game is and how to win, with a link to the rules panel (NG-5, NG-6); the
+         header's info button is the only info button (NG-9). Focus returns to the link (UP-2). -->
+    <p data-setup-goal class="text-center text-ink-soft">
+      <GameGoal />
+      {{ ' ' }}
+      <button
+        ref="howToPlayLink"
+        type="button"
         aria-haspopup="dialog"
-        :aria-expanded="rulesPanel.isOpenedBy(rulesButton?.element)"
+        :aria-expanded="rulesPanel.isOpenedBy(howToPlayLink)"
+        class="inline-flex min-h-11 cursor-pointer items-center whitespace-nowrap rounded text-accent underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-accent sm:min-h-0"
         @click="rulesPanel.open($event.currentTarget)"
       >
-        <InfoIcon :size="20" />
-      </BaseIconButton>
-    </div>
+        {{ t('rules.howToPlay') }}
+      </button>
+    </p>
+    <!-- below the goal, bigger: the screen reads what the game is, then how to set it up (NG-8) -->
+    <h3 data-setup-title class="mt-6 mb-4 text-center text-2xl font-extrabold">
+      {{ t('setup.title') }}
+    </h3>
     <!-- keep-values: what's typed survives a game mode switch (CM-10) -->
     <Form
       :initial-values="formInitialValues"
@@ -106,9 +112,8 @@ import BaseFieldError from '@/shared/components/BaseFieldError.vue'
 import BaseButton from '@/shared/components/BaseButton.vue'
 import BaseSegmentedControl from '@/shared/components/BaseSegmentedControl.vue'
 import BaseHint from '@/shared/components/BaseHint.vue'
-import BaseIconButton from '@/shared/components/BaseIconButton.vue'
+import GameGoal from '@/shared/components/GameGoal.vue'
 import { useRulesPanel } from '@/shared/composables/useRulesPanel'
-import InfoIcon from '@/shared/icons/InfoIcon.vue'
 
 import { computerColorFor, randomSwatch } from '@/utils'
 import { StorageService } from '@/services'
@@ -121,7 +126,7 @@ defineRule('max_value', max_value)
 
 const { t } = useI18n()
 const rulesPanel = useRulesPanel()
-const rulesButton = useTemplateRef('rulesButton')
+const howToPlayLink = useTemplateRef<HTMLButtonElement>('howToPlayLink')
 const sizeHintId = useId()
 const sizeErrorId = useId()
 

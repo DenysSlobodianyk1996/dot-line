@@ -23,7 +23,7 @@ describe('language button', () => {
 
     await page.clickLanguageButton()
 
-    expect(page.text()).toContain('Game Setup')
+    expect(page.text()).toContain('Settings')
     expect(document.documentElement.lang).toBe('en')
     expect(document.title).toBe('Dots and Boxes')
     expect(page.manifestHref()).toBe('/manifest.en.webmanifest')
@@ -51,7 +51,7 @@ describe('language button', () => {
 
     const reloaded = await openOn('uk-UA')
 
-    expect(reloaded.text()).toContain('Game Setup')
+    expect(reloaded.text()).toContain('Settings')
     expect(document.documentElement.lang).toBe('en')
     expect(reloaded.languageButtonState().text).toBe('EN')
   })
@@ -78,7 +78,7 @@ describe('first launch follows the device language', () => {
   it.each(['en-US', 'de-DE'])('picks English on a %s device (I18N-2, AR-6)', async (language) => {
     const page = await openOn(language)
 
-    expect(page.text()).toContain('Game Setup')
+    expect(page.text()).toContain('Settings')
     expect(page.languageButtonState().text).toBe('EN')
     expect(document.documentElement.lang).toBe('en')
     expect(document.title).toBe('Dots and Boxes')

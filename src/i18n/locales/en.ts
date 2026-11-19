@@ -16,7 +16,7 @@ const en = {
     dark: 'Dark theme',
   },
   setup: {
-    title: 'Game Setup',
+    title: 'Settings',
     player: 'Player {number}',
     playerName: 'Player {number} name',
     name: 'Name',
@@ -87,13 +87,16 @@ const en = {
     completed: 'All squares are filled.',
     stopped: 'The game was stopped.',
     score: 'Score',
-    newGameSettings: 'New game settings',
+    settings: 'Settings',
     rematch: 'Rematch',
   },
   rules: {
     title: 'How to play',
     open: 'Rules',
     close: 'Close rules',
+    // the game's goal, first on setup and in the rules panel; {name} is the bold game name (NG-5, NG-7)
+    goal: '{name} — whoever owns more squares when the board is full wins.',
+    howToPlay: 'How to play →',
     step1: 'Take turns drawing a line between two neighboring dots: left, right, up or down.',
     step2: 'The first line can go anywhere. After that, start from a dot that already has a line.',
     step3: 'Draw the fourth side of a square to claim it. One line can claim two squares.',
