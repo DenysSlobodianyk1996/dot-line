@@ -49,6 +49,7 @@ import { computed, onBeforeUnmount, onMounted, ref, type CSSProperties } from 'v
 import { useI18n } from 'vue-i18n'
 import { useDisplayName } from '@/shared/composables/useDisplayName'
 import { BOARD_MAX_CELL, BOARD_PADDING } from '@/static'
+import { tint } from '@/utils'
 
 type DotState = 'idle' | 'start' | 'selected' | 'target'
 
@@ -68,7 +69,7 @@ const FALLBACK_COLOR = 'var(--color-ink)' // follows the theme, so it stays read
 
 const RING_CLASS: Record<DotState, string> = {
   idle: '',
-  start: 'size-5 border-2 border-accent bg-accent/12',
+  start: 'size-5 border-2 border-accent bg-accent-tint',
   selected: 'size-[26px] border-2',
   target: 'size-[22px] border-2 border-dashed',
 }
@@ -157,7 +158,7 @@ function squareStyle(square: Square): CSSProperties {
     width: `${cell.value}px`,
     height: `${cell.value}px`,
     color,
-    backgroundColor: `color-mix(in srgb, ${color} 30%, transparent)`,
+    backgroundColor: tint(color, 0.3),
   }
 }
 
@@ -182,7 +183,7 @@ function lineStyle(line: Line): CSSProperties {
     // a 4 px halo in the computer's color at 40% (CM-18)
     boxShadow:
       line.key === lastComputerLine.value?.key
-        ? `0 0 0 ${HALO_WIDTH}px color-mix(in srgb, ${color} 40%, transparent)`
+        ? `0 0 0 ${HALO_WIDTH}px ${tint(color, 0.4)}`
         : undefined,
   }
 }
@@ -201,7 +202,7 @@ function ringStyle(state: DotState): CSSProperties {
   if (state !== 'selected' && state !== 'target') return {}
   return {
     borderColor: currentColor.value,
-    backgroundColor: `color-mix(in srgb, ${currentColor.value} 12%, transparent)`,
+    backgroundColor: tint(currentColor.value, 0.12),
   }
 }
 
