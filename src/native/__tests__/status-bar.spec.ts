@@ -18,6 +18,16 @@ vi.mock('@capacitor/status-bar', () => ({
   Style: { Dark: 'DARK', Light: 'LIGHT' },
 }))
 
+// the in-app update check (AR-20) also starts with the native touches: Play has nothing new here
+vi.mock('@capawesome/capacitor-app-update', () => ({
+  AppUpdate: {
+    addListener: vi.fn(async () => ({ remove: async () => {} })),
+    getAppUpdateInfo: vi.fn(async () => ({ updateAvailability: 1 })),
+  },
+  AppUpdateAvailability: { UPDATE_AVAILABLE: 2 },
+  FlexibleUpdateInstallStatus: { DOWNLOADED: 11 },
+}))
+
 vi.mock('@capacitor/app', () => ({
   App: { addListener: vi.fn(async () => ({ remove: async () => {} })), exitApp: vi.fn() },
 }))

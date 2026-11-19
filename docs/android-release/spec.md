@@ -45,6 +45,7 @@ The developer account is a personal one, so Play requires a closed test with at 
 6. **AR-6**: As a new player, I want the game in my device's language on first launch (Ukrainian on a Ukrainian device, English otherwise), so that I don't have to find the language toggle first.
 7. **AR-7**: As a returning player, I want my language choice to win over the device language once I've used the toggle, so that my choice sticks.
 8. **AR-8**: As a player, I want the app to work in portrait and landscape on phones and tablets, so that I can hold the device any way.
+20. **AR-20**: As a player, I want the Android app to tell me when a newer version is on Google Play and let me update without leaving the game, so that I always play the latest version.
 
 ### Release pipeline
 
@@ -79,6 +80,17 @@ The developer account is a personal one, so Play requires a closed test with at 
 - **Icons and splash**: `@capacitor/assets` generates them from the logo source (`src/shared/logo.ts`, through `scripts/generate-icons.ts` output). That gives an adaptive icon (logo foreground on a cream background) and a splash screen on cream in both themes (the launch theme's `windowSplashScreenBackground` and `windowSplashScreenAnimatedIcon` for Android 12+, the bitmap splash below).
 - **SDK**: targetSdk is whatever API level Play requires at release time; minSdk is Capacitor's default. Orientation is unspecified (any).
 - Web deploys (GitHub Pages) don't change.
+
+### In-app update (AR-20)
+
+- Android only: `@capawesome/capacitor-app-update`, called from `src/native/` like the other native touches, so the web build has no plugin code. The PWA keeps updating itself (`autoUpdate`).
+- Google Play's own UI, no in-app banner of ours. At launch the app asks Play for update info once:
+  - an update is available and the flexible flow is allowed → `startFlexibleUpdate()`: Play shows its default update prompt, and the download runs in the background while the player keeps playing; "No thanks" in Play's prompt is respected until the next launch;
+  - only the immediate flow is allowed → `performImmediateUpdate()` (Play's full-screen update);
+  - a flexible update already downloaded (the player left before it installed) → `completeFlexibleUpdate()`.
+- When a flexible download finishes (`onFlexibleUpdateStateChange` → `DOWNLOADED`), the app calls `completeFlexibleUpdate()`: Play installs and restarts the app. The current game is saved after every move and restored on launch, so nothing is lost.
+- Any plugin failure (no Play Store, a sideloaded debug APK, no network) is reported with `console.warn` and the app plays on.
+- Only builds installed from Google Play see updates; test it through internal app sharing or the internal track.
 
 ### Device language (AR-6, AR-7)
 
@@ -147,7 +159,8 @@ The developer account is a personal one, so Play requires a closed test with at 
 - **Unit tests** (Vitest):
   - device-language default: `uk-UA` → uk, `en-US` and `de` → en, a saved `LOCALE` wins;
   - back-button order, with the Capacitor `App` plugin faked at the module boundary: rules panel open → closes it; Stop dialog open → closes it; neither → exit;
-  - the version-code formula.
+  - the version-code formula;
+  - in-app update (AR-20), with the plugin faked: update available → flexible update starts; none → nothing; only immediate allowed → immediate update; already downloaded or download finishing → install; a failing plugin doesn't break the other native touches.
 - **Build checks**:
   - `npm run android:build` produces an AAB locally;
   - the capacitor-mode `dist/` has no `sw.js` or manifest;
