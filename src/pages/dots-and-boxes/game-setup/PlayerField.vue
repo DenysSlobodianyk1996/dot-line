@@ -56,8 +56,8 @@
           >
             <span
               aria-hidden="true"
-              class="size-8 rounded-full ring-offset-2 ring-offset-paper transition-transform group-hover:scale-110"
-              :class="value === swatch.hex ? 'scale-110 ring-3 ring-ink' : ''"
+              class="size-8 rounded-full ring-offset-2 ring-offset-paper transition-transform group-hover:[transform:scale(1.1)]"
+              :class="value === swatch.hex ? '[transform:scale(1.1)] ring-3 ring-ink' : ''"
               :style="{ backgroundColor: swatch.hex }"
             ></span>
           </button>
