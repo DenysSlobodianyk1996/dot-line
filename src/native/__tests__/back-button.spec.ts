@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { flushPromises } from '@vue/test-utils'
-import { startGame } from '@/test/game-page'
+import { openGamePage, startGame } from '@/test/game-page'
 
 // The Capacitor App plugin, faked at the module boundary: it remembers the back-button listener so
 // a test can press the Android back button, and records exitApp()
@@ -82,5 +82,17 @@ describe('Android back button (AR-3)', () => {
 
     expect(page.isRulesOpen()).toBe(false)
     expect(app.exitApp).toHaveBeenCalledOnce()
+  })
+
+  it('goes from the privacy screen back to the game instead of leaving (PV-3)', async () => {
+    const page = await openGamePage()
+    await page.openPrivacy()
+    await startNative()
+
+    await pressBack()
+
+    expect(page.privacyScreen()).toBeNull()
+    expect(page.footerLinks()?.map((link) => link.text)).toEqual(['Privacy', 'Contact'])
+    expect(app.exitApp).not.toHaveBeenCalled()
   })
 })

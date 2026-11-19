@@ -20,6 +20,30 @@ const en = {
     privacy: 'Privacy',
     contact: 'Contact',
   },
+  // the privacy policy: the in-app screen and the static store page share it (AR-15, PV-1)
+  privacy: {
+    title: 'Privacy policy',
+    updated: 'Updated:',
+    noDataTitle: 'No personal data',
+    noData:
+      'The app does not collect any personal data. It does not send data to any server, store data remotely or share data with anyone.',
+    onDeviceTitle: 'What stays on your device',
+    onDevice:
+      'To let you continue later, the app saves the current game, the language, the theme, the game mode and the difficulty on your device only. Removing the app or clearing its data deletes them.',
+    noAdsTitle: 'No ads, analytics, accounts or permissions',
+    noAds:
+      'The app shows no ads, uses no analytics or tracking, needs no account and asks for no device permissions.',
+    childrenTitle: 'Children',
+    children:
+      'The app is suitable for children. Because it collects nothing, it collects nothing from children either.',
+    contactTitle: 'Contact',
+    contactIntro: 'Questions about this policy or the app:',
+    email: 'Email:',
+    developerTitle: 'Developer',
+    createdBy: 'Created by Denys Slobodianyk',
+    back: 'Back to the game',
+    openGame: 'Open the game',
+  },
   setup: {
     title: 'Settings',
     player: 'Player {number}',

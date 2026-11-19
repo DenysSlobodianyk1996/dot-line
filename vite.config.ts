@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 
-import { defineConfig, type Plugin } from 'vite'
+import postcss from 'postcss'
+import { createServer, defineConfig, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
@@ -12,7 +13,7 @@ import { OLDEST_CHROME } from './src/static/oldest-chrome'
 import { NOT_THE_APP_PAGES } from './src/static/service-worker'
 import en from './src/i18n/locales/en'
 import uk from './src/i18n/locales/uk'
-import { fillPrivacyPage, privacyUpdated } from './scripts/privacy-updated'
+import { privacyUpdated } from './scripts/privacy-updated'
 
 // The Android app's build (`vite build --mode capacitor`): Capacitor serves the bundled files from
 // the root and they ship inside the app, so there is no service worker and no install manifest
@@ -79,21 +80,77 @@ function extraPwaFiles(): Plugin {
   }
 }
 
-// The privacy policy (AR-15) lives outside public/ so every build can stamp its "Updated" date:
-// the built commit's date, or VITE_PRIVACY_UPDATED when set (scripts/privacy-updated.ts). Both
-// the Pages build (where Workbox precaches it) and the Android build get privacy/index.html.
-const PRIVACY_SOURCE = fileURLToPath(new URL('./src/static/privacy.html', import.meta.url))
+// The privacy policy's "Updated" date (AR-15): the built commit's date, or VITE_PRIVACY_UPDATED
+// when set (scripts/privacy-updated.ts). Set here, so the app, the static page and Vitest all
+// read the same import.meta.env.VITE_PRIVACY_UPDATED (src/static/privacy.ts).
+process.env.VITE_PRIVACY_UPDATED = privacyUpdated({ given: process.env.VITE_PRIVACY_UPDATED })
 
+// vue-i18n esm-bundler feature flags: Composition API only, no devtools in production
+const I18N_FLAGS = {
+  __VUE_I18N_FULL_INSTALL__: true,
+  __VUE_I18N_LEGACY_API__: false,
+  __INTLIFY_PROD_DEVTOOLS__: false,
+  __VUE_PROD_DEVTOOLS__: false,
+}
+// Rendering the privacy page in Node: Vite bundles vue-i18n (with the flags above) rather than
+// letting Node load its bundler build, which expects the flags to be defined
+const SSR_BUNDLED = ['vue-i18n', /^@intlify\//]
+
+const SRC = fileURLToPath(new URL('./src', import.meta.url))
+const STYLES = `${SRC}/assets/styles.css`
+const PRIVACY_ENTRY = '/src/privacy-static.ts'
+type PrivacyStatic = typeof import('./src/privacy-static')
+
+// the dark theme's custom properties from styles.css, for the static page's media query
+function darkThemeVars(): string {
+  let vars = ''
+  postcss.parse(readFileSync(STYLES, 'utf8')).walkRules((rule) => {
+    if (rule.selector.replace(/["']/g, '') !== ':root[data-theme=dark]') return
+    rule.walkDecls((decl) => {
+      // !important: the flattened layers (oldWebViewCss) give the app's :root rules a specificity
+      // a plain :root here can't beat
+      if (decl.prop.startsWith('--')) vars += `${decl.prop}: ${decl.value} !important; `
+    })
+  })
+  if (!vars) throw new Error("styles.css has no :root[data-theme='dark'] rule for the privacy page")
+  return vars
+}
+
+// The static privacy page, privacy/index.html: Google Play's privacy policy URL, which must work
+// without JavaScript (AR-15, PV-4). It is the in-app screen's PrivacyContent rendered to HTML
+// (src/privacy-static.ts) with the app's stylesheet. Both builds get it (Workbox precaches it on
+// Pages); the dev server renders it at the same addresses.
 function privacyPage(): Plugin {
-  const render = () =>
-    fillPrivacyPage(
-      readFileSync(PRIVACY_SOURCE, 'utf8'),
-      privacyUpdated({ given: process.env.VITE_PRIVACY_UPDATED }),
-    )
   return {
     name: 'dots-and-boxes:privacy-page',
-    generateBundle() {
-      this.emitFile({ type: 'asset', fileName: 'privacy/index.html', source: render() })
+    enforce: 'post',
+    async generateBundle(_options, bundle) {
+      const css = Object.values(bundle).find(
+        (file) => file.type === 'asset' && /^assets\/index-.*\.css$/.test(file.fileName),
+      )
+      if (!css) throw new Error('No app stylesheet for the privacy page')
+      // a throwaway Vite server, only to load the Vue components on the server side
+      const server = await createServer({
+        configFile: false,
+        root: fileURLToPath(new URL('.', import.meta.url)),
+        logLevel: 'silent',
+        appType: 'custom',
+        server: { middlewareMode: true, hmr: false, ws: false },
+        plugins: [vue()],
+        resolve: { alias: { '@': SRC } },
+        define: I18N_FLAGS,
+        ssr: { noExternal: SSR_BUNDLED },
+      })
+      try {
+        const { renderPrivacyPage } = (await server.ssrLoadModule(PRIVACY_ENTRY)) as PrivacyStatic
+        const source = await renderPrivacyPage({
+          stylesheet: `../${css.fileName}`,
+          darkVars: darkThemeVars(),
+        })
+        this.emitFile({ type: 'asset', fileName: 'privacy/index.html', source })
+      } finally {
+        await server.close()
+      }
     },
     // dev: the same addresses the service worker leaves to the page (NOT_THE_APP_PAGES)
     configureServer(server) {
@@ -105,8 +162,19 @@ function privacyPage(): Plugin {
           res.writeHead(302, { Location: `${path}/` }).end()
           return
         }
-        res.setHeader('Content-Type', 'text/html; charset=utf-8')
-        res.end(render())
+        server
+          .ssrLoadModule(PRIVACY_ENTRY)
+          .then((module) =>
+            (module as PrivacyStatic).renderPrivacyPage({
+              stylesheet: `${server.config.base}src/assets/styles.css`,
+              darkVars: darkThemeVars(),
+            }),
+          )
+          .then((html) => {
+            res.setHeader('Content-Type', 'text/html; charset=utf-8')
+            res.end(html)
+          })
+          .catch(next)
       })
     },
   }
@@ -158,20 +226,20 @@ export default defineConfig(({ mode }) => {
   const isCapacitor = mode === CAPACITOR_MODE
   return {
     base: isCapacitor ? '/' : base,
-    // vue-i18n esm-bundler feature flags: Composition API only, no devtools in production
     define: {
-      __VUE_I18N_FULL_INSTALL__: true,
-      __VUE_I18N_LEGACY_API__: false,
-      __INTLIFY_PROD_DEVTOOLS__: false,
+      ...I18N_FLAGS,
       // true only in the Android app's build (see CAPACITOR_MODE)
       __CAPACITOR_BUILD__: isCapacitor,
     },
+    // the dev server renders the static privacy page on the server side (privacyPage())
+    ssr: { noExternal: SSR_BUNDLED },
     plugins: [
       vue(),
       vueDevTools(),
       tailwindcss(),
-      privacyPage(),
       oldWebViewCss(),
+      // after oldWebViewCss: the page links the final stylesheet
+      privacyPage(),
       ...(isCapacitor ? [] : pwaPlugins()),
     ],
     resolve: {

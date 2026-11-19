@@ -9,7 +9,7 @@ describe('footer', () => {
     const page = await openGamePage()
 
     expect(page.footerLinks()).toEqual([
-      { text: 'Privacy', href: '/privacy/index.html', tall: true },
+      { text: 'Privacy', href: '/privacy-policy', tall: true },
       { text: 'Contact', href: CONTACT, tall: true },
     ])
   })
@@ -28,7 +28,7 @@ describe('footer', () => {
     await page.switchLanguage('uk')
 
     expect(page.footerLinks()?.map(({ text, href }) => ({ text, href }))).toEqual([
-      { text: 'Конфіденційність', href: '/privacy/index.html' },
+      { text: 'Конфіденційність', href: '/privacy-policy' },
       { text: 'Зв’язатися', href: CONTACT },
     ])
   })
