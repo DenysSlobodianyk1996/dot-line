@@ -9,7 +9,7 @@
       :rules="nameRules"
       v-slot="{ field, errorMessage }"
     >
-      <div class="flex min-w-0 flex-1 flex-col gap-2">
+      <div class="flex min-w-0 flex-col gap-2">
         <BaseLabel :for="field.name" required>{{ t('setup.name') }}</BaseLabel>
         <!-- names are at most 15 characters: the field doesn't accept more, and a longer value fails `max` (GS-1) -->
         <BaseInput
