@@ -227,8 +227,8 @@ describe('game screen: button icons (UP-9)', () => {
     expect(page.buttonIcon('New game settings')).toEqual(icon('settings', 'New game settings'))
     expect(page.buttonIcon('Rematch')).toEqual(icon('refresh', 'Rematch'))
     await page.switchLanguage('uk')
-    expect(page.buttonIcon('Налаштування нової гри')).toEqual(
-      icon('settings', 'Налаштування нової гри'),
+    expect(page.buttonIcon('Налаштування гри')).toEqual(
+      icon('settings', 'Налаштування гри'),
     )
     expect(page.buttonIcon('Реванш')).toEqual(icon('refresh', 'Реванш'))
   })
@@ -342,7 +342,7 @@ describe('game screen: result (END-3..6)', () => {
     await page.switchLanguage('uk')
     expect(page.resultButtons()).toEqual([
       { label: 'Реванш', shownInFull: true },
-      { label: 'Налаштування нової гри', shownInFull: true },
+      { label: 'Налаштування гри', shownInFull: true },
     ])
   })
 

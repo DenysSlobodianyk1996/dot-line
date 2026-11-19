@@ -85,7 +85,7 @@ const uk: typeof en = {
     completed: 'Усі квадрати заповнено.',
     stopped: 'Гру зупинено.',
     score: 'Рахунок',
-    newGameSettings: 'Налаштування нової гри',
+    newGameSettings: 'Налаштування гри',
     rematch: 'Реванш',
   },
   rules: {
