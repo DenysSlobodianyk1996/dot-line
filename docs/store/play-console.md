@@ -18,13 +18,13 @@ The facts every answer rests on:
 
 | Field | Answer |
 |---|---|
-| App name | Dots and Boxes: Connected (from [en.md](en.md)) |
+| App name | Dots and Boxes (from [en.md](en.md)) |
 | App or game | Game |
 | Category | **Board** |
 | Tags (pick up to 5) | Board, Puzzle, Strategy, Family, Offline (pick whatever of these Play offers in its tag list; it changes) |
 | Contact email | `<CONTACT_EMAIL — owner fills in>` (required, shown publicly) |
 | Phone | leave empty |
-| Website | https://denysslobodianyk1996.github.io/dots-and-boxes-connected/ (optional) |
+| Website | https://denysslobodianyk1996.github.io/dots-and-boxes/ (optional) |
 | External marketing | leave the default |
 
 ## Main store listing
@@ -42,7 +42,7 @@ The facts every answer rests on:
 **Policy and programs → App content → Privacy policy**
 
 ```text
-https://denysslobodianyk1996.github.io/dots-and-boxes-connected/privacy/
+https://denysslobodianyk1996.github.io/dots-and-boxes/privacy/
 ```
 
 One page in English and Ukrainian (`public/privacy/index.html`). A privacy policy is mandatory once any under-13 age group is ticked, and Play asks for it anyway.
@@ -105,7 +105,7 @@ Follow-up questions:
 | Ads only from Families-certified SDKs, nothing interest-based | The app has no ads at all. |
 | No collection of personal information from children without disclosure and consent; no transmission of identifiers (Advertising ID, Android ID, IMEI, location) | The app collects and sends nothing. Player names stay in on-device storage. No network requests. |
 | Only Families-compliant SDKs | No third-party SDKs that touch user data: Only the Capacitor runtime and its official plugins, which work offline and collect nothing. |
-| Privacy policy linked in the listing and accurate for children | [Privacy policy](https://denysslobodianyk1996.github.io/dots-and-boxes-connected/privacy/), plain language, en and uk: "no data". |
+| Privacy policy linked in the listing and accurate for children | [Privacy policy](https://denysslobodianyk1996.github.io/dots-and-boxes/privacy/), plain language, en and uk: "no data". |
 | No links out of the app, to other apps or purchases without a parental gate | The game UI has no external links. |
 | No in-app purchases (or behind a parental gate) | None. |
 | Permissions kept to what the app needs; no location, contacts, camera, mic | The app requests no dangerous permissions. |

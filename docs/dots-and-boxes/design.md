@@ -1,4 +1,4 @@
-# Dots and Boxes: Connected: design
+# Dots and Boxes: design
 
 Implements [requirements.md](requirements.md). Requirement IDs are shown in brackets.
 
@@ -224,7 +224,7 @@ Skip squares that fall outside `0..N-1`. There are 2·N·(N+1) possible lines in
 ## Components
 
 ```
-src/pages/dots-and-boxes-connected/
+src/pages/dots-and-boxes/
   Page.vue            # setup vs game via <component :is>; gameSetup() calls start() after the setters
   Game.vue            # board + side panel; owns selectedDot and the hint; saves the game in a watchEffect
   useComputerTurn.ts  # plays the computer player's turns (pause, then its line)
@@ -341,7 +341,7 @@ The phone layout is the default, and `sm:` classes (640 px and up) restore the d
   - Closed by default on every screen, and the open state isn't saved [VR-27].
 - **useRulesPanel.ts**: a module-level `isOpen` ref with `open(button)` and `close()`, shared by the info buttons (header and setup title), the panel and `Game.vue`. `open` remembers the button that opened it (passed in, since Safari and touch screens don't focus a clicked button); `isOpenedBy(button)` drives each button's `aria-expanded`, and the panel's `returnFocus(fallback)` focuses that button on close and forgets it [UP-2].
 - **Computer turn** [VR-31, RL-6]: `Game.vue` passes `isStopConfirmOpen || rulesPanel.isOpen` as `useComputerTurn`'s `paused`, so the computer waits while the panel is open, as with the Stop dialog.
-- **index.html** [APP-1]: `<html lang="uk">` with `<title>Крапки й квадрати: ланцюжок</title>`, the default before the app starts. At runtime the title and `lang` follow the language (see Languages). The deploy workflow's `404.html` copy inherits the same defaults.
+- **index.html** [APP-1]: `<html lang="uk">` with `<title>Крапки й квадрати</title>`, the default before the app starts. At runtime the title and `lang` follow the language (see Languages). The deploy workflow's `404.html` copy inherits the same defaults.
 
 ## Languages [I18N-1..6, APP-1]
 
@@ -397,7 +397,7 @@ src/shared/components/LanguageToggle.vue
 - CM-25 (no safe line): the primary criterion, "the fewest squares the person could claim on their next turn", is the most squares any single line of theirs closes after the computer's line. When step 3 is reached no square has three sides (step 1 would have claimed it, and the missing side of a three-sided square is always a legal move), so the only three-sided squares afterwards are the ones the computer's line gave away. Those lie on opposite sides of that line and share no other side, so the person's best reply claims exactly one square for every candidate: the primary criterion always ties. The strategy therefore doesn't compute it; it goes straight to the secondary criterion, fewest squares given a third side, then the random source. The spec `with no safe line left, leaves me the fewest squares to claim on my next turn` pins this property by playing out every reply.
 - `pickRandom` uses `Math.min(n - 1, floor(random() * n))`, so tests can pass a fixed random source.
 
-### Computer turn (`src/pages/dots-and-boxes-connected/useComputerTurn.ts`) [VC-9..13, VC-21]
+### Computer turn (`src/pages/dots-and-boxes/useComputerTurn.ts`) [VC-9..13, VC-21]
 
 - `useComputerTurn(() => game, paused)` returns `{ isThinking, cancel }`.
 - It watches `isComputerTurn && !paused() ? lines.length : null` with `immediate: true`, so a restored game resumes on mount. Every change cancels any pending move; when the value isn't `null`, it sets `isThinking` and schedules the move `COMPUTER_DELAY_MS` (1000 ms) later.
@@ -514,9 +514,9 @@ The two icon buttons are `flex size-11 sm:size-9 items-center justify-center rou
 
 - `vite-plugin-pwa` with `registerType: 'autoUpdate'`: a new service worker installs quietly and takes over the next time the game opens; nothing interrupts a game, and the saved game in localStorage is untouched [VR-48, VR-49].
 - Workbox precaches every built asset (JS, CSS, the Nunito font files, icons, `index.html`, `404.html`) and falls back to `index.html` for navigations, so `/game` works offline after the first visit [VR-47].
-- Manifests: `manifest.uk.webmanifest` (Ukrainian, `name` "Крапки й квадрати: ланцюжок", `short_name` «Крапки й квадрати», linked from `index.html` by the build) and `manifest.en.webmanifest` (`name` "Dots and Boxes: Connected", `short_name` "Dots & Boxes"). Both come from `app.title` and `app.shortName` [UP-15]. Both: `display: standalone`, `orientation: any`, `start_url` and `scope` from Vite's `base` (`/dots-and-boxes-connected/` on Pages), `background_color` and `theme_color` `#fbf5ec`, and the icons above [VR-45, VR-46, VR-50..VR-52].
+- Manifests: `manifest.uk.webmanifest` (Ukrainian, `name` "Крапки й квадрати", `short_name` «Крапки й квадрати», linked from `index.html` by the build) and `manifest.en.webmanifest` (`name` "Dots and Boxes", `short_name` "Dots and Boxes"). Both come from `app.title` and `app.shortName` [UP-15, NG-11]. Both: `display: standalone`, `orientation: any`, `start_url` and `scope` from Vite's `base` (`/dots-and-boxes/` on Pages), `background_color` and `theme_color` `#fbf5ec`, and the icons above [VR-45, VR-46, VR-50..VR-52].
 - `index.html` has `<meta name="theme-color" content="#fbf5ec" media="(prefers-color-scheme: light)">` and `content="#241c17"` for dark [VR-46].
-- `setLocale()` also swaps the `<link rel="manifest">` `href` to the locale's manifest, along with `lang` and the title [VR-50, VR-51]. The English `app.title` is "Dots and Boxes: Connected" [UP-15].
+- `setLocale()` also swaps the `<link rel="manifest">` `href` to the locale's manifest, along with `lang` and the title [VR-50, VR-51]. The English `app.title` is "Dots and Boxes" [UP-15].
 
 ### Message keys
 

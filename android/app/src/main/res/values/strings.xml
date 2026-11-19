@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Dots and Boxes: Connected</string>
-    <string name="title_activity_main">Dots and Boxes: Connected</string>
-    <string name="package_name">app.dotsandboxes.connected</string>
-    <string name="custom_url_scheme">app.dotsandboxes.connected</string>
+    <string name="app_name">Dots and Boxes</string>
+    <string name="title_activity_main">Dots and Boxes</string>
+    <string name="package_name">app.dotsandboxes</string>
+    <string name="custom_url_scheme">app.dotsandboxes</string>
 </resources>

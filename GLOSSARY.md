@@ -100,7 +100,7 @@ _Avoid_: game over screen, result screen, popup
 ## App
 
 **App name**:
-"Dots and Boxes: Connected" (uk «Крапки й квадрати: ланцюжок»). Dots and Boxes is the classic game; "Connected" names this app's house rule that every line after the first starts from an existing one (see Valid start). A product name only: inside the game the term stays Square.
+"Dots and Boxes" (uk «Крапки й квадрати»), the classic game's name; this app adds the house rule that every line after the first starts from an existing one (see Valid start). A product name only: inside the game the term stays Square.
 _Avoid_: Dot-line game, Dots & Lines, Точки й лінії, box (for a square)
 
 **Swatch**:

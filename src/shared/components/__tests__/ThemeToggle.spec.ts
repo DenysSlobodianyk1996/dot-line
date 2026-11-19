@@ -56,14 +56,14 @@ describe('theme', () => {
     const page = new GamePage(await mountGamePage({ deviceLanguage: 'uk-UA' }))
 
     expect(page.themeButtonLabel()).toBe('Світла тема')
-    expect(page.headerTitle()).toBe('Крапки й квадрати: ланцюжок')
+    expect(page.headerTitle()).toBe('Крапки й квадрати')
   })
 })
 
 describe('header', () => {
   it('shows the game name and the theme button on the setup and game screens (VR-18, VR-22)', async () => {
     const page = await openGamePage()
-    expect(page.headerTitle()).toBe('Dots and Boxes: Connected')
+    expect(page.headerTitle()).toBe('Dots and Boxes')
     expect(page.themeButtonLabel()).toBe('Dark theme')
 
     await page.submitSetup({
@@ -75,7 +75,7 @@ describe('header', () => {
     })
 
     expect(page.isSetupShown).toBe(false)
-    expect(page.headerTitle()).toBe('Dots and Boxes: Connected')
+    expect(page.headerTitle()).toBe('Dots and Boxes')
     expect(page.themeButtonLabel()).toBe('Dark theme')
   })
   it('shows the logo before the game name, hidden from screen readers (VR-18, VR-19)', async () => {

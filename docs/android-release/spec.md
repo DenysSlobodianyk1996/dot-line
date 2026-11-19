@@ -1,6 +1,6 @@
 # Android release on Google Play: spec
 
-Terms follow [GLOSSARY.md](../../GLOSSARY.md). User stories carry IDs **AR-n** for commits. Builds on the PWA rules (PWA-1..PWA-6, I18N) in [requirements](../dots-and-boxes-connected/requirements.md). This spec changes the shipped decision "Packaging as a native app (Capacitor, TWA) … out of scope" in the [visual refresh spec](../visual-refresh/spec.md).
+Terms follow [GLOSSARY.md](../../GLOSSARY.md). User stories carry IDs **AR-n** for commits. Builds on the PWA rules (PWA-1..PWA-6, I18N) in [requirements](../dots-and-boxes/requirements.md). This spec changes the shipped decision "Packaging as a native app (Capacitor, TWA) … out of scope" in the [visual refresh spec](../visual-refresh/spec.md).
 
 **Status**: agreed in a grilling session on 2026-11-18, not started. **Blocked by** the [UI polish and rename spec](../ui-polish/spec.md), because the store listing and screenshots need the final name and result card. Issue: see the parent issue "Android release on Google Play".
 

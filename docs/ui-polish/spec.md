@@ -1,6 +1,6 @@
 # UI polish and rename to Dots and Boxes: Connected: spec
 
-Terms follow [GLOSSARY.md](../../GLOSSARY.md). User stories carry IDs **UP-n** for commits. Shipped rules this touches: GS-1..GS-5, END-4..END-6, MB-6, MB-8, MB-9, RL-1, VC-18, VC-19, PWA-1..PWA-6, APP-1 and I18N in [requirements](../dots-and-boxes-connected/requirements.md).
+Terms follow [GLOSSARY.md](../../GLOSSARY.md). User stories carry IDs **UP-n** for commits. Shipped rules this touches: GS-1..GS-5, END-4..END-6, MB-6, MB-8, MB-9, RL-1, VC-18, VC-19, PWA-1..PWA-6, APP-1 and I18N in [requirements](../dots-and-boxes/requirements.md).
 
 **Status**: agreed in a grilling session on 2026-11-18, not started. Issue: see the parent issue "UI polish and rename to Dots and Boxes: Connected". The Android release ([spec](../android-release/spec.md)) waits for this one, because its store screenshots show the new result card and the new name.
 

@@ -362,7 +362,7 @@
       "x": 2660,
       "y": 0,
       "w": 300,
-      "text": "Dot states\n• Small idle dot (dot token): not clickable\n• Coral accent ring: valid start (MV-2, MV-4)\n• Solid dot in the current player's color: selected Dot1\n• Dashed ring in the current player's color: valid Dot2 neighbor (MV-3, MV-5)\n\nBoard shown at N=4, 48 px squares, on the lighter surface. Sample players: Оля (coral) and Богдан (teal) on Ukrainian screens, Ann and Bob on English ones.\n\nHeader on every screen: logo and game name, then theme, info (rules panel) and UA / EN (VR-18, I18N-3). Ukrainian is the default; screen 15 shows English.\nWarm cream light here; dark versions of the main screens are in the D row.\nAll text comes from src/i18n/locales.\nSpec: docs/dots-and-boxes-connected/requirements.md, docs/visual-refresh/spec.md"
+      "text": "Dot states\n• Small idle dot (dot token): not clickable\n• Coral accent ring: valid start (MV-2, MV-4)\n• Solid dot in the current player's color: selected Dot1\n• Dashed ring in the current player's color: valid Dot2 neighbor (MV-3, MV-5)\n\nBoard shown at N=4, 48 px squares, on the lighter surface. Sample players: Оля (coral) and Богдан (teal) on Ukrainian screens, Ann and Bob on English ones.\n\nHeader on every screen: logo and game name, then theme, info (rules panel) and UA / EN (VR-18, I18N-3). Ukrainian is the default; screen 15 shows English.\nWarm cream light here; dark versions of the main screens are in the D row.\nAll text comes from src/i18n/locales.\nSpec: docs/dots-and-boxes/requirements.md, docs/visual-refresh/spec.md"
     },
     {
       "id": "mobile-notes",

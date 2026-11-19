@@ -29,7 +29,7 @@ describe('data saved before the rename (UP-16)', () => {
   it('keeps the language saved under LOCALE and the theme saved under THEME', async () => {
     const page = new GamePage(await mountGamePage({ storage: { LOCALE: 'en', THEME: 'dark' } }))
 
-    expect(page.headerTitle()).toBe('Dots and Boxes: Connected')
+    expect(page.headerTitle()).toBe('Dots and Boxes')
     expect(page.theme()).toBe('dark')
   })
 

@@ -1,4 +1,4 @@
-package app.dotsandboxes.connected;
+package app.dotsandboxes;
 
 import com.getcapacitor.BridgeActivity;
 
