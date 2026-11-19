@@ -10,7 +10,7 @@ export const COMPUTER_DELAY_MS = 1000
  * and then draws the strategy's line through the normal `drawLine` (CM-20).
  *
  * `isThinking` is true while a move is pending: the board is locked then (CM-16), and #16 shows
- * "Thinking…" from it (CM-14). Call `cancel()` on Stop, Rematch and New game settings (CM-17); unmounting
+ * "Thinking…" from it (CM-14). Call `cancel()` on Stop, Rematch and Settings (CM-17); unmounting
  * cancels too. A finished game never schedules a move.
  *
  * While `paused()` is true (the Stop dialog or the rules panel is open) no move is pending; when it

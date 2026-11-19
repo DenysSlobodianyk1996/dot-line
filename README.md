@@ -65,7 +65,7 @@ Vue 3 (`<script setup>` with TypeScript), Vite, Tailwind CSS v4, vee-validate fo
 ```
 src/
   models/                          game state and rules (DotsAndBoxesGame, Dot, Line, Square)
-  pages/dots-and-boxes/  setup screen, game screen, board and rules components
+  pages/dots-and-boxes/            setup screen, game screen, board and rules components
   services/                        localStorage wrapper
   shared/components/               base UI components (button, input, label)
 docs/                              specs, ADRs and agent-skill config (terms in GLOSSARY.md)

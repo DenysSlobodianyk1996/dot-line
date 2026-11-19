@@ -86,12 +86,12 @@ _Avoid_: tie
 A new game with the same players, size, game mode and difficulty, on an empty board.
 
 **Setup**:
-Choosing the game mode, difficulty, players and size before a game starts. It opens with the game mode and difficulty of the last game started.
-_Avoid_: settings screen, config
+Choosing the game mode, difficulty, players and size before a game starts. Its screen is titled "Settings" / «Налаштування». It opens with the game mode and difficulty of the last game started.
+_Avoid_: config
 
-**New game settings**:
-Leaving a finished game for setup, where everything can be chosen again.
-_Avoid_: new game, change settings, config
+**Settings** (result panel button):
+Leaving a finished game for setup, where everything can be chosen again. Labelled "Settings" / «Налаштування» (NG-10).
+_Avoid_: new game, New game settings, change settings, config
 
 **Result card**:
 The hero card at the top of the result panel when a game ends: trophy (or robot), the winner or "Draw", the score as `5 : 3` and the reason (completed or stopped).

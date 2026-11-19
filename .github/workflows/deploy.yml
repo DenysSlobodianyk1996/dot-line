@@ -55,8 +55,8 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # the site is served from https://<owner>.github.io/dots-and-boxes/ (the repo's name)
-          BASE_PATH: /dots-and-boxes/
+          # the site is served from https://<owner>.github.io/<repo name>/ (`/dots-and-boxes/` after the rename)
+          BASE_PATH: /${{ github.event.repository.name }}/
 
       - name: SPA fallback for history-mode routes
         run: cp dist/index.html dist/404.html

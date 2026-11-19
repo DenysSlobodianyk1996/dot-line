@@ -2,7 +2,7 @@
 const en = {
   app: {
     title: 'Dots and Boxes',
-    // install manifest short_name: launchers truncate the full name (UP-15)
+    // header name, the bold name in GameGoal and the install manifest short_name (NG-1, NG-7)
     shortName: 'Dots and Boxes',
   },
   // the language button's label, read in the language it switches to: each locale names the

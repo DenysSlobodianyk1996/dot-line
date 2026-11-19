@@ -301,7 +301,7 @@ All sizes and colors come from the approved canvas.
   - Rematch: `game.start()`.
 - **PlayerScore.vue**: a `text-sm leading-6` row with a 12 px swatch, the full name through `PlayerName` (wrapping, see Player names) and a `tabular-nums` score.
 
-Versus computer changes to these components are described in [Versus computer](#versus-computer-vc-125).
+Versus computer changes to these components are described in [Versus computer](#versus-computer-vc-126).
 
 ## Player names [GS-1, GB-5]
 

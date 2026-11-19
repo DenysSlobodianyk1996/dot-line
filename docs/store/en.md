@@ -2,7 +2,7 @@
 
 Paste each block into Play Console → **Grow users → Store presence → Main store listing** (default language English (United States) – en-US). Counts are Unicode characters, as Play counts them; the limit follows the slash. Terms follow [GLOSSARY.md](../../GLOSSARY.md). Spec: [AR-13](../android-release/spec.md#store-package-ar-13ar-19).
 
-## Title (25 / 30)
+## Title (14 / 30)
 
 ```text
 Dots and Boxes
@@ -14,7 +14,7 @@ Dots and Boxes
 The classic dots and boxes game: draw lines, close squares, beat the computer.
 ```
 
-## Full description (1375 / 4000)
+## Full description (1364 / 4000)
 
 ```text
 Dots and Boxes is the classic pencil-and-paper game, made for a phone or tablet.
@@ -43,7 +43,7 @@ NO ADS. NO DATA.
 No ads, no in-app purchases, no accounts and no tracking. The app collects no data at all: games and settings stay on your device.
 ```
 
-## Release notes (245 / 500)
+## Release notes (234 / 500)
 
 Play Console → the release → **Release notes**, inside `<en-US>` … `</en-US>`.
 

@@ -216,7 +216,7 @@ async function featureGraphic(browser: Browser, lang: Lang) {
     h1{margin:0;font-size:64px;line-height:1.1;font-weight:900}
   </style></head><body>
     <div class="logo">${logoSvg()}</div>
-    <h1>${MESSAGES[lang].app.title.replace(': ', ':<br>')}</h1>
+    <h1>${MESSAGES[lang].app.title}</h1>
   </body></html>`)
   await page.evaluate(() => document.fonts.ready)
   await page.screenshot({ path: `${storeDir}feature-graphic-${lang}.png` })

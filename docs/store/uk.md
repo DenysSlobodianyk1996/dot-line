@@ -2,7 +2,7 @@
 
 Play Console → **Grow users → Store presence → Main store listing** → **Manage translations → Add your own translation text** → Ukrainian – uk. Counts are Unicode characters, as Play counts them; the limit follows the slash. Terms match the app's Ukrainian UI (`src/i18n/locales/uk.ts`) and [GLOSSARY.md](../../GLOSSARY.md): квадрат, лінія, точка, «Проти комп’ютера», «Двоє гравців», «Легко» / «Нормально», «Реванш», «Нічия», «Зупинити», «Як грати». Spec: [AR-13](../android-release/spec.md#store-package-ar-13ar-19).
 
-## Title (27 / 30)
+## Title (17 / 30)
 
 ```text
 Крапки й квадрати
@@ -14,7 +14,7 @@ Play Console → **Grow users → Store presence → Main store listing** → **
 Класична гра в крапки й квадрати: проводьте лінії, займайте квадрати.
 ```
 
-## Full description (1469 / 4000)
+## Full description (1459 / 4000)
 
 ```text
 «Крапки й квадрати» — та сама гра, у яку грали в шкільних зошитах у клітинку, тепер на телефоні чи планшеті.
@@ -43,7 +43,7 @@ Play Console → **Grow users → Store presence → Main store listing** → **
 Жодної реклами, покупок у застосунку, облікових записів чи стеження. Застосунок не збирає жодних даних: ігри й налаштування залишаються на вашому пристрої.
 ```
 
-## Release notes (269 / 500)
+## Release notes (259 / 500)
 
 Play Console → the release → **Release notes**, inside `<uk>` … `</uk>`.
 
