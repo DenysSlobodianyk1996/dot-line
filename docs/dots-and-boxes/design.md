@@ -122,7 +122,13 @@ Spec: [short-name-and-goal/spec.md](../short-name-and-goal/spec.md) (stories NG-
 ### Footer (2026-11-19) [FT-1..FT-4]
 
 - `src/shared/components/AppFooter.vue`, rendered by `Page.vue` after the setup form only while no game is started, so the game screen has none [FT-2]. It is a `<footer>` (`mx-auto mt-6 max-w-130 border-t border-border pt-1`) with a centered `<nav>` of two links, `gap-x-5`, in `text-sm font-bold text-muted underline underline-offset-3`, `hover:text-ink`, `min-h-11 sm:min-h-10` [FT-3]. Same pattern as teach-clock's footer.
-- **Privacy**: `${BASE_URL}privacy/index.html` (`PRIVACY_PAGE` in `src/static/contact.ts`), the same tab. The full file name matters: in the Android app Capacitor serves the app's `index.html` for a bare folder path. The page is bundled and precached, so it opens offline [FT-4]; the device's back button or the browser's back returns to the game.
+- **Privacy**: a `RouterLink` to the in-app privacy screen (`{ name: 'privacy' }`, `/privacy-policy`) [FT-4, PV-2].
+
+### Privacy screen and static page [PV-1..PV-4]
+
+- `PrivacyContent.vue` (`src/shared/components/`, props `locale`, `headingLevel`): a card (`rounded-2xl border border-border bg-surface p-5`) with the title, the game's name, "Updated: <date>" (`formatPrivacyDate`, `src/utils/privacy-date.ts`, in a `<time>`), four sections (`privacy.<key>Title` + `privacy.<key>`), Contact (email `mailto:` and the GitHub issues link) and Developer ("Created by …").
+- `src/pages/privacy/Page.vue` (route `/privacy-policy`, name `privacy`): the content in the interface language and a secondary "Back to the game" button (full width below `sm`, 44 px tall) that goes back in history, or to `/game` on a direct visit [PV-3]. The Android back button on this screen goes to `/game` (`src/native/back-button.ts`).
+- `src/pages/privacy/PrivacyStaticPage.vue`: a language nav (#en, #uk), the English then the Ukrainian content (`h1`, then `h2`), and "Open the game · Відкрити гру" to `../` [PV-4].
 - **Contact**: `mailto:CONTACT_EMAIL?subject=Contact support from Dots and Boxes` (`src/static/contact.ts`; the subject stays in English).
 - Message keys: `footer.privacy`, `footer.contact`.
 

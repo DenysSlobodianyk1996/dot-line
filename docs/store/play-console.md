@@ -45,7 +45,7 @@ The facts every answer rests on:
 https://denysslobodianyk1996.github.io/dots-and-boxes/privacy/
 ```
 
-One page in English and Ukrainian (`src/static/privacy.html`, written to `privacy/index.html` by every build with the build's commit date as "Updated"). A privacy policy is mandatory once any under-13 age group is ticked, and Play asks for it anyway.
+One page in English and Ukrainian (rendered from the app's own privacy screen, `src/shared/components/PrivacyContent.vue`, to `privacy/index.html` by every build, with the build's commit date as "Updated"). A privacy policy is mandatory once any under-13 age group is ticked, and Play asks for it anyway.
 
 ## App access
 

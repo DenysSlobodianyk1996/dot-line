@@ -99,7 +99,10 @@ const SSR_BUNDLED = ['vue-i18n', /^@intlify\//]
 const SRC = fileURLToPath(new URL('./src', import.meta.url))
 const STYLES = `${SRC}/assets/styles.css`
 const PRIVACY_ENTRY = '/src/privacy-static.ts'
-type PrivacyStatic = typeof import('./src/privacy-static')
+// what src/privacy-static.ts exports (declared here: the Node tsconfig has no @/ alias for it)
+type PrivacyStatic = {
+  renderPrivacyPage(options: { stylesheet: string; darkVars: string }): Promise<string>
+}
 
 // the dark theme's custom properties from styles.css, for the static page's media query
 function darkThemeVars(): string {
