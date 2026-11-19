@@ -111,6 +111,7 @@ Acceptance:
 - **MB-7**: Below 640 px wide, the setup form shows Player 1 above Player 2.
 - **MB-8**: Below 640 px wide, buttons on the game screen are at least 44 px tall.
 - **MB-9**: On every screen width, the setup form and the game screen (the board with its panel, in progress or finished, side by side or stacked) are centered horizontally below the header, which keeps its full width. They stay top-aligned: nothing is centered vertically, so validation messages, the mode switch or the result replacing the status never move the content up or down.
+- **MB-10**: When the player cards sit side by side, a validation message in one card never moves the fields of the other card. Each card's fields stay top-aligned, and the cards keep the same height.
 
 Acceptance:
 - Given a 390 px wide phone and N=4, then squares are 48 px and the board is centered above the panel.
