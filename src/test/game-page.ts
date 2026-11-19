@@ -219,6 +219,19 @@ export class GamePage {
     return theme === 'light' || theme === 'dark' ? theme : null
   }
 
+  // ---- footer ----
+
+  // the setup screen's footer links, in order, or null when there is no footer (FT-1, FT-2)
+  footerLinks() {
+    const footer = this.wrapper.find('footer[data-app-footer]')
+    if (!footer.exists()) return null
+    return footer.findAll('a').map((link) => ({
+      text: link.text(),
+      href: link.attributes('href'),
+      tall: link.classes().includes('min-h-11'),
+    }))
+  }
+
   // ---- document ----
 
   private get languageButton() {

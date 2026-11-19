@@ -10,7 +10,7 @@ The facts every answer rests on:
 
 - The app is a local game. It has no network code, no accounts, no analytics, no crash reporting, no ads and no in-app purchases (spec: Out of Scope).
 - Player names, colors, the current game, game mode, difficulty, theme and language are saved only in the app's own storage on the device. Nothing leaves the device. Play's Data safety rules say data that stays on the device isn't "collected".
-- The game UI contains no links to websites or other apps. The privacy policy is linked only from the store listing.
+- The game UI has one footer on the setup screen (FT-1): Privacy opens the privacy policy page bundled with the app (no website), and Contact is a `mailto:` link that opens the device's email app with the developer's address. There are no other links to websites or other apps.
 
 ## App details (Store settings)
 
@@ -106,7 +106,7 @@ Follow-up questions:
 | No collection of personal information from children without disclosure and consent; no transmission of identifiers (Advertising ID, Android ID, IMEI, location) | The app collects and sends nothing. Player names stay in on-device storage. No network requests. |
 | Only Families-compliant SDKs | No third-party SDKs that touch user data: Only the Capacitor runtime and its official plugins, which work offline and collect nothing. |
 | Privacy policy linked in the listing and accurate for children | [Privacy policy](https://denysslobodianyk1996.github.io/dots-and-boxes/privacy/), plain language, en and uk: "no data". |
-| No links out of the app, to other apps or purchases without a parental gate | The game UI has no external links. |
+| No links out of the app, to other apps or purchases without a parental gate | No web links. The setup screen's Contact is a `mailto:` link to the developer that opens the email app, with no parental gate, as in teach-clock. Privacy opens a page inside the app. |
 | No in-app purchases (or behind a parental gate) | None. |
 | Permissions kept to what the app needs; no location, contacts, camera, mic | The app requests no dangerous permissions. |
 | Data safety form filled accurately | See below: no data collected or shared. |
