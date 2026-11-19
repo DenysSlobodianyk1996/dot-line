@@ -2,64 +2,93 @@ import { describe, expect, it } from 'vitest'
 import { mountGamePage } from '@/test/mount-game-page'
 import { GamePage, openGamePage } from '@/test/game-page'
 
-describe('language toggle', () => {
-  it('starts in Ukrainian with UA pressed on a Ukrainian device (I18N-2, I18N-5, UP-15, AR-6)', async () => {
-    const page = await mountGamePage({ deviceLanguage: 'uk-UA' })
+async function openOn(deviceLanguage: string, storage: Record<string, string> = {}) {
+  return new GamePage(await mountGamePage({ deviceLanguage, storage }))
+}
 
-    expect(page.get('button[lang="uk"]').attributes('aria-pressed')).toBe('true')
-    expect(page.get('button[lang="en"]').attributes('aria-pressed')).toBe('false')
-    expect(page.get('button[lang="en"]').attributes('aria-label')).toBe('English')
+describe('language button', () => {
+  it('shows UA and offers English, in English, on a Ukrainian device (I18N-2, I18N-3, I18N-5, NG-3, NG-4)', async () => {
+    const page = await openOn('uk-UA')
+
+    expect(page.languageButtonState()).toEqual({
+      text: 'UA',
+      label: 'Switch to English',
+      labelLang: 'en',
+    })
     expect(document.title).toBe('Крапки й квадрати')
   })
 
-  it('switches the text, page language and tab title when EN is pressed (I18N-3, APP-1, UP-15)', async () => {
-    const page = await mountGamePage({ deviceLanguage: 'uk-UA' })
+  it('switches the text, page language, tab title and manifest with one tap (I18N-3, APP-1, UP-15, NG-3)', async () => {
+    const page = await openOn('uk-UA')
 
-    await page.get('button[lang="en"]').trigger('click')
+    await page.clickLanguageButton()
 
     expect(page.text()).toContain('Game Setup')
-    expect(page.get('button[type="submit"]').text()).toBe('Save')
-    expect(page.get('button[lang="en"]').attributes('aria-pressed')).toBe('true')
     expect(document.documentElement.lang).toBe('en')
     expect(document.title).toBe('Dots and Boxes')
+    expect(page.manifestHref()).toBe('/manifest.en.webmanifest')
+    expect(page.languageButtonState()).toEqual({
+      text: 'EN',
+      label: 'Перейти на українську',
+      labelLang: 'uk',
+    })
+  })
+
+  it('switches back with a second tap (I18N-3, NG-3)', async () => {
+    const page = await openOn('uk-UA')
+
+    await page.clickLanguageButton()
+    await page.clickLanguageButton()
+
+    expect(document.documentElement.lang).toBe('uk')
+    expect(page.languageButtonState().text).toBe('UA')
   })
 
   it('keeps the chosen language after a reload (I18N-4)', async () => {
-    const page = await mountGamePage({ deviceLanguage: 'uk-UA' })
-    await page.get('button[lang="en"]').trigger('click')
-    page.unmount()
+    const page = await openOn('uk-UA')
+    await page.clickLanguageButton()
+    page.wrapper.unmount()
 
-    const reloaded = await mountGamePage({ deviceLanguage: 'uk-UA' })
+    const reloaded = await openOn('uk-UA')
 
     expect(reloaded.text()).toContain('Game Setup')
     expect(document.documentElement.lang).toBe('en')
+    expect(reloaded.languageButtonState().text).toBe('EN')
+  })
+
+  it('shows the short name in the header in both languages (HD-2, NG-1)', async () => {
+    const page = await openOn('uk-UA')
+    expect(page.headerTitle()).toBe('Крапки й квадрати')
+
+    await page.clickLanguageButton()
+    expect(page.headerTitle()).toBe('Dots and Boxes')
   })
 })
 
 describe('first launch follows the device language', () => {
   it('picks Ukrainian on a uk-UA device (I18N-2, AR-6)', async () => {
-    const page = await mountGamePage({ deviceLanguage: 'uk-UA' })
+    const page = await openOn('uk-UA')
 
-    expect(page.get('button[lang="uk"]').attributes('aria-pressed')).toBe('true')
+    expect(page.languageButtonState().text).toBe('UA')
     expect(document.documentElement.lang).toBe('uk')
     expect(document.title).toBe('Крапки й квадрати')
-    expect(new GamePage(page).manifestHref()).toBe('/manifest.uk.webmanifest')
+    expect(page.manifestHref()).toBe('/manifest.uk.webmanifest')
   })
 
   it.each(['en-US', 'de-DE'])('picks English on a %s device (I18N-2, AR-6)', async (language) => {
-    const page = await mountGamePage({ deviceLanguage: language })
+    const page = await openOn(language)
 
     expect(page.text()).toContain('Game Setup')
-    expect(page.get('button[lang="en"]').attributes('aria-pressed')).toBe('true')
+    expect(page.languageButtonState().text).toBe('EN')
     expect(document.documentElement.lang).toBe('en')
     expect(document.title).toBe('Dots and Boxes')
-    expect(new GamePage(page).manifestHref()).toBe('/manifest.en.webmanifest')
+    expect(page.manifestHref()).toBe('/manifest.en.webmanifest')
   })
 
   it('keeps a saved language over the device language (I18N-4, AR-7)', async () => {
-    const page = await mountGamePage({ deviceLanguage: 'en-US', storage: { LOCALE: 'uk' } })
+    const page = await openOn('en-US', { LOCALE: 'uk' })
 
-    expect(page.get('button[lang="uk"]').attributes('aria-pressed')).toBe('true')
+    expect(page.languageButtonState().text).toBe('UA')
     expect(document.documentElement.lang).toBe('uk')
     expect(document.title).toBe('Крапки й квадрати')
   })
@@ -67,7 +96,7 @@ describe('first launch follows the device language', () => {
 
 describe('install manifest', () => {
   it('links the Ukrainian manifest on the first visit from a Ukrainian device (VR-50)', async () => {
-    const page = new GamePage(await mountGamePage({ deviceLanguage: 'uk-UA' }))
+    const page = await openOn('uk-UA')
 
     expect(page.manifestHref()).toBe('/manifest.uk.webmanifest')
   })

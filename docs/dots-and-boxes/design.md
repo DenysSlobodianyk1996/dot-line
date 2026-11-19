@@ -54,7 +54,7 @@ Mobile page (second row, 390 px):
 
 Visual rules used on these screens:
 
-- **Mode and difficulty switches**: a labelled `role="radiogroup"` styled like the language toggle (`rounded-md border border-border bg-surface p-0.5 shadow-sm`), stretched to full width with equal-width options. The selected option is `bg-accent text-on-accent`. Options are `min-h-8` from `sm` up and `min-h-11` on phones. Difficulty sits right under the mode switch and is shown only in Versus computer mode [CM-6].
+- **Mode and difficulty switches**: a labelled `role="radiogroup"` (`rounded-md border border-border bg-surface p-0.5 shadow-sm`), stretched to full width with equal-width options. The selected option is `bg-accent text-on-accent`. Options are `min-h-8` from `sm` up and `min-h-11` on phones. Difficulty sits right under the mode switch and is shown only in Versus computer mode [CM-6].
 - **Hint under a control**: one line of muted text (`text-sm text-muted`) right below the control it explains, tied to it with `aria-describedby`. The difficulty switch has one describing only the selected difficulty [VC-26], and the size input has "From 2 to 10" above its validation error [GS-2]; `BaseHint.vue` draws both.
 - **Robot icon**: Material Symbols `smart_toy` (outlined, `viewBox="0 -960 960 960"`) as inline SVG with `fill: currentColor` and `aria-hidden="true"`. It is 20 px in Turn, 16 px in score rows, 24 px in the result heading and 18 px in the setup Opponent field. It always sits between the color swatch and the written name, which stays the accessible text [CM-13, CM-37].
 - **Thinking**: `text-sm text-muted animate-pulse` in an `aria-live="polite"` element under the name in Turn (as on mobile artboard 24, on both layouts). The hint is hidden while the computer's move is pending.
@@ -244,7 +244,7 @@ src/shared/
   components/AppLogo.vue              # the logo SVG (dot color, optional animation)
   components/BaseSegmentedControl.vue # labelled radiogroup switch (game mode, difficulty), optional hint
   components/BaseHint.vue             # muted hint text under a control (aria-describedby target)
-  components/LanguageToggle.vue       # UA / EN buttons in the header
+  components/LanguageToggle.vue       # one UA / EN button in the header
   components/PlayerName.vue           # displayed name, with the robot for the computer player
   components/RobotIcon.vue            # inline-SVG smart_toy icon
   composables/useDisplayName.ts       # stored name → displayed name
@@ -363,10 +363,9 @@ src/shared/components/LanguageToggle.vue
   - `configure({ generateMessage })` from vee-validate: the `differentFromAll` rule gets `validation.differentNames`, `notComputerName` gets `validation.computerName`, `max` gets `validation.maxLength` with `{ field, length }`, and every other rule gets `validation.invalid` with `{ field }`. `field` is the `<Field>`'s translated `label` [GS-1, I18N-1]. The custom rule returns `false`, not a hard-coded string. Messages are generated when validation runs, so a message already on screen updates on the next validation [I18N-6].
 - **Message keys**: `rules.step1`–`step5` for the rules, `rules.storyboard.title` and `frame1`–`frame4` for the storyboard, `game.hintFirstLine` / `hintSelected` / `hintStart` for hints, `game.dotLabel` with `{row}`/`{col}`, `result.wins` with `{name}`, `players.computer` for the computer player's name, `setup.player` / `setup.playerName` with `{number}`. Player names are passed in as parameters and never translated.
 - **Components** call `const { t } = useI18n()`. `PlayerField` takes `number` (1 or 2) instead of a `label` string.
-- **LanguageToggle.vue** [I18N-3, I18N-5]:
-  - A `role="group"` element labelled `t('language.label')`: `inline-flex rounded-md border border-border bg-surface p-0.5 shadow-sm`.
-  - One button per locale, showing "UA" / "EN" with `aria-label` set to the language's own name ("Українська" / "English"), `lang` set to the locale, and `aria-pressed`.
-  - Pressed style `bg-accent text-on-accent`; otherwise `text-ink-soft hover:bg-surface-muted`. Size `min-h-11 min-w-11 px-3 text-sm font-medium`, with `sm:min-h-8 sm:min-w-0` from 640 px up.
+- **LanguageToggle.vue** [I18N-3, I18N-5, NG-3, NG-4]:
+  - One `BaseIconButton` (`data-language-toggle`) showing "UA" / "EN" for the current locale in a `text-sm font-bold` span with `lang` set to that locale (`aria-hidden`, since the label speaks for it).
+  - A click calls `setLocale()` with the other locale. The button's `aria-label` is `language.switchTo` read in the **target** locale ("Switch to English" / «Перейти на українську»), and the button's `lang` is the target locale. No `aria-pressed`, no group; two locales only.
 - **App.vue**: the header, above `RouterView`, so it's on every screen; see [Header](#header-vr-13-vr-16-vr-18vr-23). It replaces the old `<header class="mb-2 flex justify-end">` that held only `LanguageToggle`.
 - **vite.config.ts**: `define` sets the vue-i18n esm-bundler flags: `__VUE_I18N_FULL_INSTALL__: true`, `__VUE_I18N_LEGACY_API__: false`, `__INTLIFY_PROD_DEVTOOLS__: false`.
 - **StorageService.setItem** accepts a `string` as well as an `object`, and strings are stored as they are.

@@ -155,17 +155,17 @@ Acceptance:
 
 ## HD: Header and logo
 
-- **HD-1**: Every screen has a header: the logo and the game's name on the left; the theme button (TH-5), the info button (RL-2) and the language toggle (I18N-3) on the right (VR-18, VR-23).
+- **HD-1**: Every screen has a header: the logo and the game's name on the left; the theme button (TH-5), the info button (RL-2) and the language button (I18N-3) on the right (VR-18, VR-23).
 - **HD-2**: The game's name follows the language: "Крапки й квадрати" in Ukrainian and "Dots and Boxes" in English, in the header and the browser tab (APP-1) (VR-22, UP-15, NG-11).
 - **HD-3**: The logo shows the game in one picture: four dots in a square, a coral line on top, a teal line on the left and a dashed sunflower line on the right "waiting" to close the square, with a soft halo on the dot it starts from. Its dots take the text color (cocoa in light, cream in dark). It is decorative; the game's name is the accessible text (VR-18).
 - **HD-4**: In the header, the dashed line moves gently. When the device asks for reduced motion, it stays still (VR-19, VR-20).
-- **HD-5**: Below 640 px wide, the theme and info buttons are at least 44×44 px (the language toggle follows I18N-5) (VR-21).
+- **HD-5**: The theme, info and language buttons are round and never shrink: below 640 px wide each is a 44×44 px circle, whatever the length of the game's name (VR-21, NG-2).
 - **HD-6**: The favicon is the logo on a transparent background, with cocoa dots on light tab bars and cream dots on dark ones; browsers without SVG favicons get an `.ico` version (VR-40, VR-41).
 
 Acceptance:
-- Given any screen, then the header shows the logo, the game's name, the theme button, the info button and the UA / EN toggle.
+- Given any screen, then the header shows the logo, the game's name, the theme button, the info button and the language button (UA or EN).
 - Given the language is English, then the header and the browser tab read "Dots and Boxes".
-- Given a 390 px wide phone, then the theme and info buttons are at least 44×44 px.
+- Given a 390 px wide phone, then the theme, info and language buttons are 44×44 px circles.
 
 ## APP: App
 
@@ -193,9 +193,9 @@ Acceptance (checked on a build with `BASE_PATH=/dots-and-boxes/` and by hand, no
 
 - **I18N-1**: Every text the UI shows is available in Ukrainian and English: labels, buttons, hints, the Stop dialog, the result panel, the rules, validation messages, dot `aria-label`s, the browser tab title, the header buttons and the swatch names, plus the Versus computer texts (VC-24). Player names are shown exactly as typed; only the computer player's name is translated (VC-8).
 - **I18N-2**: On the first visit (no saved language) the language follows the device: Ukrainian when the device language is Ukrainian (`navigator.language` starts with `uk`), English otherwise (AR-6). A saved language always wins (I18N-4, AR-7).
-- **I18N-3**: A language toggle ("UA" / "EN") sits in the header of every screen (HD-1, VR-18). Switching changes all text at once, along with the page's `lang` attribute, the tab title and the linked install manifest (PWA-6).
+- **I18N-3**: One round language button sits in the header of every screen (HD-1, VR-18). It shows the current language ("UA" or "EN"), and a single tap switches to the other one, changing all text at once, along with the page's `lang` attribute, the tab title and the linked install manifest (PWA-6) (NG-3).
 - **I18N-4**: The chosen language is saved in localStorage and restored on reload.
-- **I18N-5**: The toggle is a labelled button group. Each button has `aria-pressed` and the full language name for assistive technology, and below 640 px wide each button is at least 44×44 px.
+- **I18N-5**: Assistive technology hears the language button as the switch, in the target language's own words and marked with that language: "Switch to English" when Ukrainian is on, «Перейти на українську» when English is on. Below 640 px wide it is 44×44 px (HD-5) (NG-4).
 - **I18N-6**: A validation message that's already on screen switches language the next time its field is validated.
 
 Acceptance criteria elsewhere in this document quote the English text; the Ukrainian UI shows the matching translations from `src/i18n/locales/uk.ts`.
