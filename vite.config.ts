@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig, type Plugin } from 'vite'
@@ -11,6 +12,7 @@ import { OLDEST_CHROME } from './src/static/oldest-chrome'
 import { NOT_THE_APP_PAGES } from './src/static/service-worker'
 import en from './src/i18n/locales/en'
 import uk from './src/i18n/locales/uk'
+import { fillPrivacyPage, privacyUpdated } from './scripts/privacy-updated'
 
 // The Android app's build (`vite build --mode capacitor`): Capacitor serves the bundled files from
 // the root and they ship inside the app, so there is no service worker and no install manifest
@@ -77,6 +79,39 @@ function extraPwaFiles(): Plugin {
   }
 }
 
+// The privacy policy (AR-15) lives outside public/ so every build can stamp its "Updated" date:
+// the built commit's date, or VITE_PRIVACY_UPDATED when set (scripts/privacy-updated.ts). Both
+// the Pages build (where Workbox precaches it) and the Android build get privacy/index.html.
+const PRIVACY_SOURCE = fileURLToPath(new URL('./src/static/privacy.html', import.meta.url))
+
+function privacyPage(): Plugin {
+  const render = () =>
+    fillPrivacyPage(
+      readFileSync(PRIVACY_SOURCE, 'utf8'),
+      privacyUpdated({ given: process.env.VITE_PRIVACY_UPDATED }),
+    )
+  return {
+    name: 'dots-and-boxes:privacy-page',
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'privacy/index.html', source: render() })
+    },
+    // dev: the same addresses the service worker leaves to the page (NOT_THE_APP_PAGES)
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const url = req.url ?? ''
+        if (!NOT_THE_APP_PAGES.some((page) => page.test(url))) return next()
+        const path = url.split('?')[0] ?? ''
+        if (path.endsWith('/privacy')) {
+          res.writeHead(302, { Location: `${path}/` }).end()
+          return
+        }
+        res.setHeader('Content-Type', 'text/html; charset=utf-8')
+        res.end(render())
+      })
+    },
+  }
+}
+
 // An old system WebView, such as a never-updated Samsung S8's (AR-21). Tailwind v4 puts its CSS in
 // @layer (Chrome 99), which an older browser drops whole, leaving the app unstyled; and its
 // var(--x,) empty fallbacks void the ring before Chrome ~105. This runs on the final, minified CSS
@@ -135,6 +170,7 @@ export default defineConfig(({ mode }) => {
       vue(),
       vueDevTools(),
       tailwindcss(),
+      privacyPage(),
       oldWebViewCss(),
       ...(isCapacitor ? [] : pwaPlugins()),
     ],
