@@ -1,8 +1,8 @@
 # Short name, game goal and a lighter header: spec
 
-Terms follow [GLOSSARY.md](../../GLOSSARY.md). User stories carry IDs **NG-n** for commits. Shipped rules this touches: HD-1, HD-2, HD-5, APP-1, PWA-6, RL-1..RL-4, I18N-3, I18N-5, END-5, END-9, MB-6, UP-1, UP-2, UP-15, UP-17 and AR-* app id mentions in [requirements](../dots-and-boxes-connected/requirements.md).
+Terms follow [GLOSSARY.md](../../GLOSSARY.md). User stories carry IDs **NG-n** for commits. Shipped rules this touches: HD-1, HD-2, HD-5, APP-1, PWA-6, RL-1..RL-4, I18N-3, I18N-5, END-5, END-9, MB-6, UP-1, UP-2, UP-15, UP-17 and AR-* app id mentions in [requirements](../dots-and-boxes/requirements.md).
 
-**Status**: agreed in a grilling session on 2026-11-19, not started. Issue #67. Branch `feat/short-name-and-goal`.
+**Status**: agreed in a grilling session on 2026-11-19, shipped (#68–#71); NG-n folded into [requirements](../dots-and-boxes/requirements.md). Issue #67. Branch `feat/short-name-and-goal`.
 
 ## Problem Statement
 
@@ -74,7 +74,7 @@ The setup screen also repeats the header's info button next to its title, and it
 ### Rename (NG-11..NG-13)
 
 - **Web**: `index.html` title and meta, `vite.config.ts` manifest names via the locale files, `package.json`/`package-lock.json` name `dots-and-boxes`.
-- **Pages**: the repo is renamed `dots-and-boxes` by the owner in GitHub settings; `deploy.yml` builds with `BASE_PATH=/dots-and-boxes/`. No redirect from the old URL: nobody uses the app yet. localStorage is per origin (`*.github.io`), so saved data survives (NG-12).
+- **Pages**: the repo is renamed `dots-and-boxes` by the owner in GitHub settings; `deploy.yml` builds with the repo name, `/dots-and-boxes/` after the rename. No redirect from the old URL: nobody uses the app yet. localStorage is per origin (`*.github.io`), so saved data survives (NG-12).
 - **Android**: app id `app.dotsandboxes` (debug `app.dotsandboxes.debug`) in `capacitor.config.ts`, `android/app/build.gradle` (`namespace`, `applicationId`), `strings.xml` (`package_name`, `custom_url_scheme`) and the `MainActivity` package, moved from `java/app/dotsandboxes/connected/` to `java/app/dotsandboxes/`. `app_name` and `title_activity_main` become "Dots and Boxes"; a new `values-uk/strings.xml` sets «Крапки й квадрати». `capacitor.config.ts` `appName` "Dots and Boxes".
 - **Play**: `docs/store/*.md` titles and texts drop "Connected" / «ланцюжок», and the checklist notes the new app id. No Play Console work in this spec.
 - **Code and docs**: `src/pages/dots-and-boxes-connected/` → `src/pages/dots-and-boxes/`, `docs/dots-and-boxes-connected/` → `docs/dots-and-boxes/`, plus every link to them, `GLOSSARY.md`'s title, `CLAUDE.md`, `README.md`, `docs/README.md`. Older shipped specs keep their history but their links are fixed. Do this as one rename-only commit, separate from behaviour changes.

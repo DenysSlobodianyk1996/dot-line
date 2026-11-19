@@ -1,14 +1,14 @@
 // Source of message keys; uk.ts must have exactly the same shape (I18N-1)
 const en = {
   app: {
-    title: 'Dots and Boxes: Connected',
-    // install manifest short_name: launchers truncate the full name (UP-15)
-    shortName: 'Dots & Boxes',
+    title: 'Dots and Boxes',
+    // header name, the bold name in GameGoal and the install manifest short_name (NG-1, NG-7)
+    shortName: 'Dots and Boxes',
   },
+  // the language button's label, read in the language it switches to: each locale names the
+  // switch to itself (NG-4)
   language: {
-    label: 'Language',
-    uk: 'Українська',
-    en: 'English',
+    switchTo: 'Switch to English',
   },
   // the theme button names the theme it switches to (VR-16)
   theme: {
@@ -16,7 +16,7 @@ const en = {
     dark: 'Dark theme',
   },
   setup: {
-    title: 'Game Setup',
+    title: 'Settings',
     player: 'Player {number}',
     playerName: 'Player {number} name',
     name: 'Name',
@@ -87,13 +87,16 @@ const en = {
     completed: 'All squares are filled.',
     stopped: 'The game was stopped.',
     score: 'Score',
-    newGameSettings: 'New game settings',
+    settings: 'Settings',
     rematch: 'Rematch',
   },
   rules: {
     title: 'How to play',
     open: 'Rules',
     close: 'Close rules',
+    // the game's goal, first on setup and in the rules panel; {name} is the bold game name (NG-5, NG-7)
+    goal: '{name} — whoever owns more squares when the board is full wins.',
+    howToPlay: 'How to play →',
     step1: 'Take turns drawing a line between two neighboring dots: left, right, up or down.',
     step2: 'The first line can go anywhere. After that, start from a dot that already has a line.',
     step3: 'Draw the fourth side of a square to claim it. One line can claim two squares.',

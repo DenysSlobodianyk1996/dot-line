@@ -3,20 +3,18 @@ import type en from './en'
 // Typed as the English messages, so a missing or extra key fails type-check (I18N-1)
 const uk: typeof en = {
   app: {
-    title: 'Крапки й квадрати: ланцюжок',
+    title: 'Крапки й квадрати',
     shortName: 'Крапки й квадрати',
   },
   language: {
-    label: 'Мова',
-    uk: 'Українська',
-    en: 'English',
+    switchTo: 'Перейти на українську',
   },
   theme: {
     light: 'Світла тема',
     dark: 'Темна тема',
   },
   setup: {
-    title: 'Налаштування гри',
+    title: 'Налаштування',
     player: 'Гравець {number}',
     playerName: 'Ім’я гравця {number}',
     name: 'Ім’я',
@@ -85,13 +83,16 @@ const uk: typeof en = {
     completed: 'Усі квадрати заповнено.',
     stopped: 'Гру зупинено.',
     score: 'Рахунок',
-    newGameSettings: 'Налаштування гри',
+    settings: 'Налаштування',
     rematch: 'Реванш',
   },
   rules: {
     title: 'Як грати',
     open: 'Правила',
     close: 'Закрити правила',
+    // the game's goal, first on setup and in the rules panel; {name} is the bold game name (NG-5, NG-7)
+    goal: '{name} — перемагає той, у кого більше квадратів, коли поле заповниться.',
+    howToPlay: 'Як грати →',
     step1:
       'Гравці по черзі проводять лінію між двома сусідніми точками: ліворуч, праворуч, угору або вниз.',
     step2: 'Першу лінію можна провести будь-де. Далі починайте з точки, до якої вже веде лінія.',

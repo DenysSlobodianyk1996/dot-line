@@ -1,6 +1,6 @@
-# Dots and Boxes: Connected
+# Dots and Boxes
 
-«Крапки й квадрати: ланцюжок». The classic two-player Dots and Boxes game in the browser, with one house rule: every line after the first starts from an existing one. Players take turns connecting neighboring dots on an N×N board. Whoever closes a square owns it, and whoever owns more squares wins.
+«Крапки й квадрати». The classic two-player Dots and Boxes game in the browser, with one house rule: every line after the first starts from an existing one. Players take turns connecting neighboring dots on an N×N board. Whoever closes a square owns it, and whoever owns more squares wins.
 
 ## How to play
 
@@ -41,20 +41,20 @@ Recommended editor: [VS Code](https://code.visualstudio.com/) with the [Vue (Off
 
 ## Deployment
 
-Every push to `master` runs the tests, builds the app and publishes it to GitHub Pages through [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). You can also run the workflow manually from the Actions tab. The site is served at https://denysslobodianyk1996.github.io/dots-and-boxes-connected/.
+Every push to `master` runs the tests, builds the app and publishes it to GitHub Pages through [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). You can also run the workflow manually from the Actions tab. The site is served at https://denysslobodianyk1996.github.io/dots-and-boxes/.
 
-- The workflow builds with `BASE_PATH=/<repo name>/` (`/dots-and-boxes-connected/`), which `vite.config.ts` uses as Vite's `base`. Local development keeps `/`.
-- It copies `index.html` to `404.html`, so reloading a route such as `/dots-and-boxes-connected/game` still loads the app.
+- The workflow builds with `BASE_PATH=/<repo name>/` (`/dots-and-boxes/`), which `vite.config.ts` uses as Vite's `base`. Local development keeps `/`.
+- It copies `index.html` to `404.html`, so reloading a route such as `/dots-and-boxes/game` still loads the app.
 - One-time setup: in the repository's **Settings → Pages**, set the source to **GitHub Actions**. GitHub Pages requires a public repository unless the account is on a paid plan.
 
 To check a Pages build locally:
 
 ```sh
-BASE_PATH=/dots-and-boxes-connected/ npm run build
+BASE_PATH=/dots-and-boxes/ npm run build
 npm run preview
 ```
 
-Then open http://localhost:4173/dots-and-boxes-connected/.
+Then open http://localhost:4173/dots-and-boxes/.
 
 ## Tech stack
 
@@ -65,7 +65,7 @@ Vue 3 (`<script setup>` with TypeScript), Vite, Tailwind CSS v4, vee-validate fo
 ```
 src/
   models/                          game state and rules (DotsAndBoxesGame, Dot, Line, Square)
-  pages/dots-and-boxes-connected/  setup screen, game screen, board and rules components
+  pages/dots-and-boxes/            setup screen, game screen, board and rules components
   services/                        localStorage wrapper
   shared/components/               base UI components (button, input, label)
 docs/                              specs, ADRs and agent-skill config (terms in GLOSSARY.md)

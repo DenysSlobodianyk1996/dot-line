@@ -55,7 +55,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # the site is served from https://<owner>.github.io/<repo>/
+          # the site is served from https://<owner>.github.io/<repo name>/ (`/dots-and-boxes/` after the rename)
           BASE_PATH: /${{ github.event.repository.name }}/
 
       - name: SPA fallback for history-mode routes

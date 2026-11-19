@@ -32,9 +32,9 @@ Rules:
 
 | Feature | Status | Docs |
 | --- | --- | --- |
-| Dots and Boxes: Connected (gameplay, mobile, rules, languages) | Shipped | [requirements](dots-and-boxes-connected/requirements.md) · [design](dots-and-boxes-connected/design.md) |
-| Visual refresh and installable app (PWA) | Shipped (#33, device QA #31 passed) | [spec](visual-refresh/spec.md) · [requirements TH, HD, PWA, RL](dots-and-boxes-connected/requirements.md#th-look-and-theme) · [design](dots-and-boxes-connected/design.md#visual-refresh-vr-152) |
-| Versus computer game mode | Shipped (#21, browser QA #19 passed) | [spec](computer-opponent/spec.md) · [requirements VC](dots-and-boxes-connected/requirements.md#vc-versus-computer) · [design](dots-and-boxes-connected/design.md#versus-computer-vc-125) |
+| Dots and Boxes (gameplay, mobile, rules, languages) | Shipped | [requirements](dots-and-boxes/requirements.md) · [design](dots-and-boxes/design.md) |
+| Visual refresh and installable app (PWA) | Shipped (#33, device QA #31 passed) | [spec](visual-refresh/spec.md) · [requirements TH, HD, PWA, RL](dots-and-boxes/requirements.md#th-look-and-theme) · [design](dots-and-boxes/design.md#visual-refresh-vr-152) |
+| Versus computer game mode | Shipped (#21, browser QA #19 passed) | [spec](computer-opponent/spec.md) · [requirements VC](dots-and-boxes/requirements.md#vc-versus-computer) · [design](dots-and-boxes/design.md#versus-computer-vc-126) |
 | UI polish and rename to Dots and Boxes: Connected | Spec agreed | [spec](ui-polish/spec.md) |
 | Android release on Google Play | Spec agreed (blocked by UI polish) | [spec](android-release/spec.md) |
-| Short name, game goal and a lighter header | Spec agreed | [spec](short-name-and-goal/spec.md) |
+| Short name, game goal and a lighter header | Shipped (#67) | [spec](short-name-and-goal/spec.md) · [requirements HD, RL, I18N](dots-and-boxes/requirements.md) · [design](dots-and-boxes/design.md#short-name-goal-and-lighter-header-2026-11-19-67) |

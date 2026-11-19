@@ -221,9 +221,31 @@ export class GamePage {
 
   // ---- document ----
 
-  async switchLanguage(locale: 'uk' | 'en') {
-    await this.header.get(`button[lang="${locale}"]`).trigger('click')
+  private get languageButton() {
+    return this.header.get('button[data-language-toggle]')
+  }
+
+  // the header's one language button (I18N-3, I18N-5): what it shows (the current language),
+  // what it tells assistive technology (the switch, in the target language's own words) and
+  // the language that label is marked with
+  languageButtonState() {
+    const button = this.languageButton
+    return {
+      text: button.text(),
+      label: button.attributes('aria-label'),
+      labelLang: button.attributes('lang'),
+    }
+  }
+
+  // one tap on the language button: switches to the other language
+  async clickLanguageButton() {
+    await this.languageButton.trigger('click')
     await flushPromises()
+  }
+
+  // ends in the given language, tapping the language button only if it's not on already
+  async switchLanguage(locale: 'uk' | 'en') {
+    if (document.documentElement.lang !== locale) await this.clickLanguageButton()
   }
 
   // the install manifest the page links to; it names the installed app (VR-50, VR-51)
@@ -249,26 +271,24 @@ export class GamePage {
     }
   }
 
-  // the info button next to the setup title (UP-1)
-  private get setupRulesButton() {
-    return this.wrapper.find<HTMLButtonElement>('button[data-setup-rules-button]')
+  // the "How to play →" link at the end of the setup's goal sentence (NG-6)
+  private get howToPlayLink() {
+    return this.wrapper.find<HTMLButtonElement>('[data-setup-goal] button')
   }
 
-  // what the setup's info button tells assistive technology, or null when setup shows none (UP-1)
-  setupRulesButtonState() {
-    const button = this.setupRulesButton
-    if (!button.exists()) return null
-    return {
-      label: button.attributes('aria-label'),
-      haspopup: button.attributes('aria-haspopup'),
-      expanded: button.attributes('aria-expanded'),
-    }
+  // where the page has an info button labelled like the header's: 'header' or 'page' for each (NG-9)
+  rulesInfoButtons() {
+    const label = this.rulesButton.attributes('aria-label')
+    return this.wrapper
+      .findAll('button')
+      .filter((button) => button.attributes('aria-label') === label)
+      .map((button) => (this.header.element.contains(button.element) ? 'header' : 'page'))
   }
 
-  // Opens the panel with the header's info button or the one next to the setup title (UP-1).
+  // Opens the panel with the header's info button or the setup's "How to play" link (NG-6).
   // The button doesn't get focus first: Safari and touch screens don't focus a clicked button (UP-2).
-  async openRules({ from = 'header' }: { from?: 'header' | 'setup' } = {}) {
-    const button = from === 'setup' ? this.setupRulesButton : this.rulesButton
+  async openRules({ from = 'header' }: { from?: 'header' | 'how to play' } = {}) {
+    const button = from === 'how to play' ? this.howToPlayLink : this.rulesButton
     ;(document.activeElement as HTMLElement | null)?.blur()
     await button.trigger('click')
     await flushPromises()
@@ -299,6 +319,24 @@ export class GamePage {
   // the rules points, joined, as the open panel shows them
   rulesText() {
     return this.rulesPanel.get('ol[data-rules-steps]').text()
+  }
+
+  // The open panel's goal sentence (NG-7): its text, the bold game name in it, and whether it is
+  // the only paragraph between the heading and the steps.
+  rulesGoal() {
+    const panel = this.rulesPanel.element
+    const goal = panel.querySelector<HTMLElement>('[data-rules-goal]')
+    if (!goal) return null
+    const heading = panel.querySelector('h2')!
+    const steps = panel.querySelector('ol[data-rules-steps]')!
+    const between = [...panel.querySelectorAll('p, ol, ul')].filter(
+      (el) => follows(el, heading) && follows(steps, el),
+    )
+    return {
+      sentence: goal.textContent!.trim(),
+      boldName: goal.querySelector('strong')?.textContent?.trim() ?? null,
+      firstBeforeSteps: between.length === 1 && between[0] === goal,
+    }
   }
 
   // each rules point as the open panel shows it, without its number
@@ -371,14 +409,14 @@ export class GamePage {
   }
 
   // where keyboard focus is
-  focus(): 'rules panel' | 'info button' | 'setup info button' | 'elsewhere' {
+  focus(): 'rules panel' | 'info button' | 'how to play link' | 'elsewhere' {
     const active = document.activeElement
     if (active && this.rulesPanel.exists() && this.rulesPanel.element.contains(active)) {
       return 'rules panel'
     }
     if (active === this.rulesButton.element) return 'info button'
-    if (this.setupRulesButton.exists() && active === this.setupRulesButton.element) {
-      return 'setup info button'
+    if (this.howToPlayLink.exists() && active === this.howToPlayLink.element) {
+      return 'how to play link'
     }
     return 'elsewhere'
   }
@@ -417,6 +455,35 @@ export class GamePage {
 
   get isSetupShown() {
     return this.wrapper.find('form').exists()
+  }
+
+  // The setup screen's top (NG-5, NG-6, NG-8): the goal sentence without its link, the bold game
+  // name in it, the "How to play" link at its end and whether that is tall enough to tap below
+  // 640 px (44 px, read from the unprefixed Tailwind classes: jsdom has no layout), then the title
+  // and whether it sits after the goal and above the form.
+  setupIntro() {
+    const goal = this.wrapper.find<HTMLElement>('[data-setup-goal]')
+    if (!goal.exists()) return null
+    const link = this.howToPlayLink
+    const title = this.wrapper.get<HTMLElement>('[data-setup-title]')
+    const linkText = link.exists() ? link.text() : ''
+    const phoneClasses = link.exists() ? link.classes().filter((c) => !c.includes(':')) : []
+    return {
+      sentence: goal.text().replace(linkText, '').trim(),
+      boldName: goal.find('strong').exists() ? goal.get('strong').text() : null,
+      link: link.exists()
+        ? {
+            text: linkText,
+            atEnd: goal.element.lastElementChild === link.element,
+            tapHeight44BelowSm: phoneClasses.some((c) =>
+              /^(min-h|h|size)-(1[1-9]|[2-9]\d)$/.test(c),
+            ),
+          }
+        : null,
+      title: title.text(),
+      titleAfterGoal: follows(title.element, goal.element),
+      titleAboveForm: follows(this.wrapper.get('form').element, title.element),
+    }
   }
 
   async submitSetup({
@@ -975,13 +1042,14 @@ export class GamePage {
     }))
   }
 
-  // Rematch and New game settings; first = who moves first after a rematch
+  // Rematch and Settings; first = who moves first after a rematch
   async rematch(first: 1 | 2 = 1) {
     await this.withFirstPlayer(first, () => this.click('Rematch'))
   }
 
-  async newGameSettings() {
-    await this.click('New game settings')
+  // the result panel's Settings button: back to setup (END-5, NG-10)
+  async openSettings() {
+    await this.click('Settings')
   }
 
   // ---- names (GB-5) ----
@@ -1021,6 +1089,11 @@ function swatchKeyOf(name: string | undefined): SwatchKey | null {
 
 function buttonLabelsIn(el: Element) {
   return [...el.querySelectorAll('button')].map((button) => button.textContent!.trim())
+}
+
+// whether `el` comes after `other` in document order
+function follows(el: Element, other: Element) {
+  return !!(other.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING)
 }
 
 function ancestry(el: Element): Element[] {
