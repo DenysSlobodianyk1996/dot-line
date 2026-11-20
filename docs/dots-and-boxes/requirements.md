@@ -185,7 +185,7 @@ Acceptance:
 - **PV-1**: The privacy policy's text exists once and both places show it: the in-app privacy screen and the static page that Google Play links to (AR-15). Same sections, same "Updated" date (the date of the build's commit), same contact and developer lines.
 - **PV-2**: The in-app privacy screen (opened from the footer, FT-4) shows the policy in the interface language under the usual header, and follows a language switch.
 - **PV-3**: Leaving the privacy screen: its "Back to the game" button and the Android back button both return to the game; neither closes the app.
-- **PV-4**: The static page at `<pages>/dots-and-boxes/privacy/` works without JavaScript: English and Ukrainian on one page, the app's look, light or dark from the device, and a link to open the game.
+- **PV-4**: The static page at `<pages>/dots-and-boxes/privacy/` works without JavaScript: the app's header with the logo and the game's name (no theme, rules or language buttons: they need JavaScript), English and Ukrainian on one page, the app's look, light or dark from the device, and a link to open the game.
 
 Acceptance:
 - Given the setup screen, when the player taps Privacy, then the privacy screen shows "Privacy policy" (or "Політика конфіденційності") with the date, the email, the GitHub link and "Created by Denys Slobodianyk".

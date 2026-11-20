@@ -43,6 +43,15 @@ describe('static privacy page', () => {
     expect(doc.title).toBe('Privacy policy · Dots and Boxes')
   })
 
+  it("has the app's header with the logo and the game's name, and no buttons", async () => {
+    const doc = await render()
+
+    const header = doc.querySelector('header')
+    expect(header?.querySelector('[data-app-logo] svg')).not.toBeNull()
+    expect(header?.querySelector('[data-app-title]')?.textContent?.trim()).toBe('Dots and Boxes')
+    expect(header?.querySelectorAll('button')).toHaveLength(0)
+  })
+
   it('links back to the game', async () => {
     const doc = await render()
 

@@ -1,5 +1,7 @@
 <template>
-  <!-- the static store page (privacy/index.html, PV-4): both languages, no script -->
+  <!-- the static store page (privacy/index.html, PV-4): the app's header with the brand only
+       (its buttons need JavaScript), then both languages, no script -->
+  <AppHeader />
   <main class="mx-auto flex max-w-2xl flex-col gap-6">
     <nav aria-label="Language / Мова" class="flex gap-3">
       <a href="#en" hreflang="en" :class="LINK_CLASS">English</a>
@@ -17,6 +19,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import AppHeader from '@/shared/components/AppHeader.vue'
 import PrivacyContent from '@/shared/components/PrivacyContent.vue'
 
 const { t } = useI18n()
