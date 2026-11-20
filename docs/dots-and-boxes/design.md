@@ -128,7 +128,8 @@ Spec: [short-name-and-goal/spec.md](../short-name-and-goal/spec.md) (stories NG-
 
 - `PrivacyContent.vue` (`src/shared/components/`, props `locale`, `headingLevel`): a card (`rounded-2xl border border-border bg-surface p-5`) with the title, the game's name, "Updated: <date>" (`formatPrivacyDate`, `src/utils/privacy-date.ts`, in a `<time>`), four sections (`privacy.<key>Title` + `privacy.<key>`), Contact (email `mailto:` and the GitHub issues link) and Developer ("Created by …").
 - `src/pages/privacy/Page.vue` (route `/privacy-policy`, name `privacy`): the content in the interface language and a secondary "Back to the game" button (full width below `sm`, 44 px tall) that goes back in history, or to `/game` on a direct visit [PV-3]. The Android back button on this screen goes to `/game` (`src/native/back-button.ts`).
-- `src/pages/privacy/PrivacyStaticPage.vue`: a language nav (#en, #uk), the English then the Ukrainian content (`h1`, then `h2`), and "Open the game · Відкрити гру" to `../` [PV-4].
+- `src/shared/components/AppHeader.vue`: the header's brand (`AppLogo` and `app.shortName`) with a default slot on the right for the tools. `App.vue` fills it with the theme, rules and language buttons; the static page renders it with the brand only, as teach-clock's `HeaderBar` [VR-18, PV-4].
+- `src/pages/privacy/PrivacyStaticPage.vue`: the brand-only `AppHeader`, then a language nav (#en, #uk), the English then the Ukrainian content (`h1`, then `h2`), and "Open the game · Відкрити гру" to `../` [PV-4].
 - **Contact**: `mailto:CONTACT_EMAIL?subject=Contact support from Dots and Boxes` (`src/static/contact.ts`; the subject stays in English).
 - Message keys: `footer.privacy`, `footer.contact`.
 
