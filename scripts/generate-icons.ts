@@ -64,3 +64,17 @@ for (const [name, image] of Object.entries(androidSources)) {
   await writeFile(`${assetsDir}${name}`, await image)
 }
 console.log(`Android icon and splash sources written to ${assetsDir}`)
+
+// The launch splash Android 11 and older show (the launch theme's window background and the
+// @capacitor/splash-screen plugin) is drawable/launch_splash.xml: cream with this logo drawn
+// unscaled in the middle. A full-screen bitmap would be stretched to the screen's shape and turn
+// the round dots into ovals (AR-5). 112 dp per density bucket, about the size it had before.
+const androidRes = fileURLToPath(new URL('../android/app/src/main/res/', import.meta.url))
+const SPLASH_ICON_DP = 112
+const DENSITIES = { mdpi: 1, hdpi: 1.5, xhdpi: 2, xxhdpi: 3, xxxhdpi: 4 } as const
+for (const [bucket, factor] of Object.entries(DENSITIES)) {
+  const dir = `${androidRes}drawable-${bucket}/`
+  await mkdir(dir, { recursive: true })
+  await writeFile(`${dir}splash_icon.png`, await png(logoSvg(transparent), SPLASH_ICON_DP * factor))
+}
+console.log(`Android splash icon written to ${androidRes}drawable-*/splash_icon.png`)

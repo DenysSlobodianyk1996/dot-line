@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The launch splash on Android 11 and older (AR-5): the launch theme's window background and the
+     @capacitor/splash-screen plugin's image (capacitor.config.ts). Cream with the logo drawn
+     unscaled in the middle, so it stays round on every screen shape; the full-screen splash.png
+     files @capacitor/assets writes would be stretched. splash_icon comes from npm run generate-icons. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/splash_background" />
+    <item>
+        <bitmap android:gravity="center" android:src="@drawable/splash_icon" />
+    </item>
+</layer-list>

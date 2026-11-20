@@ -115,3 +115,13 @@ body {
     calc(--spacing(--value(integer)) + var(--safe-bottom))
     calc(--spacing(--value(integer)) + var(--safe-left));
 }
+
+/* the app shell is exactly the screen's height and never scrolls; only its <main> does (MB-11).
+   vh first: old Android WebViews have no dvh (AR-21). dvh sits behind @supports because the
+   minifier drops a plain `height: 100vh; height: 100dvh` fallback pair */
+@utility h-app {
+  height: 100vh;
+  @supports (height: 1dvh) {
+    height: 100dvh;
+  }
+}
