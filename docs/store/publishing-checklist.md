@@ -83,8 +83,10 @@ The Play API can't create an app's first release, so this one upload is manual.
 - [ ] Release notes from [en.md](en.md) and [uk.md](uk.md); start a full (100%) or staged rollout; send for review.
 - [ ] Once live, open the listing on a phone in both languages and check the texts, screenshots, rating, "No data collected" label and privacy link.
 
-## 8. Every later release is a tag push
+## 8. Every later release is `npm run release`
 
-- [ ] Bump nothing by hand: `versionName` is the tag without `v`, and `versionCode` = `major*10000 + minor*100 + patch` (spec AR-11). Minor and patch stay at 0..99, and each tag must be higher than the last one Play has seen; a malformed tag (`v1.2`, `v1.2.3-beta`) stops the workflow before it builds.
-- [ ] `git tag vX.Y.Z && git push origin vX.Y.Z` runs the **Android release** workflow (`.github/workflows/android-release.yml`): tests, a signed AAB attached to the run as `app-release-X.Y.Z`, and an upload to the **internal** track (AR-10). If the upload fails (for example the service account lacks release rights), fix it and re-run the job, or upload the attached AAB by hand.
+- [ ] Bump nothing by hand: every merge to `master` raises the version by one. `versionName` = `MAJOR.MINOR` from `package.json` plus the merges on master since 1.0.0 (`1.0.7` after seven merges), and `versionCode` = `10000` + those merges (spec AR-11, PV-5; `scripts/app-version.ts`). Raise `MAJOR.MINOR` in `package.json` by hand for a big change; the code keeps counting.
+- [ ] The web app shows the new version on its privacy pages as soon as the merge is deployed. To send that same commit to Play, run **`npm run release`** on an up-to-date, clean `master`: it tags the commit with its own version (`v1.0.7`) and pushes the tag. With nothing merged since the last release it stops, because that tag already exists. A hand-made tag that isn't the commit's version stops the workflow before it builds.
+- [ ] A local signed build (`npm run android:build` with the keystore) refuses to run without `ANDROID_VERSION_NAME` and `ANDROID_VERSION_CODE` (`node scripts/app-version.ts` prints both), so it can't make another 1.0.0 by accident.
+- [ ] The tag push runs the **Android release** workflow (`.github/workflows/android-release.yml`): tests, a signed AAB attached to the run as `app-release-X.Y.Z`, and an upload to the **internal** track (AR-10). If the upload fails (for example the service account lacks release rights), fix it and re-run the job, or upload the attached AAB by hand.
 - [ ] Check it on a device from the internal track, then promote it to closed testing or production by hand in Play Console, with release notes in both languages.

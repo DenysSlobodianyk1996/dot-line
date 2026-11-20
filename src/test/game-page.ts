@@ -280,6 +280,7 @@ export class GamePage {
       lang: content.attributes('lang'),
       title: content.get('h1').text(),
       updated: content.get('[data-privacy-updated]').text(),
+      version: content.get('[data-privacy-version]').text(),
       author: content.get('[data-privacy-author]').text(),
       links: content.findAll('a').map((link) => link.attributes('href')),
       back: screen.get('[data-privacy-back]').text(),

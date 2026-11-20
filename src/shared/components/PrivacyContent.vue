@@ -13,6 +13,8 @@
     <p data-privacy-updated class="mt-3 text-muted">
       {{ t('privacy.updated') }} <time :datetime="PRIVACY_UPDATED">{{ updated }}</time>
     </p>
+    <!-- the same version in the web app and the Android app built from one commit (PV-5) -->
+    <p data-privacy-version class="text-muted">{{ t('privacy.version') }} {{ APP_VERSION }}</p>
 
     <template v-for="key in SECTIONS" :key="key">
       <component :is="subheading" :class="SUBHEADING_CLASS">{{ t(`privacy.${key}Title`) }}</component>
@@ -42,7 +44,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { CONTACT_EMAIL, GITHUB_ISSUES_URL, PRIVACY_UPDATED } from '@/static'
+import { APP_VERSION, CONTACT_EMAIL, GITHUB_ISSUES_URL, PRIVACY_UPDATED } from '@/static'
 import { formatPrivacyDate } from '@/utils'
 
 const props = withDefaults(

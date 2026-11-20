@@ -24,6 +24,8 @@ const en = {
   privacy: {
     title: 'Privacy policy',
     updated: 'Updated:',
+    // the app's version under the date (PV-5)
+    version: 'Version:',
     noDataTitle: 'No personal data',
     noData:
       'The app does not collect any personal data. It does not send data to any server, store data remotely or share data with anyone.',
