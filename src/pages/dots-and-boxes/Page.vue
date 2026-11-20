@@ -1,14 +1,15 @@
 <template>
-  <div>
+  <AppScreen>
     <component
       :is="componentConfig.component"
       v-bind="componentConfig.props"
       v-on="componentConfig.listeners"
     >
     </component>
-    <!-- the setup screen ends with Privacy and Contact; the game screen has no footer (FT-2) -->
-    <AppFooter v-if="!dotsAndBoxesGame.isGameStarted" />
-  </div>
+    <!-- the setup screen ends with Privacy and Contact, pinned below it; the game screen has no
+         footer (FT-1, FT-2, MB-11) -->
+    <template v-if="!dotsAndBoxesGame.isGameStarted" #footer><AppFooter /></template>
+  </AppScreen>
 </template>
 
 <script setup lang="ts">
@@ -17,6 +18,7 @@ import { computed, reactive } from 'vue'
 import GameSetup from './game-setup/GameSetup.vue'
 import Game from './Game.vue'
 import AppFooter from '@/shared/components/AppFooter.vue'
+import AppScreen from '@/shared/components/AppScreen.vue'
 import { StorageService } from '@/services/storage.service.ts'
 import { CURRENT_GAME } from '@/static/storage-keys.ts'
 

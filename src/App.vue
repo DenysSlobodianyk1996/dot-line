@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen overflow-y-auto p-safe-2">
+  <!-- the screen's height and never scrolls: the header stays on top and each screen scrolls
+       inside its own <main> (AppScreen.vue, MB-11) -->
+  <div data-app-shell class="flex h-app flex-col overflow-hidden p-safe-2">
     <!-- every screen: game name on the left; theme, rules and language on the right (VR-18, VR-21, VR-23) -->
     <AppHeader>
       <ThemeToggle />

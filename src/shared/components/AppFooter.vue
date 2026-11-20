@@ -1,6 +1,7 @@
 <template>
-  <!-- the setup screen's footer: Privacy and Contact, nothing else (FT-1..FT-4) -->
-  <footer data-app-footer class="mx-auto mt-6 max-w-130 border-t border-border pt-1">
+  <!-- the setup screen's footer: Privacy and Contact, nothing else, pinned to the bottom below
+       the scrolling screen (FT-1..FT-4, MB-11) -->
+  <footer data-app-footer class="mx-auto mt-2 w-full max-w-130 border-t border-border pt-1">
     <nav class="flex flex-wrap justify-center gap-x-5 gap-y-1">
       <!-- the in-app privacy screen: offline, in the Android app, with a way back (FT-4, PV-2) -->
       <RouterLink data-footer-privacy :to="{ name: 'privacy' }" :class="LINK_CLASS">

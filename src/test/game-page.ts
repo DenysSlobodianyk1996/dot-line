@@ -219,6 +219,37 @@ export class GamePage {
     return theme === 'light' || theme === 'dark' ? theme : null
   }
 
+  // ---- layout ----
+
+  // how the app is laid out (MB-11): the shell is the screen's height and never scrolls; the
+  // header sits above the one scrolling <main>, which holds the screen, and the footer (if any)
+  // below it. jsdom has no layout, so this reads the structure and the classes that make it so.
+  layout() {
+    const shell = this.wrapper.get('[data-app-shell]')
+    const mains = shell.findAll('main')
+    const main = mains[0]
+    const footer = shell.find('footer[data-app-footer]')
+    const inMain = (selector: string) => main?.find(selector).exists() ?? false
+    const screen = ['form', '[data-privacy-screen]', 'button[aria-label^="Dot row"]'].find(inMain)
+    return {
+      shellFillsScreen: shell.classes().includes('h-app'),
+      shellScrolls: !shell.classes().includes('overflow-hidden'),
+      mains: mains.length,
+      mainScrolls: Boolean(main?.classes().includes('overflow-y-auto')),
+      headerAboveMain: Boolean(
+        main && !main.find('header').exists() && follows(main.element, shell.get('header').element),
+      ),
+      screenInMain: screen !== undefined,
+      footer: !footer.exists()
+        ? null
+        : {
+            belowMain: Boolean(
+              main && !main.find('footer').exists() && follows(footer.element, main.element),
+            ),
+          },
+    }
+  }
+
   // ---- footer ----
 
   // the setup screen's footer links, in order, or null when there is no footer (FT-1, FT-2)

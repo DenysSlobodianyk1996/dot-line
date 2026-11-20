@@ -112,12 +112,15 @@ Acceptance:
 - **MB-8**: Below 640 px wide, buttons on the game screen are at least 44 px tall.
 - **MB-9**: On every screen width, the setup form and the game screen (the board with its panel, in progress or finished, side by side or stacked) are centered horizontally below the header, which keeps its full width. They stay top-aligned: nothing is centered vertically, so validation messages, the mode switch or the result replacing the status never move the content up or down.
 - **MB-10**: When the player cards sit side by side, a validation message in one card never moves the fields of the other card. Each card's fields stay top-aligned, and the cards keep the same height.
+- **MB-11**: The app never scrolls as a whole, as in teach-clock: it is exactly the screen's height (the browser window, or the phone screen in the Android app). The header stays at the top and, on the setup screen, the footer (FT-1) stays at the bottom; only the screen between them (setup, game or privacy) scrolls, inside itself, when it is taller than the space left. Scrolling it to its end never moves or bounces the header or the footer.
 
 Acceptance:
 - Given a 390 px wide phone and N=4, then squares are 48 px and the board is centered above the panel.
 - Given a 390 px wide phone and N=10, then squares are 34 px and the whole board is visible without scrolling.
 - Given a 320 px wide phone, when I press Stop, then the dialog has at least 16 px of space on both sides.
 - Given a 1024 px wide screen, then the layout is the desktop one (board with the panel beside it).
+- Given a 360×640 phone on the setup screen, when I scroll, then only the form moves: the header stays on top and the footer stays at the bottom.
+- Given any screen that fits, then nothing scrolls.
 
 ## RL: Rules
 
@@ -170,7 +173,7 @@ Acceptance:
 
 ## FT: Footer
 
-- **FT-1**: The setup screen ends with a footer holding two links and nothing else, as in teach-clock: Privacy, which opens the privacy policy (AR-15), and Contact, which opens an email to the developer with the subject "Contact support from Dots and Boxes".
+- **FT-1**: The setup screen ends with a footer, pinned to the bottom of the screen (MB-11), holding two links and nothing else, as in teach-clock: Privacy, which opens the privacy policy (AR-15), and Contact, which opens an email to the developer with the subject "Contact support from Dots and Boxes".
 - **FT-2**: The footer belongs to the setup screen only. The game screen, in progress or finished, has none.
 - **FT-3**: The links follow the language ("Конфіденційність" and "Зв’язатися" in Ukrainian). Below 640 px wide each link is at least 44 px tall.
 - **FT-4**: Privacy opens the in-app privacy screen (PV-2), so it works offline and in the Android app (AR-2).
