@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 // Version and signing come from env vars, so releasing never edits this file (AR-11, AR-12).
-// Releases are `npm run release` (a tag; CI sets the version from it). Unsigned local builds use
+// Releases are `npm run release` (a tag; CI sets the commit's version, scripts/app-version.ts). Unsigned local builds use
 // the defaults; without ANDROID_KEYSTORE_FILE the release bundle is unsigned.
 def env = System.getenv()
 def keystoreFile = env.ANDROID_KEYSTORE_FILE
@@ -10,7 +10,7 @@ def keystoreFile = env.ANDROID_KEYSTORE_FILE
 if (keystoreFile && !(env.ANDROID_VERSION_NAME && env.ANDROID_VERSION_CODE)) {
     throw new GradleException(
         "A signed build needs ANDROID_VERSION_NAME and ANDROID_VERSION_CODE. Release with " +
-        "`npm run release` instead, or set both, e.g. from `node scripts/android-version.ts v1.0.2`.")
+        "`npm run release` instead, or set both from `node scripts/app-version.ts`.")
 }
 def appVersionName = env.ANDROID_VERSION_NAME ?: "1.0.0"
 def appVersionCode = (env.ANDROID_VERSION_CODE ?: "10000") as Integer

@@ -21,15 +21,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          # the whole history: the version counts merges since 1.0.0 (scripts/app-version.ts)
+          fetch-depth: 0
 
       - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
 
-      # fails on a malformed tag (e.g. v1.2, v1.2.3-beta) before anything is built
-      - name: Version from the tag
-        run: node scripts/android-version.ts "$GITHUB_REF_NAME" >> "$GITHUB_ENV"
+      # the commit's own version (1.0.<merges since 1.0.0>), the same the web app shows (PV-5);
+      # fails before anything is built unless the tag is that version (npm run release makes it)
+      - name: Version of this commit
+        run: node scripts/app-version.ts "$GITHUB_REF_NAME" >> "$GITHUB_ENV"
 
       - run: npm ci
 

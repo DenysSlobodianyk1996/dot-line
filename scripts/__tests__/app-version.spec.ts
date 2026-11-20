@@ -1,44 +1,56 @@
 import { describe, expect, it } from 'vitest'
-import { appVersion, latestVersion, nextReleaseTag } from '../app-version'
+import { appVersion, checkReleaseTag, currentVersion, versionFor } from '../app-version'
 
-describe('nextReleaseTag: the tag npm run release creates (AR-11)', () => {
-  it('follows 1.0.0, which went to Play by hand without a tag', () => {
-    expect(nextReleaseTag([])).toBe('v1.0.1')
+describe('versionFor: one version per commit, one higher after every merge (PV-5, AR-11)', () => {
+  it('is 1.0.0 (code 10000) at the commit released by hand', () => {
+    expect(versionFor('1.0.0', 0)).toEqual({ name: '1.0.0', code: 10000 })
   })
 
-  it('raises the patch of the highest release tag, comparing numbers, not text', () => {
-    expect(nextReleaseTag(['v1.0.1', 'v1.0.10', 'v1.0.9'])).toBe('v1.0.11')
-    expect(nextReleaseTag(['v1.2.3', 'v1.10.0'])).toBe('v1.10.1')
+  it('counts merges since then as the patch and adds them to the code, with no 99 limit', () => {
+    expect(versionFor('1.0.0', 1)).toEqual({ name: '1.0.1', code: 10001 })
+    expect(versionFor('1.0.0', 250)).toEqual({ name: '1.0.250', code: 10250 })
   })
 
-  it('ignores tags that are not releases', () => {
-    expect(nextReleaseTag(['v2.0.0-beta', 'latest', 'v1.0.4'])).toBe('v1.0.5')
+  it('takes major and minor from package.json; the code keeps growing when they change', () => {
+    expect(versionFor('1.1.0', 31)).toEqual({ name: '1.1.31', code: 10031 })
+    expect(versionFor('2.0.5', 40)).toEqual({ name: '2.0.40', code: 10040 })
   })
 
-  it('keeps minor and patch within 0..99, so Android version codes stay unique', () => {
-    expect(nextReleaseTag(['v1.0.99'])).toBe('v1.1.0')
-    expect(nextReleaseTag(['v1.99.99'])).toBe('v2.0.0')
+  it('rejects a package version or count that is not one', () => {
+    expect(() => versionFor('1.0', 1)).toThrow(/MAJOR.MINOR.PATCH/)
+    expect(() => versionFor('1.0.0', -1)).toThrow(/merge count/)
   })
 })
 
-describe('appVersion: the version a build shows, the same on the web and Android (FT-5)', () => {
-  const tags = () => ['v1.0.1', 'v1.0.2']
+describe('appVersion: what a build shows, the same on the web and Android (PV-5)', () => {
+  const current = () => '1.0.7'
 
-  it('is the latest release tag, so the web app shows what was last released', () => {
-    expect(appVersion({ tags })).toBe('1.0.2')
-    expect(latestVersion(tags())).toBe('1.0.2')
+  it("is the commit's own version", () => {
+    expect(appVersion({ current })).toBe('1.0.7')
   })
 
-  it('is the tag the Android release builds', () => {
-    expect(appVersion({ androidVersionName: '1.0.3', tags })).toBe('1.0.3')
+  it('is the version the Android release builds', () => {
+    expect(appVersion({ androidVersionName: '1.0.6', current })).toBe('1.0.6')
   })
 
-  it('takes a version given in VITE_APP_VERSION first', () => {
-    expect(appVersion({ given: '1.0.1', androidVersionName: '1.0.3', tags })).toBe('1.0.1')
+  it('takes a version given in VITE_APP_VERSION first, and ignores names that are not versions', () => {
+    expect(appVersion({ given: '1.0.3', androidVersionName: '1.0.6', current })).toBe('1.0.3')
+    expect(appVersion({ given: 'next', current })).toBe('1.0.7')
   })
 
-  it('is 1.0.0, the first release, with no tags or no git; ignores names that are not versions', () => {
-    expect(appVersion({ tags: () => [] })).toBe('1.0.0')
-    expect(appVersion({ given: 'next', androidVersionName: '', tags: () => [] })).toBe('1.0.0')
+  it('is 1.0.0 without git history', () => {
+    expect(appVersion({ current: () => null })).toBe('1.0.0')
+  })
+
+  it('works out this checkout, from the history back to 1.0.0', () => {
+    expect(currentVersion()?.name).toMatch(/^1\.0\.\d+$/)
+  })
+})
+
+describe('checkReleaseTag: a release tag is the commit’s own version', () => {
+  it('accepts v + the version and refuses any other tag', () => {
+    const version = { name: '1.0.4', code: 10004 }
+    expect(() => checkReleaseTag('v1.0.4', version)).not.toThrow()
+    expect(() => checkReleaseTag('v1.0.5', version)).toThrow(/release tag is v1.0.4/)
   })
 })

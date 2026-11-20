@@ -13,16 +13,17 @@ const uk: typeof en = {
     light: 'Світла тема',
     dark: 'Темна тема',
   },
-  // the setup screen's footer (FT-1, FT-3, FT-5)
+  // the setup screen's footer (FT-1, FT-3)
   footer: {
     privacy: 'Конфіденційність',
     contact: 'Зв’язатися',
-    version: 'Версія {version}',
   },
   // the privacy policy: the in-app screen and the static store page share it (AR-15, PV-1)
   privacy: {
     title: 'Політика конфіденційності',
     updated: 'Оновлено:',
+    // the app's version under the date (PV-5)
+    version: 'Версія:',
     noDataTitle: 'Жодних персональних даних',
     noData:
       'Застосунок не збирає жодних персональних даних. Він не надсилає дані на сервер, не зберігає їх віддалено і нікому їх не передає.',

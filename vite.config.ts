@@ -86,9 +86,9 @@ function extraPwaFiles(): Plugin {
 // read the same import.meta.env.VITE_PRIVACY_UPDATED (src/static/privacy.ts).
 process.env.VITE_PRIVACY_UPDATED = privacyUpdated({ given: process.env.VITE_PRIVACY_UPDATED })
 
-// The app's version in the footer (FT-5), the same on the web and Android: VITE_APP_VERSION when
-// set, the Android release's tag (ANDROID_VERSION_NAME), else the latest release tag
-// (scripts/app-version.ts). Read as APP_VERSION (src/static/app-version.ts).
+// The app's version on the privacy pages (PV-5), the same in the web app and the Android app built
+// from one commit: VITE_APP_VERSION when set, the Android release's ANDROID_VERSION_NAME, else the
+// commit's own 1.0.<merges since 1.0.0> (scripts/app-version.ts). Read as APP_VERSION.
 process.env.VITE_APP_VERSION = appVersion({
   given: process.env.VITE_APP_VERSION,
   androidVersionName: process.env.ANDROID_VERSION_NAME,

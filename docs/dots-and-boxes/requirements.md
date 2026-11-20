@@ -173,17 +173,15 @@ Acceptance:
 
 ## FT: Footer
 
-- **FT-1**: The setup screen ends with a footer, pinned to the bottom of the screen (MB-11), holding two links, as in teach-clock, and the app version (FT-5): Privacy, which opens the privacy policy (AR-15), and Contact, which opens an email to the developer with the subject "Contact support from Dots and Boxes".
+- **FT-1**: The setup screen ends with a footer, pinned to the bottom of the screen (MB-11), holding two links and nothing else, as in teach-clock: Privacy, which opens the privacy policy (AR-15), and Contact, which opens an email to the developer with the subject "Contact support from Dots and Boxes".
 - **FT-2**: The footer belongs to the setup screen only. The game screen, in progress or finished, has none.
 - **FT-3**: The links follow the language ("Конфіденційність" and "Зв’язатися" in Ukrainian). Below 640 px wide each link is at least 44 px tall.
 - **FT-4**: Privacy opens the in-app privacy screen (PV-2), so it works offline and in the Android app (AR-2).
-- **FT-5**: Below the links, the footer shows the app version in small muted text: "Version 1.0.2" / «Версія 1.0.2». The web app and the Android app show the same number: the latest release, which `npm run release` tags (the patch goes up by one each time). Nothing is bumped by hand.
 
 Acceptance:
 - Given the setup screen, then a footer shows Privacy and Contact.
 - Given a game in progress or finished, then there is no footer.
 - Given the language is Ukrainian, then the links read "Конфіденційність" and "Зв’язатися".
-- Given release v1.0.2 is the latest, then the footer reads "Version 1.0.2" on the web and in the Android app.
 
 ## PV: Privacy policy
 
@@ -191,11 +189,13 @@ Acceptance:
 - **PV-2**: The in-app privacy screen (opened from the footer, FT-4) shows the policy in the interface language under the usual header, and follows a language switch.
 - **PV-3**: Leaving the privacy screen: its "Back to the game" button and the Android back button both return to the game; neither closes the app.
 - **PV-4**: The static page at `<pages>/dots-and-boxes/privacy/` works without JavaScript: the app's header with the logo and the game's name (no theme, rules or language buttons: they need JavaScript), English and Ukrainian on one page, the app's look, light or dark from the device, and a link to open the game.
+- **PV-5**: Under the "Updated" date, both privacy pages (the in-app screen and the static page) show the app's version: "Version: 1.0.7" / «Версія: 1.0.7». The number goes up by one with every merge to master (1.0.<merges since 1.0.0>, the version Google Play has as 1.0.0 being the first), with nothing bumped by hand, and the web app and the Android app built from the same commit show the same version, which is also the Android versionName.
 
 Acceptance:
 - Given the setup screen, when the player taps Privacy, then the privacy screen shows "Privacy policy" (or "Політика конфіденційності") with the date, the email, the GitHub link and "Created by Denys Slobodianyk".
 - Given the privacy screen, when the player taps "Back to the game" or the Android back button, then the setup screen is back.
 - Given the static page with JavaScript off, then both languages show, styled, in the device's theme.
+- Given a build of the commit 7 merges after 1.0.0, then both privacy pages read "Version: 1.0.7", on the web and in the Android app built from it.
 
 ## APP: App
 

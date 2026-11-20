@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { openGamePage } from '@/test/game-page'
-import { PRIVACY_UPDATED } from '@/static'
+import { APP_VERSION, PRIVACY_UPDATED } from '@/static'
 import { formatPrivacyDate } from '@/utils'
 
 const EMAIL = 'mailto:denys.slobodianyk@gmail.com'
@@ -16,6 +16,7 @@ describe('privacy screen', () => {
       lang: 'en',
       title: 'Privacy policy',
       updated: `Updated: ${formatPrivacyDate(PRIVACY_UPDATED, 'en')}`,
+      version: `Version: ${APP_VERSION}`,
       author: 'Created by Denys Slobodianyk',
       links: [EMAIL, ISSUES],
       back: 'Back to the game',
@@ -33,6 +34,7 @@ describe('privacy screen', () => {
       lang: 'uk',
       title: 'Політика конфіденційності',
       updated: `Оновлено: ${formatPrivacyDate(PRIVACY_UPDATED, 'uk')}`,
+      version: `Версія: ${APP_VERSION}`,
       author: 'Створив Денис Слободяник',
       back: 'Назад до гри',
     })

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { renderPrivacyPage } from '@/privacy-static'
-import { PRIVACY_UPDATED } from '@/static'
+import { APP_VERSION, PRIVACY_UPDATED } from '@/static'
 
 // the static page Google Play links to: the in-app screen's text, both languages, no script (PV-4)
 describe('static privacy page', () => {
@@ -28,6 +28,14 @@ describe('static privacy page', () => {
     expect(
       [...doc.querySelectorAll('time')].map((time) => time.getAttribute('datetime')),
     ).toEqual([PRIVACY_UPDATED, PRIVACY_UPDATED])
+  })
+
+  it("shows the app's version under the date, in both languages (PV-5)", async () => {
+    const doc = await render()
+
+    expect(
+      [...doc.querySelectorAll('[data-privacy-version]')].map((v) => v.textContent?.trim()),
+    ).toEqual([`Version: ${APP_VERSION}`, `Версія: ${APP_VERSION}`])
   })
 
   it('needs no JavaScript: no script, the app stylesheet, dark from the device', async () => {

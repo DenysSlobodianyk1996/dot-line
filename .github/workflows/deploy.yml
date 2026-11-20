@@ -17,9 +17,6 @@ on:
       - '.oxlintrc.json'
       - 'eslint.config.ts'
       - 'LICENSE'
-    # a release tag (`npm run release`) redeploys too, so the web app shows the new version at
-    # the same time as the Android release (FT-5); path filters don't apply to tags
-    tags: ['v*.*.*']
   # manual "Run workflow" button in the Actions tab, for forcing a deploy
   workflow_dispatch:
 
@@ -38,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          # every tag, so the build shows the latest release version (scripts/app-version.ts)
+          # the whole history: the version counts merges since 1.0.0 (scripts/app-version.ts, PV-5)
           fetch-depth: 0
 
       - uses: actions/setup-node@v5

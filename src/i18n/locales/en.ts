@@ -15,16 +15,17 @@ const en = {
     light: 'Light theme',
     dark: 'Dark theme',
   },
-  // the setup screen's footer (FT-1, FT-3, FT-5)
+  // the setup screen's footer (FT-1, FT-3)
   footer: {
     privacy: 'Privacy',
     contact: 'Contact',
-    version: 'Version {version}',
   },
   // the privacy policy: the in-app screen and the static store page share it (AR-15, PV-1)
   privacy: {
     title: 'Privacy policy',
     updated: 'Updated:',
+    // the app's version under the date (PV-5)
+    version: 'Version:',
     noDataTitle: 'No personal data',
     noData:
       'The app does not collect any personal data. It does not send data to any server, store data remotely or share data with anyone.',

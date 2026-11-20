@@ -9,17 +9,13 @@
       </RouterLink>
       <a data-footer-contact :href="contactHref" :class="LINK_CLASS">{{ t('footer.contact') }}</a>
     </nav>
-    <!-- the same version on the web and in the Android app: the latest release (FT-5) -->
-    <p data-footer-version class="text-center text-xs text-muted">
-      {{ t('footer.version', { version: APP_VERSION }) }}
-    </p>
   </footer>
 </template>
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
-import { APP_VERSION, CONTACT_EMAIL, CONTACT_SUBJECT } from '@/static'
+import { CONTACT_EMAIL, CONTACT_SUBJECT } from '@/static'
 
 const { t } = useI18n()
 
