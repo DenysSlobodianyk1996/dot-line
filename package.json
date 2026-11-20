@@ -19,6 +19,7 @@
     "generate-icons": "node scripts/generate-icons.ts",
     "store:screenshots": "node scripts/store-screenshots.ts",
     "build:capacitor": "vite build --mode capacitor",
+    "release": "node scripts/release.ts",
     "android:build": "npm run build:capacitor && cap sync android && cd android && ./gradlew bundleRelease",
     "android:apk": "bash scripts/android-debug-apk.sh",
     "android:install": "bash scripts/android-debug-apk.sh --install",

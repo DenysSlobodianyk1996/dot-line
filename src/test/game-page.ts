@@ -263,6 +263,12 @@ export class GamePage {
     }))
   }
 
+  // the version under the footer links, or null when there is no footer (FT-5)
+  footerVersion() {
+    const version = this.wrapper.find('footer[data-app-footer] [data-footer-version]')
+    return version.exists() ? version.text() : null
+  }
+
   // ---- privacy screen ----
 
   // the footer's Privacy link: opens the in-app privacy screen (FT-4, PV-2)

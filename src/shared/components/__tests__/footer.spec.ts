@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest'
+import { APP_VERSION } from '@/static'
 import { openGamePage, startGame } from '@/test/game-page'
 
 const CONTACT =
   'mailto:denys.slobodianyk@gmail.com?subject=Contact%20support%20from%20Dots%20and%20Boxes'
 
 describe('footer', () => {
-  it('ends the setup screen with Privacy and Contact, nothing else (FT-1, FT-4)', async () => {
+  it('ends the setup screen with two links, Privacy and Contact (FT-1, FT-4)', async () => {
     const page = await openGamePage()
 
     expect(page.footerLinks()).toEqual([
@@ -31,6 +32,15 @@ describe('footer', () => {
       { text: 'Конфіденційність', href: '/privacy-policy' },
       { text: 'Зв’язатися', href: CONTACT },
     ])
+  })
+
+  it('shows the app version under the links, in the interface language (FT-5)', async () => {
+    const page = await openGamePage()
+    expect(page.footerVersion()).toBe(`Version ${APP_VERSION}`)
+    expect(APP_VERSION).toMatch(/^\d+\.\d+\.\d+$/)
+
+    await page.switchLanguage('uk')
+    expect(page.footerVersion()).toBe(`Версія ${APP_VERSION}`)
   })
 
   it('comes back with the setup screen after a game (FT-2)', async () => {

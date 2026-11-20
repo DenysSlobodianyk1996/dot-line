@@ -13,10 +13,11 @@ const uk: typeof en = {
     light: 'Світла тема',
     dark: 'Темна тема',
   },
-  // the setup screen's footer (FT-1, FT-3)
+  // the setup screen's footer (FT-1, FT-3, FT-5)
   footer: {
     privacy: 'Конфіденційність',
     contact: 'Зв’язатися',
+    version: 'Версія {version}',
   },
   // the privacy policy: the in-app screen and the static store page share it (AR-15, PV-1)
   privacy: {

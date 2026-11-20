@@ -14,6 +14,7 @@ import { NOT_THE_APP_PAGES } from './src/static/service-worker'
 import en from './src/i18n/locales/en'
 import uk from './src/i18n/locales/uk'
 import { privacyUpdated } from './scripts/privacy-updated'
+import { appVersion } from './scripts/app-version'
 
 // The Android app's build (`vite build --mode capacitor`): Capacitor serves the bundled files from
 // the root and they ship inside the app, so there is no service worker and no install manifest
@@ -84,6 +85,14 @@ function extraPwaFiles(): Plugin {
 // when set (scripts/privacy-updated.ts). Set here, so the app, the static page and Vitest all
 // read the same import.meta.env.VITE_PRIVACY_UPDATED (src/static/privacy.ts).
 process.env.VITE_PRIVACY_UPDATED = privacyUpdated({ given: process.env.VITE_PRIVACY_UPDATED })
+
+// The app's version in the footer (FT-5), the same on the web and Android: VITE_APP_VERSION when
+// set, the Android release's tag (ANDROID_VERSION_NAME), else the latest release tag
+// (scripts/app-version.ts). Read as APP_VERSION (src/static/app-version.ts).
+process.env.VITE_APP_VERSION = appVersion({
+  given: process.env.VITE_APP_VERSION,
+  androidVersionName: process.env.ANDROID_VERSION_NAME,
+})
 
 // vue-i18n esm-bundler feature flags: Composition API only, no devtools in production
 const I18N_FLAGS = {

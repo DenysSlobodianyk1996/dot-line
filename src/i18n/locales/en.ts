@@ -15,10 +15,11 @@ const en = {
     light: 'Light theme',
     dark: 'Dark theme',
   },
-  // the setup screen's footer (FT-1, FT-3)
+  // the setup screen's footer (FT-1, FT-3, FT-5)
   footer: {
     privacy: 'Privacy',
     contact: 'Contact',
+    version: 'Version {version}',
   },
   // the privacy policy: the in-app screen and the static store page share it (AR-15, PV-1)
   privacy: {
